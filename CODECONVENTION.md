@@ -34,3 +34,19 @@ int second{2};
 double temperature{26.5};
 std::string name{"Alex"};
 ```
+
+**Class**
+
+```
+class MyClass {
+ public:
+  MyClass();
+
+  void SomeFunction();
+
+ private:
+  void SomePrivateFunction();
+
+  int some_variable_;
+};
+```
