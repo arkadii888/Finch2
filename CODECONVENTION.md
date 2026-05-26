@@ -15,7 +15,7 @@
 
 **Looping and branching statements**
 
-```
+```cpp
 if (condition) {
   DoOneThing();
 } else if (condition) {
@@ -29,7 +29,7 @@ if (condition) {
 
 Use brace initialization `{}` by default for all variables and class object creations.
 
-```
+```cpp
 int first{1};
 int second{2};
 double temperature{26.5};
@@ -38,7 +38,7 @@ std::string name{"Alex"};
 
 **Class**
 
-```
+```cpp
 class MyClass {
  public:
   MyClass();
@@ -54,7 +54,7 @@ class MyClass {
 
 **Includes**
 
-```
+```cpp
 #include "my_class.hpp"
 
 #include <system.h>
@@ -64,4 +64,12 @@ class MyClass {
 #include "third_party/hello.h"
 
 #include "my_utils/util.hpp"
+```
+
+**Literals**
+
+```cpp
+int max_users{5'000};
+float delta{0.000'1f};
+double alpha{0.05};
 ```
