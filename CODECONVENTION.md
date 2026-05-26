@@ -55,8 +55,6 @@ class MyClass {
 **Includes**
 
 ```cpp
-#include "my_class.hpp"
-
 #include <system.h>
 
 #include <string>
