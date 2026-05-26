@@ -3,6 +3,7 @@
 ## Naming
 
 - **Files** - snake_case `my_file.hpp`, `my_file.cpp`
+- **Folders** - snake_case `my_folder`
 - **Types** - PascalCase `MyClass`
 - **Variables** - snake_case `my_variable`
 - **Class Members** - snake_case_ `my_variable_`
@@ -49,4 +50,18 @@ class MyClass {
 
   int some_variable_;
 };
+```
+
+**Includes**
+
+```
+#include "my_class.hpp"
+
+#include <system.h>
+
+#include <string>
+
+#include "third_party/hello.h"
+
+#include "my_utils/util.hpp"
 ```
