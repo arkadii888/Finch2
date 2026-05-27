@@ -71,3 +71,9 @@ int max_users{5'000};
 float delta{0.000'1f};
 double alpha{0.05};
 ```
+
+**Logging**
+
+```cpp
+std::cout << "MyClass::MyFunction: Houston, we have a problem." << std::endl;
+```
