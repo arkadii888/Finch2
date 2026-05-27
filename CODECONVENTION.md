@@ -30,10 +30,10 @@ if (condition) {
 Use brace initialization `{}` by default for all variables and class object creations.
 
 ```cpp
-int first{1};
-int second{2};
-double temperature{26.5};
-std::string name{"Alex"};
+int first {1};
+int second {2};
+double temperature {26.5};
+std::string name {"Alex"};
 ```
 
 **Class**
@@ -67,9 +67,9 @@ class MyClass {
 **Literals**
 
 ```cpp
-int max_users{5'000};
-float delta{0.000'1f};
-double alpha{0.05};
+int max_users {5'000};
+float delta {0.000'1f};
+double alpha {0.05};
 ```
 
 **Logging**
