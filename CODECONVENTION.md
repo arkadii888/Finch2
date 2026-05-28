@@ -40,15 +40,15 @@ std::string name {"Alex"};
 
 ```cpp
 class MyClass {
- public:
-  MyClass();
+ public: // 1 space
+    MyClass(); // 4 spaces
 
-  void SomeFunction();
+    void SomeFunction(); 
 
  private:
-  void SomePrivateFunction();
+    void SomePrivateFunction();
 
-  int some_variable_;
+    int some_variable_;
 };
 ```
 
