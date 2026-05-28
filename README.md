@@ -1,6 +1,6 @@
 # Finch2
 
-**Build** 
+**Build & Run** 
 
 ```cpp
 cmake -B build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
