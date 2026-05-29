@@ -66,6 +66,21 @@ class MyClass {
 };
 ```
 
+All logically grouped lines (variables, dependencies, functions, etc.) should be alphabetically sorted with case sensitivity.
+
+```cpp
+struct Telemetry {
+    double latitude_deg {0.0f};
+    double longitude_deg {0.0f};
+    float absolute_altitude_m {0.0f};
+    float current_battery_a {0.0f};
+    float relative_altitude_m {0.0f};
+    float remaining_percent {0.0f};
+    float voltage_v {0.0f};
+    float yaw_deg {0.0f};
+};
+```
+
 **Includes**
 
 *Example:*
@@ -96,23 +111,4 @@ double alpha {0.05};
 
 ```cpp
 std::cout << "MyClass::MyFunction: Houston, we have a problem." << std::endl;
-```
-
-**Line Sorting**
-
-All logically grouped lines (variables, dependencies, functions, etc.) should be alphabetically sorted with case sensitivity.
-
-*Example:*
-
-```cpp
-struct Telemetry {
-    double latitude_deg {0.0f};
-    double longitude_deg {0.0f};
-    float absolute_altitude_m {0.0f};
-    float current_battery_a {0.0f};
-    float relative_altitude_m {0.0f};
-    float remaining_percent {0.0f};
-    float voltage_v {0.0f};
-    float yaw_deg {0.0f};
-};
 ```
