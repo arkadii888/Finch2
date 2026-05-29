@@ -28,9 +28,9 @@ Telemetry DummyDrone::GetTelemetry() {
     t.longitude_deg = -73.757'8;
     t.absolute_altitude_m = 32.193f;
     t.current_battery_a = 10.0f;
-    t.relative_altitude_m = 0.001f;
+    t.relative_altitude_m = 0.000f;
     t.remaining_percent = 100.0f;
-    t.voltage_v = 65.535f;
+    t.voltage_v = 12.6f;
     t.yaw_deg = 180.0f;
     return t;
 }
