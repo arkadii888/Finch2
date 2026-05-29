@@ -4,7 +4,7 @@ void Px4Drone::Init() {
 
 }
 
-void Px4Drone::LaunchMission(const std::any& mission_items) {
+void Px4Drone::LaunchMission(const std::vector<MissionItem>& mission_items) {
 
 }
 
@@ -20,6 +20,6 @@ void Px4Drone::Disarm() {
 
 }
 
-std::any Px4Drone::GetTelemetry() {
-    return 0;
+Telemetry Px4Drone::GetTelemetry() {
+    return {};
 }
