@@ -1,6 +1,6 @@
 # Finch2
 
-## Prerequisites & Compatibility
+## Compatibility
 
 ### Minimum Required Versions
 
