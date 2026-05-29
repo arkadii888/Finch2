@@ -1,10 +1,7 @@
-name: CI
+name: Build Test
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -26,49 +23,23 @@ jobs:
             compiler: apple-clang
             cc: clang
             cxx: clang++
-          - os: windows-2022
-            compiler: msvc
-            cc: cl
-            cxx: cl
-          - os: windows-2022
-            compiler: gcc
-            cc: gcc
-            cxx: g++
-          - os: windows-2022
-            compiler: clang
-            cc: clang
-            cxx: clang++
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install dependencies (Ubuntu)
-      if: matrix.os == 'ubuntu-24.04'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y ${{ matrix.cc }} ${{ matrix.cxx }}
+      - name: Install dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-24.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.cc }} ${{ matrix.cxx }}
 
-    - name: Install dependencies (Windows GCC)
-      if: matrix.os == 'windows-2022' && matrix.compiler == 'gcc'
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: UCRT64
-        update: true
-        install: mingw-w64-ucrt-x86_64-gcc
+      - name: Setup CMake and Ninja
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "~3.28.0"
 
-    - name: Setup CMake and Ninja
-      uses: lukka/get-cmake@latest
-      with:
-        cmakeVersion: "~3.28.0"
+      - name: Configure CMake
+        run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=${{ matrix.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} -DCMAKE_BUILD_TYPE=Release
 
-    - name: Configure CMake
-      shell: bash
-      run: |
-        GENERATOR=""
-        if [ "${{ matrix.os }}" == "windows-2022" ] && [ "${{ matrix.compiler }}" != "msvc" ]; then
-          GENERATOR="-G Ninja"
-        fi
-        cmake -B build $GENERATOR -DCMAKE_C_COMPILER=${{ matrix.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} -DCMAKE_BUILD_TYPE=Release
-
-    - name: Build
-      run: cmake --build build --config Release
+      - name: Build
+        run: cmake --build build --config Release

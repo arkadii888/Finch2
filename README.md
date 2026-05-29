@@ -1,15 +1,13 @@
 # Finch2
 
-## Compatibility
+## Platforms & Compatibility
 
-### Minimum Required Versions
+* 🍏 **Mac**
+  * **Apple Clang 15.0+**: [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=macos-14%20-%20apple-clang)](https://github.com/arkadii888/Finch2/actions)
 
-🛠️ **CMake**: 3.28+
-
-🐂 **GCC**: 13.1+
-🐉 **Clang**: 16.0+
-🍏 **Apple Clang**: 15.0+
-🪟 **MSVC**: 19.30+
+* 🐧 **Linux**
+  * **GCC 13.1+**: [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20gcc)](https://github.com/arkadii888/Finch2/actions)
+  * **Clang 16.0+**: [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20clang)](https://github.com/arkadii888/Finch2/actions)
 
 ## MAVProxy Setup
 
@@ -38,15 +36,6 @@ Scenario: The flight controller is connected to a Mac directly via a USB cable. 
 ```
 pip3 install mavproxy
 mavproxy.py --master=/dev/tty.usbmodem101 --baudrate=921600 --out=udp:127.0.0.1:14540 --out=udp:127.0.0.1:14550
-```
-
-### Windows
-
-Scenario: The flight controller is connected to a Windows PC directly via a USB cable. The C++ code and QGroundControl are running on the same PC.
-
-```
-pip install mavproxy
-mavproxy.py --master=COM3 --baudrate=921600 --out=udp:127.0.0.1:14540 --out=udp:127.0.0.1:14550
 ```
 
 ## Building and Running
