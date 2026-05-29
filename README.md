@@ -42,7 +42,7 @@ mavproxy.py --master=/dev/tty.usbmodem101 --baudrate=921600 --out=udp:127.0.0.1:
 
 ### Windows
 
-Scenario: The controller is connected to a Windows PC directly via a USB cable. The C++ code and QGroundControl are running on the same PC.
+Scenario: The flight controller is connected to a Windows PC directly via a USB cable. The C++ code and QGroundControl are running on the same PC.
 
 ```
 pip install mavproxy
