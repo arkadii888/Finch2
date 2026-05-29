@@ -83,9 +83,9 @@ struct Telemetry {
 
 **Includes**
 
-*Example:*
-
 Include headers in the following order: Related header, C system headers, C++ standard library headers, other libraries' headers, your project's headers.
+
+*Example:*
 
 ```cpp
 #include <system.h>
