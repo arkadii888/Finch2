@@ -18,7 +18,7 @@ void Px4Drone::Init() {
     mission_ = std::make_unique<mavsdk::Mission>(system_);
     telemetry_ = std::make_unique<mavsdk::Telemetry>(system_);
 
-    while(!telemetry_->health_all_ok()) {
+    while (!telemetry_->health_all_ok()) {
         std::cout << "Px4Drone::Init: Drone is not ready to arm yet..." << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
