@@ -99,11 +99,13 @@ Include headers in the following order: Related header, C system headers, C++ st
 
 **Literals**
 
+Use digit separators ```'``` for large numbers to improve readability. Use appropriate literal suffixes for floating-point types.
+
 *Example:*
 
 ```cpp
 int max_users {5'000};
-float delta {0.000'1f};
+float delta {0.000'01f};
 double alpha {0.05};
 ```
 
