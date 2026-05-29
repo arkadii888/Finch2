@@ -4,13 +4,16 @@
 
 ### Minimum Required Versions
 
-**GCC**: 13.1+
-**Clang**: 16.0+
-**Apple Clang**: 15.0+
-**MSVC**: 19.30+
-**CMake**: 3.28+
+🛠️ **CMake**: 3.28+
+
+🐂 **GCC**: 13.1+
+🐉 **Clang**: 16.0+
+🍏 **Apple Clang**: 15.0+
+🪟 **MSVC**: 19.30+
 
 ## Building and Running
+
+CMake will automatically download and build **MAVSDK v3.17.1** during the first configuration step.
 
 ### Debug Build
 
