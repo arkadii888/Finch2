@@ -2,14 +2,22 @@
 
 ## Naming
 
-- **Files** - snake_case. Example: `my_file.hpp`, `my_file.cpp`
-- **Folders** - snake_case. Example: `my_folder`
-- **Types** - PascalCase. Example: `MyClass`
-- **Variables** - snake_case. Example: `my_variable`
-- **Class Members** - snake_case_. Example: `my_variable_`
-- **Constants** - UPPER_CASE. Example: `MY_VALUE`
-- **Enums** - PascalCase. Example: `MyEnum`
-- **Functions** - PascalCase. Example: `MyFunction()`
+- **Files** - snake_case. 
+Example: `my_file.hpp`, `my_file.cpp`
+- **Folders** - snake_case. 
+Example: `my_folder`
+- **Types** - PascalCase. 
+Example: `MyClass`
+- **Variables** - snake_case. 
+Example: `my_variable`
+- **Class Members** - snake_case_. 
+Example: `my_variable_`
+- **Constants** - UPPER_CASE. 
+Example: `MY_VALUE`
+- **Enums** - PascalCase. 
+Example: `MyEnum`
+- **Functions** - PascalCase. 
+Example: `MyFunction()`
 
 ## Formatting
 
