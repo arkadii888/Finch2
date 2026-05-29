@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 3.28)
 
 project(Finch2 CXX)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+        OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        AND NOT APPLE)
+
+    set(CMAKE_CXX_FLAGS_RELEASE
+            "${CMAKE_CXX_FLAGS_RELEASE} -march=native"
+        )
+  endif()
+endif()
+
 add_compile_options(-Wno-address-of-packed-member)
 
 set(CMAKE_CXX_STANDARD 20)
