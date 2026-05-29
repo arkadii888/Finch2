@@ -42,7 +42,7 @@ void Px4Drone::Disarm() {
 }
 
 Telemetry Px4Drone::GetTelemetry() {
-    Telemetry t{};
+    Telemetry t;
 
     auto position {telemetry_->position()};
     auto battery {telemetry_->battery()};
