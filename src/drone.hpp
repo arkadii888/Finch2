@@ -4,8 +4,8 @@
 #include <cmath>
 
 struct Telemetry {
-    double latitude_deg {0.0f};
-    double longitude_deg {0.0f};
+    double latitude_deg {0.0};
+    double longitude_deg {0.0};
     float absolute_altitude_m {0.0f};
     float current_battery_a {0.0f};
     float relative_altitude_m {0.0f};
