@@ -42,5 +42,22 @@ void Px4Drone::Disarm() {
 }
 
 Telemetry Px4Drone::GetTelemetry() {
-    return {};
+    Telemetry t{};
+
+    auto position {telemetry_->position()};
+    auto battery {telemetry_->battery()};
+    auto euler {telemetry_->attitude_euler()};
+
+    t.latitude_deg = position.latitude_deg;
+    t.longitude_deg = position.longitude_deg;
+    t.absolute_altitude_m = position.absolute_altitude_m;
+    t.relative_altitude_m = position.relative_altitude_m;
+
+    t.voltage_v = battery.voltage_v;
+    t.current_battery_a = battery.current_battery_a;
+    t.remaining_percent = battery.remaining_percent;
+
+    t.yaw_deg = euler.yaw_deg;
+
+    return t;
 }
