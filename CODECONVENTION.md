@@ -3,34 +3,27 @@
 ## Naming
 
 - **Files** - snake_case. 
-Example: `my_file.hpp`, `my_file.cpp`
-
+*Example:* `my_file.hpp`, `my_file.cpp`
 - **Folders** - snake_case. 
-Example: `my_folder`
-
+*Example:* `my_folder`
 - **Types** - PascalCase. 
-Example: `MyClass`
-
+*Example:* `MyClass`
 - **Variables** - snake_case. 
-Example: `my_variable`
-
+*Example:* `my_variable`
 - **Class Members** - snake_case_. 
-Example: `my_variable_`
-
+*Example:* `my_variable_`
 - **Constants** - UPPER_CASE. 
-Example: `MY_VALUE`
-
+*Example:* `MY_VALUE`
 - **Enums** - PascalCase. 
-Example: `MyEnum`
-
+*Example:* `MyEnum`
 - **Functions** - PascalCase. 
-Example: `MyFunction()`
+*Example:*`MyFunction()`
 
 ## Formatting
 
 **Looping and branching statements**
 
-Example:
+*Example:*
 
 ```cpp
 if (condition) {
@@ -46,7 +39,7 @@ if (condition) {
 
 Use brace initialization `{}` by default for all variables and class object creations.
 
-Example:
+*Example:*
 
 ```cpp
 int first {1};
@@ -57,7 +50,7 @@ std::string name {"Alex"};
 
 **Class**
 
-Example:
+*Example:*
 
 ```cpp
 class MyClass {
@@ -75,7 +68,7 @@ class MyClass {
 
 **Includes**
 
-Example:
+*Example:*
 
 ```cpp
 #include <system.h>
@@ -89,7 +82,7 @@ Example:
 
 **Literals**
 
-Example:
+*Example:*
 
 ```cpp
 int max_users {5'000};
@@ -99,7 +92,7 @@ double alpha {0.05};
 
 **Logging**
 
-Example:
+*Example:*
 
 ```cpp
 std::cout << "MyClass::MyFunction: Houston, we have a problem." << std::endl;
@@ -109,7 +102,7 @@ std::cout << "MyClass::MyFunction: Houston, we have a problem." << std::endl;
 
 All logically grouped lines (variables, dependencies, functions, etc.) should be alphabetically sorted with case sensitivity.
 
-Example:
+*Example:*
 
 ```cpp
 struct Telemetry {
