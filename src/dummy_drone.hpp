@@ -2,7 +2,7 @@
 
 #include "drone.hpp"
 
-class DummyDrone : public IDrone {
+class DummyDrone : public Drone {
  public:
     void Arm() override;
     void Disarm() override;

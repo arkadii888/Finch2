@@ -10,7 +10,7 @@
 
 #include "drone.hpp"
 
-class Px4Drone : public IDrone {
+class Px4Drone : public Drone {
  public:
     void Arm() override;
     void Disarm() override;

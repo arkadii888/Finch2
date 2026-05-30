@@ -31,9 +31,9 @@ struct MissionItem {
     int vehicle_action {0};
 };
 
-class IDrone {
+class Drone {
  public:
-    virtual ~IDrone() = default;
+    virtual ~Drone() = default;
 
     virtual void Arm() = 0;
     virtual void Disarm() = 0;
