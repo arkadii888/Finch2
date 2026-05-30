@@ -39,5 +39,10 @@ void Server::Run() {
 }
 
 std::string Server::ProcessCommand(const std::string& command) {
+    if (!command.empty() && command[0] == '#') {
+
+    } else {
+        agent_.SetPrompt(command);
+    }
     return "Recieved";
 }
