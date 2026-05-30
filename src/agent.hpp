@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <string>
 
 #include "drone.hpp"
@@ -14,4 +15,5 @@ class Agent {
  private:
     Drone& drone_;
     std::string prompt_;
+    std::mutex prompt_mutex_;
 };
