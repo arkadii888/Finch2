@@ -6,7 +6,7 @@
 
 class Server {
  public:
-    Server(Agent& agent);
+    Server(Agent& agent, const int port = 8888);
 
     void Run();
 
@@ -14,4 +14,5 @@ class Server {
     std::string ProcessCommand(const std::string& command);
 
     Agent& agent_;
+    const int port_;
 };

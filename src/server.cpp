@@ -4,7 +4,7 @@
 
 #include <asio.hpp>
 
-Server::Server(Agent& agent) : agent_(agent) {}
+Server::Server(Agent& agent, const int port) : agent_(agent), port_(port) {}
 
 void Server::Run() {
     try {
