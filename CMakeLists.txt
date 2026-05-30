@@ -41,6 +41,7 @@ add_executable(run
     src/px4_drone.cpp
     src/dummy_drone.cpp
     src/agent.cpp
+    src/server.cpp
 )
 
 target_link_libraries(run PRIVATE mavsdk)
