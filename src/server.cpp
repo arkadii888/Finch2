@@ -39,6 +39,5 @@ void Server::Run() {
 }
 
 std::string Server::ProcessCommand(const std::string& command) {
-    std::cout << "Server::ProcessCommand: Recieved - " << command << std::endl;
     return "Recieved";
 }
