@@ -33,13 +33,27 @@ FetchContent_Declare(
   GIT_TAG v3.17.1
 )
 
-FetchContent_MakeAvailable(mavsdk)
+FetchContent_Declare(
+  asio
+  GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
+  GIT_TAG asio-1-36-0
+)
+
+FetchContent_MakeAvailable(mavsdk asio)
+
+if(NOT TARGET asio)
+  add_library(asio INTERFACE)
+  target_include_directories(asio INTERFACE ${asio_SOURCE_DIR}/asio/include)
+  target_compile_definitions(asio INTERFACE ASIO_STANDALONE)
+endif()
 
 add_executable(run
     src/main.cpp
     src/drone.hpp
     src/px4_drone.cpp
     src/dummy_drone.cpp
+    src/agent.cpp
+    src/server.cpp
 )
 
-target_link_libraries(run PRIVATE mavsdk)
+target_link_libraries(run PRIVATE mavsdk asio)

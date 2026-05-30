@@ -9,7 +9,7 @@ void Px4Drone::Init() {
 
     while (mavsdk_.systems().empty()) {
         std::cout << "Px4Drone::Init: Drone is not detected yet..." << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds {1});
     }
     std::cout << "Px4Drone::Init: Drone is detected." << std::endl;
 
@@ -20,7 +20,7 @@ void Px4Drone::Init() {
 
     while (!telemetry_->health_all_ok()) {
         std::cout << "Px4Drone::Init: Drone is not ready to arm yet..." << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds {1});
     }
     std::cout << "Px4Drone::Init: Drone is ready to arm." << std::endl;
 }
