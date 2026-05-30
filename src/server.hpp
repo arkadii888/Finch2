@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "agent.hpp"
 
 class Server {
