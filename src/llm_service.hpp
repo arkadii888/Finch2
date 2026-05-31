@@ -17,7 +17,7 @@ class LlmService {
     std::string Complete(const std::string& prompt);
 
  private:
-    pid_t pid_ = -1;
+    pid_t pid_ {-1};
     httplib::Client client_;
     std::string model_path_;
 };
