@@ -16,6 +16,6 @@ void Agent::Run() {
     }
 };
 
-void Agent::SetPrompt(const std::string& prompt) {
-    prompt_.Set(prompt);
+std::string Agent::HandleUserInput(const std::string& prompt) {
+    return llm_service_.Complete(prompt);
 }
