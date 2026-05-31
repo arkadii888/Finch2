@@ -7,7 +7,7 @@
 
 class Server {
  public:
-   Server(Agent& agent, const int port = 8888);
+    Server(Agent& agent, const int port = 8888);
 
     void Run();
     bool Started() const;
