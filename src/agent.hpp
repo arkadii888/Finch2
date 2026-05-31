@@ -5,31 +5,24 @@
 
 #include "drone.hpp"
 
-class PromptString {
- public:
-    std::string Get() const {
-        std::lock_guard<std::mutex> lock {mutex_};
-        return value_;
-    }
-
-    void Set(const std::string& value) {
-        std::lock_guard<std::mutex> lock {mutex_};
-        value_ = value;
-    }
-
- private:
-    mutable std::mutex mutex_;
-    std::string value_;
-};
+class LlmService;
 
 class Agent {
  public:
-    Agent(Drone& drone);
+    Agent(Drone& drone, LlmService& llm);
 
     void Run();
-    void SetPrompt(const std::string& prompt);
+    std::string HandleUserInput(const std::string& prompt);
+
+    std::string GetLastPrompt() const;
+    std::string GetLastResponse() const;
 
  private:
+    std::string RunLlmTurn(const std::string& prompt);
+
     Drone& drone_;
-    PromptString prompt_;
+    LlmService& llm_;
+    mutable std::mutex turn_mutex_;
+    std::string last_prompt_;
+    std::string last_response_;
 };

@@ -47,6 +47,36 @@ if(NOT TARGET asio)
   target_compile_definitions(asio INTERFACE ASIO_STANDALONE)
 endif()
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_COMMON ON CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_TOOLS ON CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_SERVER ON CACHE BOOL "" FORCE)
+FetchContent_Declare(
+  llama_cpp
+  GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
+  GIT_TAG master
+)
+FetchContent_Declare(
+  httplib
+  GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
+  GIT_TAG v0.19.0
+)
+FetchContent_Declare(
+  nlohmann_json
+  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_TAG v3.11.3
+)
+FetchContent_MakeAvailable(llama_cpp httplib nlohmann_json)
+
+if(TARGET llama-server)
+  set_target_properties(llama-server PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+  )
+endif()
+
 add_executable(run
     src/main.cpp
     src/drone.hpp
@@ -54,6 +84,17 @@ add_executable(run
     src/dummy_drone.cpp
     src/agent.cpp
     src/server.cpp
+    src/llm_server.cpp
+    src/llm_service.cpp
 )
 
-target_link_libraries(run PRIVATE mavsdk asio)
+target_link_libraries(run PRIVATE
+    mavsdk
+    asio
+    httplib::httplib
+    nlohmann_json::nlohmann_json
+)
+
+if(TARGET llama-server)
+  add_dependencies(run llama-server)
+endif()

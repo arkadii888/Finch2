@@ -4,7 +4,9 @@
 #include <thread>
 #include <iostream>
 
-Agent::Agent(Drone& drone) : drone_(drone) {}
+#include "llm_service.hpp"
+
+Agent::Agent(Drone& drone, LlmService& llm) : drone_ {drone}, llm_ {llm} {}
 
 void Agent::Run() {
     while (true) {
@@ -14,8 +16,30 @@ void Agent::Run() {
 
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
-};
+}
 
-void Agent::SetPrompt(const std::string& prompt) {
-    prompt_.Set(prompt);
+std::string Agent::HandleUserInput(const std::string& prompt) {
+    return RunLlmTurn(prompt);
+}
+
+std::string Agent::GetLastPrompt() const {
+    std::lock_guard<std::mutex> lock {turn_mutex_};
+    return last_prompt_;
+}
+
+std::string Agent::GetLastResponse() const {
+    std::lock_guard<std::mutex> lock {turn_mutex_};
+    return last_response_;
+}
+
+std::string Agent::RunLlmTurn(const std::string& prompt) {
+    const std::string response {llm_.Complete(prompt)};
+
+    {
+        std::lock_guard<std::mutex> lock {turn_mutex_};
+        last_prompt_ = prompt;
+        last_response_ = response;
+    }
+
+    return response;
 }
