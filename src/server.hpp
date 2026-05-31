@@ -1,8 +1,11 @@
 #pragma once
 
 #include <string>
+#include <atomic>
 
 #include "agent.hpp"
+
+extern std::atomic<bool> global_running;
 
 class Server {
  public:

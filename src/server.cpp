@@ -12,7 +12,7 @@ void Server::Run() {
         asio::ip::tcp::acceptor acceptor {io_context, asio::ip::tcp::endpoint {asio::ip::tcp::v4(), 8888}};
         std::cout << "Server::Run: Server started on port 8888." << std::endl;
 
-        while (true) {
+        while (global_running) {
             asio::ip::tcp::socket client_socket {io_context};
             acceptor.accept(client_socket);
             asio::streambuf buffer;
@@ -42,7 +42,7 @@ std::string Server::ProcessCommand(const std::string& command) {
     if (!command.empty() && command[0] == '#') {
 
     } else {
-        agent_.SetPrompt(command);
+        agent_.HandleUserInput(command);
     }
     return "Recieved";
 }

@@ -1,9 +1,12 @@
 #pragma once
 
 #include <string>
+#include <atomic>
 
 #include "drone.hpp"
 #include "llm_service.hpp"
+
+extern std::atomic<bool> global_running;
 
 class Agent {
  public:
