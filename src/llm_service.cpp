@@ -18,6 +18,7 @@ LlmService::~LlmService() {
     }
 }
 
+// Single caller only. Concurrent Complete() calls share one pending_prompt_/result_ slot.
 std::string LlmService::Complete(const std::string& prompt) {
     std::unique_lock<std::mutex> lock {mutex_};
     pending_prompt_ = prompt;
