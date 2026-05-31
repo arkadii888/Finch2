@@ -17,5 +17,5 @@ class Agent {
 
  private:
     Drone& drone_;
-    LlmService llm_service_;
+    LlmService llm_service_ {"models/1"};
 };
