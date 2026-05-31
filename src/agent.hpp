@@ -21,8 +21,8 @@ class Agent {
     std::string RunLlmTurn(const std::string& prompt);
 
     Drone& drone_;
-    LlmService& llm_;
-    mutable std::mutex turn_mutex_;
     std::string last_prompt_;
     std::string last_response_;
+    LlmService& llm_;
+    mutable std::mutex turn_mutex_;
 };

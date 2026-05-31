@@ -57,7 +57,7 @@ set(LLAMA_BUILD_SERVER ON CACHE BOOL "" FORCE)
 FetchContent_Declare(
   llama_cpp
   GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
-  GIT_TAG master
+  GIT_TAG b9354
 )
 FetchContent_Declare(
   httplib

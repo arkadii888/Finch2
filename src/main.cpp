@@ -12,22 +12,20 @@
 
 namespace {
 
-constexpr const char kModelRel[] {"models/gemma-4-E2B-it-Q4_K_M.gguf"};
-constexpr const char kModelId[] {"gemma-4-E2B-it-Q4_K_M.gguf"};
+constexpr char MODEL_REL[] {"models/gemma-4-E2B-it-Q4_K_M.gguf"};
+constexpr char MODEL_ID[] {"gemma-4-E2B-it-Q4_K_M.gguf"};
 
 }  // namespace
 
-int main(int argc, char* argv[]) {
-    (void)argc;
-
+int main(int, char* argv[]) {
     const std::filesystem::path exe_dir {
         std::filesystem::weakly_canonical(argv[0]).parent_path()};
-    const std::filesystem::path model_path {kModelRel};
+    const std::filesystem::path model_path {MODEL_REL};
 
     LlmServer llm_server {exe_dir, model_path};
     const int llm_port {llm_server.Port()};
     std::cout << "LlmServer: llama-server ready on port " << llm_port << std::endl;
-    LlmHttpBackend backend {llm_port, kModelId};
+    LlmHttpBackend backend {llm_port, MODEL_ID};
     LlmService llm_service {backend};
 
     DummyDrone drone;

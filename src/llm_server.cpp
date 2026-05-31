@@ -1,6 +1,8 @@
 #include "llm_server.hpp"
 
-#include <httplib.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include <chrono>
 #include <cstdlib>
@@ -8,14 +10,12 @@
 #include <string>
 #include <thread>
 
-#include <signal.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <httplib.h>
 
 namespace {
 
-constexpr int kHealthPollMs {500};
-constexpr int kHealthTimeoutSec {120};
+constexpr int HEALTH_POLL_MS {500};
+constexpr int HEALTH_TIMEOUT_SEC {120};
 
 void RequireExists(const std::filesystem::path& path, const char* label) {
     if (!std::filesystem::exists(path)) {
@@ -37,7 +37,7 @@ void ThrowIfChildExited(const pid_t pid, const int port) {
     }
 }
 
-}  // namespace
+}
 
 LlmServer::LlmServer(std::filesystem::path exe_dir,
                      std::filesystem::path model_path,
@@ -77,7 +77,14 @@ LlmServer::LlmServer(std::filesystem::path exe_dir,
         _exit(1);
     }
 
-    WaitUntilReady();
+    try {
+        WaitUntilReady();
+    } catch (...) {
+        kill(pid_, SIGTERM);
+        waitpid(pid_, nullptr, 0);
+        pid_ = -1;
+        throw;
+    }
 }
 
 LlmServer::~LlmServer() {
@@ -98,7 +105,7 @@ void LlmServer::WaitUntilReady() {
     client.set_read_timeout(5, 0);
 
     const auto deadline {
-        std::chrono::steady_clock::now() + std::chrono::seconds {kHealthTimeoutSec}};
+        std::chrono::steady_clock::now() + std::chrono::seconds {HEALTH_TIMEOUT_SEC}};
 
     while (std::chrono::steady_clock::now() < deadline) {
         ThrowIfChildExited(pid_, port_);
@@ -107,7 +114,7 @@ void LlmServer::WaitUntilReady() {
             return;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds {kHealthPollMs});
+        std::this_thread::sleep_for(std::chrono::milliseconds {HEALTH_POLL_MS});
     }
 
     ThrowIfChildExited(pid_, port_);

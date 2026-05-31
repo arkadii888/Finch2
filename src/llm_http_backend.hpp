@@ -1,30 +1,30 @@
 #pragma once
 
-#include <httplib.h>
-#include <nlohmann/json.hpp>
-
 #include <stdexcept>
 #include <string>
+
+#include <httplib.h>
+#include <nlohmann/json.hpp>
 
 class LlmHttpBackend {
  public:
     explicit LlmHttpBackend(int port, std::string model_id)
-        : port_ {port}, model_id_ {std::move(model_id)} {}
+        : client_ {"127.0.0.1", port},
+          model_id_ {std::move(model_id)},
+          port_ {port} {
+        client_.set_connection_timeout(10, 0);
+        client_.set_read_timeout(300, 0);
+        client_.set_write_timeout(30, 0);
+    }
 
     std::string Complete(const std::string& prompt) {
-        httplib::Client client {"127.0.0.1", port_};
-        client.set_connection_timeout(10, 0);
-        client.set_read_timeout(300, 0);
-        client.set_write_timeout(30, 0);
-        client.set_keep_alive(false);
-
         const nlohmann::json request {
             {"model", model_id_},
             {"messages", {{{"role", "user"}, {"content", prompt}}}},
             {"stream", false},
         };
 
-        auto response {client.Post(
+        auto response {client_.Post(
             "/v1/chat/completions",
             httplib::Headers {{"Content-Type", "application/json"}},
             request.dump(),
@@ -88,6 +88,7 @@ class LlmHttpBackend {
         return content.get<std::string>();
     }
 
-    int port_;
+    httplib::Client client_;
     std::string model_id_;
+    int port_;
 };

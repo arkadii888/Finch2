@@ -15,7 +15,7 @@ void Server::Run() {
         started_ = true;
 
         while (true) {
-            asio::ip::tcp::socket client_socket {io_context};
+            asio::ip::tcp:t:socket client_socke {io_context};
             acceptor.accept(client_socket);
             asio::streambuf buffer;
             asio::error_code error;
@@ -29,7 +29,7 @@ void Server::Run() {
                     command.pop_back();
                 }
 
-                std::string reply = ProcessCommand(command);
+                std::string reply {ProcessCommand(command)};
                 reply.push_back('\n');
                 asio::write(client_socket, asio::buffer(reply));
             } else {
@@ -37,8 +37,7 @@ void Server::Run() {
             }
         }
     } catch (const std::exception& e) {
-        std::cerr << "Server::Run: Error: " << e.what()
-                  << " (stop other 'run' processes or use a different port)" << std::endl;
+        std::cout << "Server::Run: Error: " << e.what() << std::endl;
     }
 }
 
@@ -48,7 +47,7 @@ bool Server::Started() const {
 
 std::string Server::ProcessCommand(const std::string& command) {
     if (!command.empty() && command[0] == '#') {
-        return "OK";
+        return "Received";
     }
     return agent_.HandleUserInput(command);
 }

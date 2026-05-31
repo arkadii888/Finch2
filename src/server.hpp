@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <string>
 
 #include "agent.hpp"
@@ -16,5 +17,5 @@ class Server {
 
     Agent& agent_;
     const int port_;
-    bool started_ {false};
+    std::atomic<bool> started_ {false};
 };

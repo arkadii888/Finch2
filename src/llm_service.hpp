@@ -10,7 +10,7 @@
 
 class LlmService {
  public:
-    explicit LlmService(LlmHttpBackend& backend);
+    LlmService(LlmHttpBackend& backend);
     ~LlmService();
 
     std::string Complete(const std::string& prompt);
@@ -19,11 +19,11 @@ class LlmService {
     void WorkerLoop();
 
     LlmHttpBackend& backend_;
-    std::thread worker_;
-    std::mutex mutex_;
     std::condition_variable cv_;
+    std::mutex mutex_;
 
     std::optional<std::string> pending_prompt_;
     std::optional<std::string> result_;
     bool stop_ {false};
+    std::thread worker_;
 };

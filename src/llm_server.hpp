@@ -4,12 +4,15 @@
 
 class LlmServer {
  public:
-    static constexpr int kDefaultPort {8889};
+    static constexpr int DEFAULT_PORT {8889};
 
     LlmServer(std::filesystem::path exe_dir,
               std::filesystem::path model_path,
-              int port = kDefaultPort);
+              int port = DEFAULT_PORT);
     ~LlmServer();
+
+    LlmServer(const LlmServer&) = delete;
+    LlmServer& operator=(const LlmServer&) = delete;
 
     int Port() const;
 
