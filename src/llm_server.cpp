@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <cstdlib>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -17,16 +18,16 @@ namespace {
 constexpr int HEALTH_POLL_MS {500};
 constexpr int HEALTH_TIMEOUT_SEC {120};
 
+bool ChildRunning(const pid_t pid) {
+    int status {0};
+    return pid > 0 && waitpid(pid, &status, WNOHANG) == 0;
+}
+
 void RequireExists(const std::filesystem::path& path, const char* label) {
     if (!std::filesystem::exists(path)) {
         throw std::runtime_error {
             std::string {"LlmServer: "} + label + " not found at " + path.string()};
     }
-}
-
-bool ChildRunning(const pid_t pid) {
-    int status {0};
-    return pid > 0 && waitpid(pid, &status, WNOHANG) == 0;
 }
 
 void ThrowIfChildExited(const pid_t pid, const int port) {
@@ -111,6 +112,8 @@ void LlmServer::WaitUntilReady() {
         ThrowIfChildExited(pid_, port_);
 
         if (auto health {client.Get("/health")}; health && health->status == 200) {
+            std::cout << "LlmServer::WaitUntilReady: llama-server ready on port " << port_
+                      << std::endl;
             return;
         }
 

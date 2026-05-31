@@ -15,7 +15,7 @@ void Server::Run() {
         started_ = true;
 
         while (true) {
-            asio::ip::tcp:t:socket client_socke {io_context};
+            asio::ip::tcp::socket client_socket {io_context};
             acceptor.accept(client_socket);
             asio::streambuf buffer;
             asio::error_code error;

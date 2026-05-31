@@ -1,8 +1,8 @@
 #include "agent.hpp"
 
 #include <chrono>
-#include <thread>
 #include <iostream>
+#include <thread>
 
 #include "llm_service.hpp"
 
@@ -11,15 +11,11 @@ Agent::Agent(Drone& drone, LlmService& llm) : drone_ {drone}, llm_ {llm} {}
 void Agent::Run() {
     while (true) {
         auto telemetry {drone_.GetTelemetry()};
-        std::cout << "Agent::Run(): Latitude is " << telemetry.latitude_deg << std::endl;
-        std::cout << "Agent::Run(): Longitude is " << telemetry.longitude_deg << std::endl;
+        std::cout << "Agent::Run: Latitude is " << telemetry.latitude_deg << std::endl;
+        std::cout << "Agent::Run: Longitude is " << telemetry.longitude_deg << std::endl;
 
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
-}
-
-std::string Agent::HandleUserInput(const std::string& prompt) {
-    return RunLlmTurn(prompt);
 }
 
 std::string Agent::GetLastPrompt() const {
@@ -30,6 +26,10 @@ std::string Agent::GetLastPrompt() const {
 std::string Agent::GetLastResponse() const {
     std::lock_guard<std::mutex> lock {turn_mutex_};
     return last_response_;
+}
+
+std::string Agent::HandleUserInput(const std::string& prompt) {
+    return RunLlmTurn(prompt);
 }
 
 std::string Agent::RunLlmTurn(const std::string& prompt) {
