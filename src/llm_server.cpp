@@ -5,7 +5,6 @@
 #include <unistd.h>
 
 #include <chrono>
-#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -61,9 +60,6 @@ LlmServer::LlmServer(std::filesystem::path exe_dir,
         if (chdir(exe_dir.c_str()) != 0) {
             _exit(1);
         }
-#if defined(__APPLE__)
-        setenv("DYLD_LIBRARY_PATH", exe_dir.c_str(), 1);
-#endif
         execl(server_bin.c_str(),
               "llama-server",
               "-m",

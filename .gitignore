@@ -69,4 +69,5 @@ Testing/
 .cache/
 
 # LLM model weights
-models/
+models/*
+!models/.gitkeep
