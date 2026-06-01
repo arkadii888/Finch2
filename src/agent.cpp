@@ -19,7 +19,8 @@ std::string Agent::GetDroneTelemetry() {
 }
 
 std::string Agent::GetOutput() {
-    return "Not ready yet.";
+    auto output = output_.Get();
+    return !output.empty() ? output : "Not ready yet.";
 }
 
 void Agent::KillDrone() {
