@@ -1,19 +1,25 @@
 #pragma once
 
+#include <atomic>
+#include <chrono>
+#include <future>
 #include <mutex>
 #include <string>
 
 #include "drone.hpp"
+#include "llm_service.hpp"
 
-class PromptString {
+extern std::atomic<bool> global_running;
+
+class Output {
  public:
     std::string Get() const {
-        std::lock_guard<std::mutex> lock {mutex_};
+        std::lock_guard lock {mutex_};
         return value_;
     }
 
     void Set(const std::string& value) {
-        std::lock_guard<std::mutex> lock {mutex_};
+        std::lock_guard lock {mutex_};
         value_ = value;
     }
 
@@ -22,14 +28,52 @@ class PromptString {
     std::string value_;
 };
 
+class LlmOutput {
+ public:
+    std::string Get() {
+        std::lock_guard lock {mutex_};
+        if (!value_.valid()) {
+            return "";
+        }
+        if (value_.wait_for(std::chrono::milliseconds {0}) == std::future_status::ready) {
+            is_processing = false;
+            return value_.get();
+        }
+        return "";
+    }
+
+    bool Is_Processing() const {
+        return is_processing;
+    }
+
+    void Set(std::future<std::string> value) {
+        std::lock_guard lock {mutex_};
+        is_processing = true;
+        value_ = std::move(value);
+    }
+
+ private:
+    std::mutex mutex_;
+    std::future<std::string> value_;
+    std::atomic<bool> is_processing = false;
+};
+
 class Agent {
  public:
     Agent(Drone& drone);
 
     void Run();
-    void SetPrompt(const std::string& prompt);
+
+    std::string GetDroneTelemetry();
+    std::string GetOutput();
+
+    void KillDrone();
+    void ProcessInput(const std::string& input);
 
  private:
     Drone& drone_;
-    PromptString prompt_;
+    LlmOutput llm_output_;
+    LlmService llm_service_;
+    Output output_;
+    std::mutex input_mutex_;
 };

@@ -116,3 +116,7 @@ double alpha {0.05};
 ```cpp
 std::cout << "MyClass::MyFunction: Houston, we have a problem." << std::endl;
 ```
+
+**Code Width**
+
+Use a vertical guide at `100` characters in your editor to monitor line length.

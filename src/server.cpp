@@ -1,48 +1,50 @@
 #include "server.hpp"
 
 #include <iostream>
+#include <thread>
+#include <chrono>
 
-#include <asio.hpp>
+#include <httplib.h>
 
-Server::Server(Agent& agent, const int port) : agent_(agent), port_(port) {}
+#include "config.hpp"
+
+Server::Server(Agent& agent) : agent_ {agent} {}
 
 void Server::Run() {
-    try {
-        asio::io_context io_context;
-        asio::ip::tcp::acceptor acceptor {io_context, asio::ip::tcp::endpoint {asio::ip::tcp::v4(), 8888}};
-        std::cout << "Server::Run: Server started on port 8888." << std::endl;
+    httplib::Server server;
 
-        while (true) {
-            asio::ip::tcp::socket client_socket {io_context};
-            acceptor.accept(client_socket);
-            asio::streambuf buffer;
-            asio::error_code error;
-            asio::read_until(client_socket, buffer, '\n', error);
-            if (!error) {
-                std::string command;
-                std::istream is {&buffer};
+    server.Post("/input", [this](const httplib::Request& req, httplib::Response& res) {
+        std::string input {req.body};
+        agent_.ProcessInput(input);
+        res.set_content("Recieved", "application/json");
+    });
 
-                std::getline(is, command);
-                if (!command.empty() && command.back() == '\r') {
-                    command.pop_back();
-                }
+    server.Post("/kill", [this](const httplib::Request& req, httplib::Response& res) {
+        agent_.KillDrone();
+        res.set_content("Recieved", "application/json");
+    });
 
-                std::string reply = ProcessCommand(command);
-                asio::write(client_socket, asio::buffer(reply));
-            } else {
-                std::cout << "Server::Run: Error while receiving data: " << error.message() << std::endl;
-            }
+    server.Get("/output", [this](const httplib::Request& req, httplib::Response& res) {
+        std::string output {agent_.GetOutput()};
+        res.set_content(output, "application/json");
+    });
+
+    server.Get("/telemetry", [this](const httplib::Request& req, httplib::Response& res) {
+        std::string telemetry {agent_.GetDroneTelemetry()};
+        res.set_content(telemetry, "application/json");
+    });
+
+    std::thread monitor {[&server]() {
+        while (global_running) {
+            std::this_thread::sleep_for(std::chrono::milliseconds {200});
         }
-    } catch (const std::exception& e) {
-        std::cout << "Server::Run: Error: " << e.what() << std::endl;
-    }
-}
+        server.stop();
+    }};
 
-std::string Server::ProcessCommand(const std::string& command) {
-    if (!command.empty() && command[0] == '#') {
+    std::cout << "Server::Run: HTTP server started on port " << config.http_server_port << "." << std::endl;
 
-    } else {
-        agent_.SetPrompt(command);
-    }
-    return "Recieved";
+    server.listen("0.0.0.0", config.http_server_port);
+
+    monitor.join();
+    std::cout << "Server::Run: HTTP server stopped." << std::endl;
 }

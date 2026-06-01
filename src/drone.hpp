@@ -3,6 +3,8 @@
 #include <vector>
 #include <cmath>
 
+#include <nlohmann/json.hpp>
+
 struct Telemetry {
     double latitude_deg {0.0};
     double longitude_deg {0.0};
@@ -13,6 +15,17 @@ struct Telemetry {
     float voltage_v {0.0f};
     float yaw_deg {0.0f};
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Telemetry,
+    latitude_deg,
+    longitude_deg,
+    absolute_altitude_m,
+    current_battery_a,
+    relative_altitude_m,
+    remaining_percent,
+    voltage_v,
+    yaw_deg
+)
 
 struct MissionItem {
     bool is_fly_through {false};
