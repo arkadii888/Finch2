@@ -62,11 +62,36 @@ std::string LlmService::Complete(const std::string& prompt) {
         return "";
     }
 
-    auto root {nlohmann::json::parse(result->body, nullptr, false)};
-    if (root.is_discarded() || root.contains("error")) {
-        std::cout << "LlmService::Complete: Json error." << std::endl;
+    try {
+        auto root = nlohmann::json::parse(result->body);
+
+        if (!root.is_object()) {
+            throw std::runtime_error {"expected JSON object"};
+        }
+
+        if (root.contains("error")) {
+            const auto& err {root["error"]};
+            if (err.is_object() && err.contains("message") && err["message"].is_string()) {
+                throw std::runtime_error {err["message"].get<std::string>()};
+            }
+            throw std::runtime_error {err.dump()};
+        }
+
+        const auto& choices {root["choices"]};
+        if (!choices.is_array() || choices.empty()) {
+            throw std::runtime_error {"missing choices"};
+        }
+
+        const auto& content {choices[0]["message"]["content"]};
+        if (!content.is_string()) {
+            throw std::runtime_error {"expected string content"};
+        }
+
+        return content.get<std::string>();
+
+    } catch (const std::exception& e) {
+        std::cout << "LlmService::Complete: Error: " << e.what() << "\n"
+                  << "Raw response body: " << result->body << std::endl;
         return "";
     }
-
-    return root["choices"][0]["message"]["content"].get<std::string>();
 }

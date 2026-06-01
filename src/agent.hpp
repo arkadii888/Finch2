@@ -17,5 +17,5 @@ class Agent {
 
  private:
     Drone& drone_;
-    LlmService llm_service_ {"models/1"};
+    LlmService llm_service_ {"/home/arkadii/Documents/Projects/CxxProjects/Finch2/models/gemma-4-E2B-it-Q4_K_M.gguf"};
 };

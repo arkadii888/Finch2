@@ -40,9 +40,8 @@ void Server::Run() {
 
 std::string Server::ProcessCommand(const std::string& command) {
     if (!command.empty() && command[0] == '#') {
-
+        return "Recieved";
     } else {
-        agent_.HandleUserInput(command);
+        return agent_.HandleUserInput(command);
     }
-    return "Recieved";
 }
