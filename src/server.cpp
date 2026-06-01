@@ -13,15 +13,25 @@ Server::Server(Agent& agent) : agent_ {agent} {}
 void Server::Run() {
     httplib::Server server;
 
-    server.Post("/command", [this](const httplib::Request& req, httplib::Response& res) {
-        std::string command {req.body};
+    server.Post("/input", [this](const httplib::Request& req, httplib::Response& res) {
+        std::string input {req.body};
+        agent_.ProcessInput(input);
+        res.set_content("Recieved", "application/json");
+    });
 
-        if (!command.empty() && command[0] == '#') {
-            res.set_content("Recieved", "text/plain");
-        } else {
-            std::string reply {agent_.HandleUserInput(command)};
-            res.set_content(reply, "text/plain");
-        }
+    server.Post("/kill", [this](const httplib::Request& req, httplib::Response& res) {
+        agent_.KillDrone();
+        res.set_content("Recieved", "application/json");
+    });
+
+    server.Get("/output", [this](const httplib::Request& req, httplib::Response& res) {
+        std::string output {agent_.GetOutput()};
+        res.set_content(output, "application/json");
+    });
+
+    server.Get("/telemetry", [this](const httplib::Request& req, httplib::Response& res) {
+        std::string telemetry {agent_.GetDroneTelemetry()};
+        res.set_content(telemetry, "application/json");
     });
 
     std::thread monitor {[&server]() {
