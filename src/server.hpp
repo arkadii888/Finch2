@@ -9,7 +9,7 @@ extern std::atomic<bool> global_running;
 
 class Server {
  public:
-    Server(Agent& agent, const int port = 8888);
+    Server(Agent& agent, const unsigned short port = 8888);
 
     void Run();
 
@@ -17,5 +17,5 @@ class Server {
     std::string ProcessCommand(const std::string& command);
 
     Agent& agent_;
-    const int port_;
+    const unsigned short port_;
 };

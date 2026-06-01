@@ -4,13 +4,13 @@
 
 #include <asio.hpp>
 
-Server::Server(Agent& agent, const int port) : agent_ {agent}, port_ {port} {}
+Server::Server(Agent& agent, const unsigned short port) : agent_ {agent}, port_ {port} {}
 
 void Server::Run() {
     try {
         asio::io_context io_context;
-        asio::ip::tcp::acceptor acceptor {io_context, asio::ip::tcp::endpoint {asio::ip::tcp::v4(), 8888}};
-        std::cout << "Server::Run: Server started on port 8888." << std::endl;
+        asio::ip::tcp::acceptor acceptor {io_context, asio::ip::tcp::endpoint {asio::ip::tcp::v4(), port_}};
+        std::cout << "Server::Run: Server started on port " << port_ << "." << std::endl;
 
         while (global_running) {
             asio::ip::tcp::socket client_socket {io_context};
