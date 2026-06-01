@@ -4,7 +4,7 @@
 
 #include <asio.hpp>
 
-Server::Server(Agent& agent, const int port) : agent_(agent), port_(port) {}
+Server::Server(Agent& agent, const int port) : agent_ {agent}, port_ {port} {}
 
 void Server::Run() {
     try {
@@ -27,7 +27,7 @@ void Server::Run() {
                     command.pop_back();
                 }
 
-                std::string reply = ProcessCommand(command);
+                std::string reply {ProcessCommand(command)};
                 asio::write(client_socket, asio::buffer(reply));
             } else {
                 std::cout << "Server::Run: Error while receiving data: " << error.message() << std::endl;
