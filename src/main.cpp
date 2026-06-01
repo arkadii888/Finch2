@@ -17,6 +17,8 @@ int main() {
     std::signal(SIGTERM, signal_handler);
 
     DummyDrone drone;
+    drone.Init();
+
     Agent agent {drone};
     Server server {agent};
 
