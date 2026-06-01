@@ -80,3 +80,7 @@ if (TARGET llama-server)
         LLAMA_SERVER_PATH="$<TARGET_FILE:llama-server>"
     )
 endif()
+
+target_compile_definitions(run PRIVATE
+    PROJECT_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)
