@@ -11,7 +11,7 @@
 
 class LlmService {
  public:
-    LlmService(const std::string& model_path, int port = 8889);
+    LlmService();
     ~LlmService();
 
     std::string Complete(const std::string& prompt);
@@ -19,5 +19,4 @@ class LlmService {
  private:
     pid_t pid_ {-1};
     httplib::Client client_;
-    std::string model_path_;
 };

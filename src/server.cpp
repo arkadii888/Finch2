@@ -6,7 +6,9 @@
 
 #include <httplib.h>
 
-Server::Server(Agent& agent, const int port) : agent_ {agent}, port_ {port} {}
+#include "config.hpp"
+
+Server::Server(Agent& agent) : agent_ {agent} {}
 
 void Server::Run() {
     httplib::Server server;
@@ -29,9 +31,9 @@ void Server::Run() {
         server.stop();
     }};
 
-    std::cout << "Server::Run: HTTP server started on port " << port_ << "." << std::endl;
+    std::cout << "Server::Run: HTTP server started on port " << config.http_server_port << "." << std::endl;
 
-    server.listen("0.0.0.0", port_);
+    server.listen("0.0.0.0", config.http_server_port);
 
     monitor.join();
     std::cout << "Server::Run: HTTP server stopped." << std::endl;

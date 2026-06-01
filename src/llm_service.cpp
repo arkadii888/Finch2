@@ -11,7 +11,9 @@
 
 #include <nlohmann/json.hpp>
 
-LlmService::LlmService(const std::string& model_path, int port) : model_path_ {model_path}, client_ {"127.0.0.1", port} {
+#include "config.hpp"
+
+LlmService::LlmService() : client_ {"127.0.0.1", config.llama_server_port} {
     client_.set_connection_timeout(10, 0);
     client_.set_read_timeout(300, 0);
 
@@ -21,8 +23,8 @@ LlmService::LlmService(const std::string& model_path, int port) : model_path_ {m
     }
 
     if (pid_ == 0) {
-        execl(LLAMA_SERVER_PATH, "llama-server", "-m", model_path.c_str(),
-                  "--port", std::to_string(port).c_str(), "-c", "4096", nullptr);
+        execl(LLAMA_SERVER_PATH, "llama-server", "-m", config.model_path.c_str(),
+                  "--port", std::to_string(config.llama_server_port).c_str(), "-c", "4096", nullptr);
         perror("Exec failed");
         _exit(1);
     }
@@ -37,7 +39,7 @@ LlmService::LlmService(const std::string& model_path, int port) : model_path_ {m
         auto result {client_.Get("/health")};
         if(result && result->status == 200) {
             std::cout << "LlmService::LlmService: Llama server started on port "
-            << port << "." << std::endl;
+            << config.llama_server_port << "." << std::endl;
             return;
         }
 
@@ -54,7 +56,7 @@ LlmService::~LlmService() {
 
 std::string LlmService::Complete(const std::string& prompt) {
     nlohmann::json request = {
-        {"model", model_path_},
+        {"model", config.model_path},
         {"messages", {{{"role", "user"}, {"content", prompt}}}},
         {"stream", false}
     };
