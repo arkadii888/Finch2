@@ -62,7 +62,7 @@ std::string LlmService::Complete(const std::string& prompt) {
 
     auto result {client_.Post("/v1/chat/completions", request.dump(), "application/json")};
     if (!result || result->status != 200) {
-        std::cout << "LlmService::Complete: Http connection error." << std::endl;
+        std::cout << "LlmService::Complete: HTTP connection error." << std::endl;
         return "";
     }
 

@@ -36,7 +36,7 @@ void Server::Run() {
 
     std::thread monitor {[&server]() {
         while (global_running) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds {200});
         }
         server.stop();
     }};
