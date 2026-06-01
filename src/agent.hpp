@@ -13,7 +13,12 @@ class Agent {
     Agent(Drone& drone);
 
     void Run();
-    std::string HandleUserInput(const std::string& prompt);
+
+    std::string GetDroneTelemetry();
+    std::string GetOutput();
+
+    void KillDrone();
+    void ProcessInput(const std::string& input);
 
  private:
     Drone& drone_;

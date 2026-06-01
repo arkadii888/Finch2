@@ -3,6 +3,8 @@
 #include <chrono>
 #include <thread>
 
+#include <nlohmann/json.hpp>
+
 Agent::Agent(Drone& drone) : drone_(drone) {}
 
 void Agent::Run() {
@@ -11,6 +13,19 @@ void Agent::Run() {
     }
 };
 
-std::string Agent::HandleUserInput(const std::string& prompt) {
-    return llm_service_.Complete(prompt);
+std::string Agent::GetDroneTelemetry() {
+    nlohmann::json telemetry {drone_.GetTelemetry()};
+    return telemetry.dump();
+}
+
+std::string Agent::GetOutput() {
+    return "Not ready yet.";
+}
+
+void Agent::KillDrone() {
+    drone_.Kill();
+}
+
+void Agent::ProcessInput(const std::string& input) {
+
 }
