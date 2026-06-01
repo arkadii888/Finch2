@@ -34,12 +34,6 @@ FetchContent_Declare(
 )
 
 FetchContent_Declare(
-  asio
-  GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
-  GIT_TAG asio-1-36-0
-)
-
-FetchContent_Declare(
   cpp_httplib
   GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
   GIT_TAG v0.46.0
@@ -63,13 +57,7 @@ set(LLAMA_BUILD_COMMON ON CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_TOOLS ON CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_SERVER ON CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(mavsdk asio cpp_httplib nlohmann_json llama_cpp)
-
-if(NOT TARGET asio)
-  add_library(asio INTERFACE)
-  target_include_directories(asio INTERFACE ${asio_SOURCE_DIR}/asio/include)
-  target_compile_definitions(asio INTERFACE ASIO_STANDALONE)
-endif()
+FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp)
 
 add_executable(run
     src/main.cpp
@@ -83,7 +71,6 @@ add_executable(run
 
 target_link_libraries(run PRIVATE
     mavsdk
-    asio
     httplib
     nlohmann_json::nlohmann_json
 )

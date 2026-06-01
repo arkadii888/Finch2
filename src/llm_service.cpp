@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <cstdio>
+#include <format>
 #include <iostream>
 #include <signal.h>
 #include <sys/wait.h>
@@ -35,7 +36,8 @@ LlmService::LlmService(const std::string& model_path, int port) : model_path_ {m
 
         auto result {client_.Get("/health")};
         if(result && result->status == 200) {
-            std::cout << "LlmService::LlmService: Llama server started on port " << port << "." << std::endl;
+            std::cout << "LlmService::LlmService: Llama server started on port "
+            << port << "." << std::endl;
             return;
         }
 

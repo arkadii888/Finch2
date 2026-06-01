@@ -1,47 +1,38 @@
 #include "server.hpp"
 
 #include <iostream>
+#include <thread>
+#include <chrono>
 
-#include <asio.hpp>
+#include <httplib.h>
 
-Server::Server(Agent& agent, const unsigned short port) : agent_ {agent}, port_ {port} {}
+Server::Server(Agent& agent, const int port) : agent_ {agent}, port_ {port} {}
 
 void Server::Run() {
-    try {
-        asio::io_context io_context;
-        asio::ip::tcp::acceptor acceptor {io_context, asio::ip::tcp::endpoint {asio::ip::tcp::v4(), port_}};
-        std::cout << "Server::Run: Server started on port " << port_ << "." << std::endl;
+    httplib::Server server;
 
-        while (global_running) {
-            asio::ip::tcp::socket client_socket {io_context};
-            acceptor.accept(client_socket);
-            asio::streambuf buffer;
-            asio::error_code error;
-            asio::read_until(client_socket, buffer, '\n', error);
-            if (!error) {
-                std::string command;
-                std::istream is {&buffer};
+    server.Post("/command", [this](const httplib::Request& req, httplib::Response& res) {
+        std::string command {req.body};
 
-                std::getline(is, command);
-                if (!command.empty() && command.back() == '\r') {
-                    command.pop_back();
-                }
-
-                std::string reply {ProcessCommand(command)};
-                asio::write(client_socket, asio::buffer(reply));
-            } else {
-                std::cout << "Server::Run: Error while receiving data: " << error.message() << std::endl;
-            }
+        if (!command.empty() && command[0] == '#') {
+            res.set_content("Recieved", "text/plain");
+        } else {
+            std::string reply {agent_.HandleUserInput(command)};
+            res.set_content(reply, "text/plain");
         }
-    } catch (const std::exception& e) {
-        std::cout << "Server::Run: Error: " << e.what() << std::endl;
-    }
-}
+    });
 
-std::string Server::ProcessCommand(const std::string& command) {
-    if (!command.empty() && command[0] == '#') {
-        return "Recieved";
-    } else {
-        return agent_.HandleUserInput(command);
-    }
+    std::thread monitor {[&server]() {
+        while (global_running) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+        server.stop();
+    }};
+
+    std::cout << "Server::Run: HTTP server started on port " << port_ << "." << std::endl;
+
+    server.listen("0.0.0.0", port_);
+
+    monitor.join();
+    std::cout << "Server::Run: HTTP server stopped." << std::endl;
 }
