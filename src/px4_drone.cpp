@@ -83,8 +83,6 @@ void Px4Drone::UploadMission(const std::vector<MissionItem>& mission_items) {
 
     std::this_thread::sleep_for(std::chrono::milliseconds {500});
 
-    mission_progress_.Set(items_count, 0, MissionStatus::Started);
-
     std::cout << "Px4Drone::UploadMission: Mission uploaded." << std::endl;
 }
 
@@ -115,19 +113,9 @@ void Px4Drone::Disarm() {
     std::cout << "Px4Drone::Arm: Disarmed." << std::endl;
 }
 
-MissionProgress Px4Drone::GetMissionProgress() {
-    int current_item = mission_->mission_progress().current;
-
-    auto progress = mission_progress_.Get();
-    progress.current_item = current_item;
-
-    if (progress.current_item == progress.total_items) {
-        progress.status = MissionStatus::Finished;
-    }
-
-    mission_progress_.Set(progress.total_items, progress.current_item, progress.status);
-
-    return progress;
+std::pair<int, int> Px4Drone::GetMissionProgress() {
+    auto progress = mission_->mission_progress();
+    return {progress.current, progress.total};
 }
 
 Telemetry Px4Drone::GetTelemetry() {

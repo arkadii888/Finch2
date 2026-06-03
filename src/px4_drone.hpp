@@ -19,7 +19,7 @@ class Px4Drone : public Drone {
     void LaunchMission() override;
     void UploadMission(const std::vector<MissionItem>& mission_items) override;
 
-    MissionProgress GetMissionProgress() override;
+    std::pair<int, int> GetMissionProgress() override;
 
     Telemetry GetTelemetry() override;
 
@@ -30,6 +30,4 @@ class Px4Drone : public Drone {
     std::unique_ptr<mavsdk::Action> action_;
     std::unique_ptr<mavsdk::Mission> mission_;
     std::unique_ptr<mavsdk::Telemetry> telemetry_;
-
-    MissionProgressThreadSafe mission_progress_;
 };

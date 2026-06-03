@@ -26,12 +26,8 @@ void DummyDrone::UploadMission(const std::vector<MissionItem>& mission_items) {
     std::cout << "DummyDrone::LaunchMission: Mission uploaded." << std::endl;
 }
 
-MissionProgress DummyDrone::GetMissionProgress() {
-    MissionProgress mission_progress;
-    mission_progress.current_item = 2;
-    mission_progress.total_items = 6;
-    mission_progress.status = MissionStatus::Started;
-    return mission_progress;
+std::pair<int, int> DummyDrone::GetMissionProgress() {
+    return {2, 6};
 }
 
 Telemetry DummyDrone::GetTelemetry() {

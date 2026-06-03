@@ -11,7 +11,7 @@ class DummyDrone : public Drone {
     void LaunchMission() override;
     void UploadMission(const std::vector<MissionItem>& mission_items) override;
 
-    MissionProgress GetMissionProgress() override;
+    std::pair<int, int> GetMissionProgress() override;
 
     Telemetry GetTelemetry() override;
 };
