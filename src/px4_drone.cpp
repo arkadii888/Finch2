@@ -89,15 +89,30 @@ void Px4Drone::UploadMission(const std::vector<MissionItem>& mission_items) {
 }
 
 void Px4Drone::Kill() {
+    if(action_->kill() != mavsdk::Action::Result::Success) {
+        std::cout << "Px4Drone::Kill: Failed." << std::endl;
+        return;
+    }
 
+    std::cout << "Px4Drone::Kill: Killed." << std::endl;
 }
 
 void Px4Drone::Arm() {
+    if(action_->arm() != mavsdk::Action::Result::Success) {
+        std::cout << "Px4Drone::Arm: Failed." << std::endl;
+        return;
+    }
 
+    std::cout << "Px4Drone::Arm: Armed." << std::endl;
 }
 
 void Px4Drone::Disarm() {
+    if(action_->disarm() != mavsdk::Action::Result::Success) {
+        std::cout << "Px4Drone::Disarm: Failed." << std::endl;
+        return;
+    }
 
+    std::cout << "Px4Drone::Arm: Disarmed." << std::endl;
 }
 
 MissionProgress Px4Drone::GetMissionProgress() {
