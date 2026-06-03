@@ -36,26 +36,26 @@ class LlmOutput {
             return "";
         }
         if (value_.wait_for(std::chrono::milliseconds {0}) == std::future_status::ready) {
-            is_processing = false;
+            is_processing_ = false;
             return value_.get();
         }
         return "";
     }
 
     bool Is_Processing() const {
-        return is_processing;
+        return is_processing_;
     }
 
     void Set(std::future<std::string> value) {
         std::lock_guard lock {mutex_};
-        is_processing = true;
+        is_processing_ = true;
         value_ = std::move(value);
     }
 
  private:
     std::mutex mutex_;
     std::future<std::string> value_;
-    std::atomic<bool> is_processing = false;
+    std::atomic<bool> is_processing_ = false;
 };
 
 class Agent {
