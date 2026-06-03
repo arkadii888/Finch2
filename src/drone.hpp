@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cmath>
+#include <mutex>
 
 #include <nlohmann/json.hpp>
 
@@ -44,6 +45,38 @@ struct MissionItem {
     int vehicle_action {0};
 };
 
+enum class MissionStatus {
+    None,
+    Started,
+    Finished,
+    Failed
+};
+
+struct MissionProgress {
+    int total_items {0};
+    int current_item {0};
+    MissionStatus status {MissionStatus::None};
+};
+
+class MissionProgressThreadSafe {
+ public:
+    MissionProgress Get () {
+        std::lock_guard lock {m_};
+        return mission_progress_;
+    };
+
+    void Set(int total, int current, MissionStatus status) {
+        std::lock_guard lock {m_};
+        mission_progress_.total_items = total;
+        mission_progress_.current_item = current;
+        mission_progress_.status = status;
+    }
+
+ private:
+    MissionProgress mission_progress_;
+    std::mutex m_;
+};
+
 class Drone {
  public:
     virtual ~Drone() = default;
@@ -52,7 +85,10 @@ class Drone {
     virtual void Disarm() = 0;
     virtual void Init() = 0;
     virtual void Kill() = 0;
-    virtual void LaunchMission(const std::vector<MissionItem>& mission_items) = 0;
+    virtual void LaunchMission() = 0;
+    virtual void UploadMission(const std::vector<MissionItem>& mission_items) = 0;
+
+    virtual MissionProgress GetMissionProgress() = 0;
 
     virtual Telemetry GetTelemetry() = 0;
 };
