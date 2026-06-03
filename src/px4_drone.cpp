@@ -31,7 +31,7 @@ void Px4Drone::LaunchMission() {
         std::this_thread::sleep_for(std::chrono::milliseconds {500});
     }
 
-    if(mission_->start_mission() != mavsdk::Mission::Result::Success) {
+    if (mission_->start_mission() != mavsdk::Mission::Result::Success) {
         std::cout << "Vehicle::LaunchMission: Mission launch failed." << std::endl;
     }
 
@@ -39,12 +39,12 @@ void Px4Drone::LaunchMission() {
 }
 
 void Px4Drone::UploadMission(const std::vector<MissionItem>& mission_items) {
-    if(mission_->pause_mission() != mavsdk::Mission::Result::Success) {
+    if (mission_->pause_mission() != mavsdk::Mission::Result::Success) {
         std::cout << "Px4Drone::UploadMission: Mission pause failed." << std::endl;
         return;
     }
 
-    if(mission_->clear_mission() != mavsdk::Mission::Result::Success) {
+    if (mission_->clear_mission() != mavsdk::Mission::Result::Success) {
         std::cout << "Px4Drone::UploadMission: Mission clear failed." << std::endl;
         return;
     }
@@ -54,7 +54,7 @@ void Px4Drone::UploadMission(const std::vector<MissionItem>& mission_items) {
     std::size_t items_count {mission_items.size()};
     std::vector<mavsdk::Mission::MissionItem> final_items(items_count);
 
-    for(int i {0}; i < items_count; ++i) {
+    for (int i {0}; i < items_count; ++i) {
         final_items[i].is_fly_through = mission_items[i].is_fly_through;
         final_items[i].camera_photo_interval_s = mission_items[i].camera_photo_interval_s;
         final_items[i].latitude_deg = mission_items[i].latitude_deg;
@@ -76,7 +76,7 @@ void Px4Drone::UploadMission(const std::vector<MissionItem>& mission_items) {
     mavsdk::Mission::MissionPlan plan {};
     plan.mission_items = final_items;
 
-    if(mission_->upload_mission(plan) != mavsdk::Mission::Result::Success) {
+    if (mission_->upload_mission(plan) != mavsdk::Mission::Result::Success) {
         std::cout << "Px4Drone::UploadMission: Mission upload failed." << std::endl;
         return;
     }
@@ -89,7 +89,7 @@ void Px4Drone::UploadMission(const std::vector<MissionItem>& mission_items) {
 }
 
 void Px4Drone::Kill() {
-    if(action_->kill() != mavsdk::Action::Result::Success) {
+    if (action_->kill() != mavsdk::Action::Result::Success) {
         std::cout << "Px4Drone::Kill: Failed." << std::endl;
         return;
     }
@@ -98,7 +98,7 @@ void Px4Drone::Kill() {
 }
 
 void Px4Drone::Arm() {
-    if(action_->arm() != mavsdk::Action::Result::Success) {
+    if (action_->arm() != mavsdk::Action::Result::Success) {
         std::cout << "Px4Drone::Arm: Failed." << std::endl;
         return;
     }
@@ -107,7 +107,7 @@ void Px4Drone::Arm() {
 }
 
 void Px4Drone::Disarm() {
-    if(action_->disarm() != mavsdk::Action::Result::Success) {
+    if (action_->disarm() != mavsdk::Action::Result::Success) {
         std::cout << "Px4Drone::Disarm: Failed." << std::endl;
         return;
     }
@@ -121,7 +121,7 @@ MissionProgress Px4Drone::GetMissionProgress() {
     auto progress = mission_progress_.Get();
     progress.current_item = current_item;
 
-    if(progress.current_item == progress.total_items) {
+    if (progress.current_item == progress.total_items) {
         progress.status = MissionStatus::Finished;
     }
 
