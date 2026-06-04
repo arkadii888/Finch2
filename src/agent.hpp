@@ -6,7 +6,7 @@
 #include <mutex>
 #include <string>
 
-#include "drone.hpp"
+#include "drone/drone.hpp"
 #include "llm_service.hpp"
 
 extern std::atomic<bool> global_running;

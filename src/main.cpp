@@ -3,7 +3,7 @@
 #include <atomic>
 
 #include "agent.hpp"
-#include "dummy_drone.hpp"
+#include "drone/dummy_drone.hpp"
 #include "server.hpp"
 #include "logger.hpp"
 
