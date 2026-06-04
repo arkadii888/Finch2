@@ -29,13 +29,8 @@ int main() {
     Agent agent {drone, llama};
     Server server {agent};
 
-    std::thread agent_thread {[&agent](){
-        agent.Run();
-    }};
-
-    std::thread server_thread {[&server](){
-        server.Run();
-    }};
+    std::thread agent_thread {[&agent](){agent.Run();}};
+    std::thread server_thread {[&server](){server.Run();}};
 
     agent_thread.join();
     server_thread.join();
