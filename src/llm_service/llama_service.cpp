@@ -8,7 +8,7 @@ void LlamaService::Run() {
     client_.set_read_timeout(300, 0);
 
     if ((pid_ = fork()) < 0) {
-        spdlog::error("LlmService::LlmService: Fork failed.");
+        spdlog::error("LlmService::Run: Fork failed.");
         return;
     }
 
@@ -22,13 +22,13 @@ void LlamaService::Run() {
     auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(120);
     while (std::chrono::steady_clock::now() < deadline) {
         if (waitpid(pid_, nullptr, WNOHANG) > 0) {
-            spdlog::error("LlmService::LlmService: Llama server crashed.");
+            spdlog::error("LlmService::Run: Llama server crashed.");
             return;
         }
 
         auto result {client_.Get("/health")};
         if(result && result->status == 200) {
-            spdlog::info("LlmService::LlmService: Started on port {}", config.llama_server_port);
+            spdlog::info("LlmService::Run: Started on port {}", config.llama_server_port);
             return;
         }
 
@@ -40,7 +40,7 @@ void LlamaService::Stop() {
     if (pid_ > 0) {
         kill(pid_, SIGTERM);
         waitpid(pid_, nullptr, 0);
-        spdlog::info("LlmService::~LlmService: Stopped.");
+        spdlog::info("LlmService::~Stop: Stopped.");
     }
 }
 
