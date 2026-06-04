@@ -4,6 +4,7 @@
 
 #include "agent.hpp"
 #include "drone/dummy_drone.hpp"
+#include "llm_service/llama_service.hpp"
 #include "server.hpp"
 #include "logger.hpp"
 
@@ -22,7 +23,10 @@ int main() {
     DummyDrone drone;
     drone.Init();
 
-    Agent agent {drone};
+    LlamaService llama;
+    llama.Run();
+
+    Agent agent {drone, llama};
     Server server {agent};
 
     std::thread agent_thread {[&agent](){
@@ -35,6 +39,8 @@ int main() {
 
     agent_thread.join();
     server_thread.join();
+
+    llama.Stop();
 
     return 0;
 }

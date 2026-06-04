@@ -60,7 +60,7 @@ class LlmOutput {
 
 class Agent {
  public:
-    Agent(Drone& drone);
+    Agent(Drone& drone, LlmService& llm_service);
 
     void Run();
 
@@ -73,7 +73,7 @@ class Agent {
  private:
     Drone& drone_;
     LlmOutput llm_output_;
-    LlmService llm_service_;
+    LlmService& llm_service_;
     Output output_;
     std::mutex input_mutex_;
 };

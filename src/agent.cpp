@@ -2,11 +2,10 @@
 
 #include <nlohmann/json.hpp>
 
-Agent::Agent(Drone& drone) : drone_(drone) {}
+Agent::Agent(Drone& drone, LlmService& llm_service) : drone_(drone), llm_service_(llm_service) {}
 
 void Agent::Run() {
     while (global_running) {
-        std::cout << llm_output_.Get() << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
 };

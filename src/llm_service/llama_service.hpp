@@ -12,7 +12,7 @@
 #error "LLAMA_SERVER_PATH is not defined!"
 #endif
 
-class LlamaService : LlmService {
+class LlamaService : public LlmService {
  public:
     void Run() override;
     void Stop() override;
