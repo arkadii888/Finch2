@@ -57,7 +57,16 @@ set(LLAMA_BUILD_COMMON ON CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_TOOLS ON CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_SERVER ON CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp)
+FetchContent_Declare(
+  spdlog
+  GIT_REPOSITORY https://github.com/gabime/spdlog.git
+  GIT_TAG v1.17.0
+)
+set(SPDLOG_BUILD_TESTS OFF CACHE INTERNAL "")
+set(SPDLOG_BUILD_EXAMPLE OFF CACHE INTERNAL "")
+set(SPDLOG_BUILD_COMPILED ON CACHE INTERNAL "")
+
+FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp spdlog)
 
 add_executable(run
     src/main.cpp
@@ -67,12 +76,15 @@ add_executable(run
     src/agent.cpp
     src/server.cpp
     src/llm_service.cpp
+    src/logger.hpp
+    src/config.hpp
 )
 
 target_link_libraries(run PRIVATE
     mavsdk
     httplib
     nlohmann_json::nlohmann_json
+    spdlog
 )
 
 if (TARGET llama-server)
