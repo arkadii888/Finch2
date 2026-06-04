@@ -75,9 +75,11 @@ add_executable(run
     src/drone/dummy_drone.cpp
     src/drone/px4_drone.cpp
 
+    src/llm_service/llm_service.hpp
+    src/llm_service/llama_service.cpp
+
     src/agent.cpp
     src/server.cpp
-    src/llm_service.cpp
     src/logger.hpp
     src/config.hpp
 )

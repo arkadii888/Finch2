@@ -1,18 +1,9 @@
-#include "llm_service.hpp"
+#include "llama_service.hpp"
 
-#include <chrono>
-#include <cstdio>
-#include <signal.h>
-#include <sys/wait.h>
-#include <thread>
-#include <unistd.h>
-
-#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+#include <nlohmann/json.hpp>
 
-#include "config.hpp"
-
-LlmService::LlmService() : client_ {"127.0.0.1", config.llama_server_port} {
+void LlamaService::Run() {
     client_.set_connection_timeout(10, 0);
     client_.set_read_timeout(300, 0);
 
@@ -45,7 +36,7 @@ LlmService::LlmService() : client_ {"127.0.0.1", config.llama_server_port} {
     }
 }
 
-LlmService::~LlmService() {
+void LlamaService::Stop() {
     if (pid_ > 0) {
         kill(pid_, SIGTERM);
         waitpid(pid_, nullptr, 0);
@@ -53,7 +44,7 @@ LlmService::~LlmService() {
     }
 }
 
-std::string LlmService::Complete(const std::string& prompt) {
+std::string LlamaService::Complete(const std::string& prompt) {
     nlohmann::json request = {
         {"model", config.model_path},
         {"messages", {{{"role", "user"}, {"content", prompt}}}},
