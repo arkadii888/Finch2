@@ -52,7 +52,10 @@ class Drone {
     virtual void Disarm() = 0;
     virtual void Init() = 0;
     virtual void Kill() = 0;
-    virtual void LaunchMission(const std::vector<MissionItem>& mission_items) = 0;
+    virtual void LaunchMission() = 0;
+    virtual void UploadMission(const std::vector<MissionItem>& mission_items) = 0;
+
+    virtual std::pair<int, int> GetMissionProgress() = 0;
 
     virtual Telemetry GetTelemetry() = 0;
 };

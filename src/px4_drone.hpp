@@ -16,12 +16,16 @@ class Px4Drone : public Drone {
     void Disarm() override;
     void Init() override;
     void Kill() override;
-    void LaunchMission(const std::vector<MissionItem>& mission_items) override;
+    void LaunchMission() override;
+    void UploadMission(const std::vector<MissionItem>& mission_items) override;
+
+    std::pair<int, int> GetMissionProgress() override;
 
     Telemetry GetTelemetry() override;
 
  private:
     mavsdk::Mavsdk mavsdk_ {mavsdk::Mavsdk::Configuration {mavsdk::ComponentType::GroundStation}};
+
     std::shared_ptr<mavsdk::System> system_;
     std::unique_ptr<mavsdk::Action> action_;
     std::unique_ptr<mavsdk::Mission> mission_;

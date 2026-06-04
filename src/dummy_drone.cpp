@@ -18,8 +18,16 @@ void DummyDrone::Kill() {
     std::cout << "DummyDrone::Kill: Killed." << std::endl;
 }
 
-void DummyDrone::LaunchMission(const std::vector<MissionItem>& mission_items) {
-    std::cout << "DummyDrone::LaunchMission: Mission is launched." << std::endl;
+void DummyDrone::LaunchMission() {
+    std::cout << "DummyDrone::LaunchMission: Mission launched." << std::endl;
+}
+
+void DummyDrone::UploadMission(const std::vector<MissionItem>& mission_items) {
+    std::cout << "DummyDrone::LaunchMission: Mission uploaded." << std::endl;
+}
+
+std::pair<int, int> DummyDrone::GetMissionProgress() {
+    return {2, 6};
 }
 
 Telemetry DummyDrone::GetTelemetry() {
