@@ -2,17 +2,18 @@
 #include "drone.hpp"
 
 #include <chrono>
-#include <iostream>
 #include <thread>
+
+#include <spdlog/spdlog.h>
 
 void Px4Drone::Init() {
     mavsdk_.add_any_connection("udpin://127.0.0.1:14540");
 
     while (mavsdk_.systems().empty()) {
-        std::cout << "Px4Drone::Init: Drone is not detected yet..." << std::endl;
+        spdlog::info("Px4Drone::Init: Not detected yet..");
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
-    std::cout << "Px4Drone::Init: Drone is detected." << std::endl;
+    spdlog::info("Px4Drone::Init: Detected.");
 
     system_ = mavsdk_.systems().at(0);
     action_ = std::make_unique<mavsdk::Action>(system_);
@@ -20,10 +21,10 @@ void Px4Drone::Init() {
     telemetry_ = std::make_unique<mavsdk::Telemetry>(system_);
 
     while (!telemetry_->health_all_ok()) {
-        std::cout << "Px4Drone::Init: Drone is not ready to arm yet..." << std::endl;
+        spdlog::info("Px4Drone::Init: Not ready to arm yet...");
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
-    std::cout << "Px4Drone::Init: Drone is ready to arm." << std::endl;
+    spdlog::info("Px4Drone::Init: Ready to arm.");
 }
 
 void Px4Drone::LaunchMission() {
@@ -32,20 +33,20 @@ void Px4Drone::LaunchMission() {
     }
 
     if (mission_->start_mission() != mavsdk::Mission::Result::Success) {
-        std::cout << "Vehicle::LaunchMission: Mission launch failed." << std::endl;
+        spdlog::error("Px4Drone::LaunchMission: Failed.");
     }
 
-    std::cout << "Vehicle::LaunchMission: Mission launched." << std::endl;
+    spdlog::info("Px4Drone::LaunchMission: Done.");
 }
 
 void Px4Drone::UploadMission(const std::vector<MissionItem>& mission_items) {
     if (mission_->pause_mission() != mavsdk::Mission::Result::Success) {
-        std::cout << "Px4Drone::UploadMission: Mission pause failed." << std::endl;
+        spdlog::error("Px4Drone::UploadMission: Pause failed.");
         return;
     }
 
     if (mission_->clear_mission() != mavsdk::Mission::Result::Success) {
-        std::cout << "Px4Drone::UploadMission: Mission clear failed." << std::endl;
+        spdlog::error("Px4Drone::UploadMission: Clear failed.");
         return;
     }
 
@@ -77,40 +78,40 @@ void Px4Drone::UploadMission(const std::vector<MissionItem>& mission_items) {
     plan.mission_items = final_items;
 
     if (mission_->upload_mission(plan) != mavsdk::Mission::Result::Success) {
-        std::cout << "Px4Drone::UploadMission: Mission upload failed." << std::endl;
+        spdlog::error("Px4Drone::UploadMission: Failed.");
         return;
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds {500});
 
-    std::cout << "Px4Drone::UploadMission: Mission uploaded." << std::endl;
+    spdlog::info("Px4Drone::UploadMission: Done.");
 }
 
 void Px4Drone::Kill() {
     if (action_->kill() != mavsdk::Action::Result::Success) {
-        std::cout << "Px4Drone::Kill: Failed." << std::endl;
+        spdlog::error("Px4Drone::Kill: Failed.");
         return;
     }
 
-    std::cout << "Px4Drone::Kill: Killed." << std::endl;
+    spdlog::info("Px4Drone::Kill: Done.");
 }
 
 void Px4Drone::Arm() {
     if (action_->arm() != mavsdk::Action::Result::Success) {
-        std::cout << "Px4Drone::Arm: Failed." << std::endl;
+        spdlog::error("Px4Drone::Arm: Failed.");
         return;
     }
 
-    std::cout << "Px4Drone::Arm: Armed." << std::endl;
+    spdlog::info("Px4Drone::Arm: Done.");
 }
 
 void Px4Drone::Disarm() {
     if (action_->disarm() != mavsdk::Action::Result::Success) {
-        std::cout << "Px4Drone::Disarm: Failed." << std::endl;
+        spdlog::error("Px4Drone::Disarm: Failed.");
         return;
     }
 
-    std::cout << "Px4Drone::Arm: Disarmed." << std::endl;
+    spdlog::info("Px4Drone::Disarm: Done.");
 }
 
 std::pair<int, int> Px4Drone::GetMissionProgress() {

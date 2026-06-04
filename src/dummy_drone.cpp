@@ -1,6 +1,6 @@
 #include "dummy_drone.hpp"
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 void DummyDrone::Arm() {
     spdlog::info("DummyDrone::Arm: Done.");
