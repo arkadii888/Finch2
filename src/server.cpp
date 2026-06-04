@@ -1,10 +1,10 @@
 #include "server.hpp"
 
-#include <iostream>
 #include <thread>
 #include <chrono>
 
 #include <httplib.h>
+#include <spdlog/spdlog.h>
 
 #include "config.hpp"
 
@@ -41,10 +41,10 @@ void Server::Run() {
         server.stop();
     }};
 
-    std::cout << "Server::Run: HTTP server started on port " << config.http_server_port << "." << std::endl;
+    spdlog::info("Server::Run: Started on port {}", config.http_server_port);
 
     server.listen("0.0.0.0", config.http_server_port);
 
     monitor.join();
-    std::cout << "Server::Run: HTTP server stopped." << std::endl;
+    spdlog::info("Server::Run: Stopped");
 }

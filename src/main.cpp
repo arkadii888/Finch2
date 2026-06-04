@@ -5,6 +5,7 @@
 #include "agent.hpp"
 #include "dummy_drone.hpp"
 #include "server.hpp"
+#include "logger.hpp"
 
 std::atomic<bool> global_running {true};
 
@@ -13,6 +14,8 @@ void signal_handler(int signum) {
 }
 
 int main() {
+    Logger logger;
+
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
 

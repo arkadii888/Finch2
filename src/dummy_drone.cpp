@@ -1,29 +1,29 @@
 #include "dummy_drone.hpp"
 
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 void DummyDrone::Arm() {
-    std::cout << "DummyDrone::Arm: Armed." << std::endl;
+    spdlog::info("DummyDrone::Arm: Done.");
 }
 
 void DummyDrone::Disarm() {
-    std::cout << "DummyDrone::Disarm: Disarmed." << std::endl;
+    spdlog::info("DummyDrone::Disarm: Done.");
 }
 
 void DummyDrone::Init() {
-    std::cout << "DummyDrone::Init: Drone is ready to arm." << std::endl;
+    spdlog::info("DummyDrone::Init: Drone is ready to arm.");
 }
 
 void DummyDrone::Kill() {
-    std::cout << "DummyDrone::Kill: Killed." << std::endl;
+    spdlog::info("DummyDrone::Kill: Done.");
 }
 
 void DummyDrone::LaunchMission() {
-    std::cout << "DummyDrone::LaunchMission: Mission launched." << std::endl;
+    spdlog::info("DummyDrone::LaunchMission: Done.");
 }
 
 void DummyDrone::UploadMission(const std::vector<MissionItem>& mission_items) {
-    std::cout << "DummyDrone::LaunchMission: Mission uploaded." << std::endl;
+    spdlog::info("DummyDrone::UploadMission: Done.");
 }
 
 std::pair<int, int> DummyDrone::GetMissionProgress() {

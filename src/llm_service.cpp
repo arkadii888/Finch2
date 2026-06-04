@@ -2,13 +2,13 @@
 
 #include <chrono>
 #include <cstdio>
-#include <iostream>
 #include <signal.h>
 #include <sys/wait.h>
 #include <thread>
 #include <unistd.h>
 
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 
 #include "config.hpp"
 
@@ -17,7 +17,7 @@ LlmService::LlmService() : client_ {"127.0.0.1", config.llama_server_port} {
     client_.set_read_timeout(300, 0);
 
     if ((pid_ = fork()) < 0) {
-        std::cout << "LlmService::LlmService: Fork failed." << std::endl;
+        spdlog::error("LlmService::LlmService: Fork failed.");
         return;
     }
 
@@ -31,14 +31,13 @@ LlmService::LlmService() : client_ {"127.0.0.1", config.llama_server_port} {
     auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(120);
     while (std::chrono::steady_clock::now() < deadline) {
         if (waitpid(pid_, nullptr, WNOHANG) > 0) {
-            std::cout << "LlmService::LlmService: Llama server crashed." << std::endl;
+            spdlog::error("LlmService::LlmService: Llama server crashed.");
             return;
         }
 
         auto result {client_.Get("/health")};
         if(result && result->status == 200) {
-            std::cout << "LlmService::LlmService: Llama server started on port "
-            << config.llama_server_port << "." << std::endl;
+            spdlog::info("LlmService::LlmService: Started on port {}", config.llama_server_port);
             return;
         }
 
@@ -50,6 +49,7 @@ LlmService::~LlmService() {
     if (pid_ > 0) {
         kill(pid_, SIGTERM);
         waitpid(pid_, nullptr, 0);
+        spdlog::info("LlmService::~LlmService: Stopped.");
     }
 }
 
@@ -62,7 +62,7 @@ std::string LlmService::Complete(const std::string& prompt) {
 
     auto result {client_.Post("/v1/chat/completions", request.dump(), "application/json")};
     if (!result || result->status != 200) {
-        std::cout << "LlmService::Complete: HTTP connection error." << std::endl;
+        spdlog::error("LlmService::Complete: Connection error.");
         return "";
     }
 
@@ -94,8 +94,7 @@ std::string LlmService::Complete(const std::string& prompt) {
         return content.get<std::string>();
 
     } catch (const std::exception& e) {
-        std::cout << "LlmService::Complete: Error: " << e.what() << "\n"
-                  << "Raw response body: " << result->body << std::endl;
+        spdlog::error("LlmService::Complete: Error: {}", e.what());
         return "";
     }
 }

@@ -114,7 +114,11 @@ double alpha {0.05};
 *Example:*
 
 ```cpp
-std::cout << "MyClass::MyFunction: Houston, we have a problem." << std::endl;
+#include <spdlog/spdlog.h>
+
+spdlog::error("Class::Function: Failed.");
+
+spdlog::info("Class::Function: Done.");
 ```
 
 **Code Width**
