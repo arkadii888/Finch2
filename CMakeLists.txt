@@ -70,12 +70,16 @@ FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp spdlog)
 
 add_executable(run
     src/main.cpp
-    src/drone.hpp
-    src/px4_drone.cpp
-    src/dummy_drone.cpp
+
+    src/drone/drone.hpp
+    src/drone/dummy_drone.cpp
+    src/drone/px4_drone.cpp
+
+    src/llm_service/llm_service.hpp
+    src/llm_service/llama_service.cpp
+
     src/agent.cpp
     src/server.cpp
-    src/llm_service.cpp
     src/logger.hpp
     src/config.hpp
 )

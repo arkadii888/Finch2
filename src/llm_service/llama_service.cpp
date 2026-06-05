@@ -1,23 +1,14 @@
-#include "llm_service.hpp"
+#include "llama_service.hpp"
 
-#include <chrono>
-#include <cstdio>
-#include <signal.h>
-#include <sys/wait.h>
-#include <thread>
-#include <unistd.h>
-
-#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+#include <nlohmann/json.hpp>
 
-#include "config.hpp"
-
-LlmService::LlmService() : client_ {"127.0.0.1", config.llama_server_port} {
+void LlamaService::Run() {
     client_.set_connection_timeout(10, 0);
     client_.set_read_timeout(300, 0);
 
     if ((pid_ = fork()) < 0) {
-        spdlog::error("LlmService::LlmService: Fork failed.");
+        spdlog::error("LlmService::Run: Fork failed.");
         return;
     }
 
@@ -31,13 +22,13 @@ LlmService::LlmService() : client_ {"127.0.0.1", config.llama_server_port} {
     auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(120);
     while (std::chrono::steady_clock::now() < deadline) {
         if (waitpid(pid_, nullptr, WNOHANG) > 0) {
-            spdlog::error("LlmService::LlmService: Llama server crashed.");
+            spdlog::error("LlmService::Run: Llama server crashed.");
             return;
         }
 
         auto result {client_.Get("/health")};
         if(result && result->status == 200) {
-            spdlog::info("LlmService::LlmService: Started on port {}", config.llama_server_port);
+            spdlog::info("LlmService::Run: Started on port {}", config.llama_server_port);
             return;
         }
 
@@ -45,15 +36,15 @@ LlmService::LlmService() : client_ {"127.0.0.1", config.llama_server_port} {
     }
 }
 
-LlmService::~LlmService() {
+void LlamaService::Stop() {
     if (pid_ > 0) {
         kill(pid_, SIGTERM);
         waitpid(pid_, nullptr, 0);
-        spdlog::info("LlmService::~LlmService: Stopped.");
+        spdlog::info("LlmService::~Stop: Stopped.");
     }
 }
 
-std::string LlmService::Complete(const std::string& prompt) {
+std::string LlamaService::Complete(const std::string& prompt) {
     nlohmann::json request = {
         {"model", config.model_path},
         {"messages", {{{"role", "user"}, {"content", prompt}}}},

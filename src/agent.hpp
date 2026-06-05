@@ -6,8 +6,8 @@
 #include <mutex>
 #include <string>
 
-#include "drone.hpp"
-#include "llm_service.hpp"
+#include "drone/drone.hpp"
+#include "llm_service/llm_service.hpp"
 
 extern std::atomic<bool> global_running;
 
@@ -60,7 +60,7 @@ class LlmOutput {
 
 class Agent {
  public:
-    Agent(Drone& drone);
+    Agent(Drone& drone, LlmService& llm_service);
 
     void Run();
 
@@ -73,7 +73,7 @@ class Agent {
  private:
     Drone& drone_;
     LlmOutput llm_output_;
-    LlmService llm_service_;
+    LlmService& llm_service_;
     Output output_;
     std::mutex input_mutex_;
 };
