@@ -14,13 +14,14 @@
 #endif
 
 struct LlamaBackendConfig {
-    int batch_size = 2'048;
+    int batch_size = 2048;
     bool cont_batching = true;
     std::string flash_attn = "on";  // on | off | auto
     bool log_disable = true;
     bool mlock = false;
     bool no_mmap = false;
     int parallel = 1;
+    int threads = -1;       // -1 = let backend decide
     int threads_batch = -1;
     int ubatch_size = 512;
 };

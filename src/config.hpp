@@ -8,7 +8,7 @@
 
 struct InferenceConfig {
     int context_size = 4096;
-    int max_tokens = -1;  // -1 = unlimited
+    int max_tokens = 4096; 
     float temperature = 0.8f;
 
     #if defined(FINCH_BACKEND_METAL) || defined(FINCH_BACKEND_CUDA)
@@ -16,8 +16,6 @@ struct InferenceConfig {
     #else
         int gpu_layers = 0;
     #endif
-
-    int threads = -1;  // -1 = let backend decide
 };
 
 struct Config {

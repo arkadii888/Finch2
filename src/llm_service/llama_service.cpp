@@ -37,7 +37,7 @@ void LlamaService::Run() {
 
         flag(inference.max_tokens >= 0,  "-n",   std::to_string(inference.max_tokens));
         flag(inference.gpu_layers > 0,   "-ngl", std::to_string(inference.gpu_layers));
-        flag(inference.threads >= 0,    "-t",   std::to_string(inference.threads));
+        flag(llama.threads >= 0,        "-t",   std::to_string(llama.threads));
         flag(llama.threads_batch >= 0,  "-tb",  std::to_string(llama.threads_batch));
         flag(llama.cont_batching,       "--cont-batching");
         flag(!llama.flash_attn.empty(), "--flash-attn", llama.flash_attn);
