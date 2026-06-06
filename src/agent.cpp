@@ -16,8 +16,17 @@ std::string Agent::GetDroneTelemetry() {
 }
 
 std::string Agent::GetOutput() {
-    auto output = output_.Get();
-    return !output.empty() ? output : "Not ready yet.";
+    const LlmOutputSnapshot snapshot {llm_output_.Snapshot()};
+
+    if (snapshot.state == LlmState::Ready) {
+        return snapshot.result;
+    }
+
+    if (snapshot.state == LlmState::Running) {
+        return "Processing...";
+    }
+
+    return "Not ready yet.";
 }
 
 void Agent::KillDrone() {
@@ -27,11 +36,11 @@ void Agent::KillDrone() {
 void Agent::ProcessInput(const std::string& input) {
     std::lock_guard lock {input_mutex_};
 
-    if (llm_output_.Is_Processing()) {
+    if (llm_output_.IsRunning()) {
         return;
     }
 
-    auto output {std::async(std::launch::async, [this, input]{
+    std::future<std::string> output {std::async(std::launch::async, [this, input] {
         return llm_service_.Complete(input);
     })};
 

@@ -66,6 +66,30 @@ set(SPDLOG_BUILD_TESTS OFF CACHE INTERNAL "")
 set(SPDLOG_BUILD_EXAMPLE OFF CACHE INTERNAL "")
 set(SPDLOG_BUILD_COMPILED ON CACHE INTERNAL "")
 
+set(FINCH_BACKEND "AUTO" CACHE STRING "AUTO | CPU | METAL | CUDA")
+
+if(FINCH_BACKEND STREQUAL "AUTO")
+    if(APPLE)
+        set(_backend "METAL")
+    else()
+        find_package(CUDAToolkit QUIET)
+        if(CUDAToolkit_FOUND)
+            set(_backend "CUDA")
+        else()
+            set(_backend "CPU")
+        endif()
+    endif()
+else()
+    set(_backend "${FINCH_BACKEND}")
+endif()
+message(STATUS "Finch2 backend: ${_backend}")
+
+if(_backend STREQUAL "METAL")
+    set(GGML_METAL ON CACHE BOOL "" FORCE)
+elseif(_backend STREQUAL "CUDA")
+    set(GGML_CUDA ON CACHE BOOL "" FORCE)
+endif()
+
 FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp spdlog)
 
 add_executable(run
@@ -99,4 +123,5 @@ endif()
 
 target_compile_definitions(run PRIVATE
     PROJECT_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    "FINCH_BACKEND_${_backend}=1"
 )
