@@ -57,6 +57,30 @@ set(LLAMA_BUILD_COMMON ON CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_TOOLS ON CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_SERVER ON CACHE BOOL "" FORCE)
 
+set(LLAMA_BACKEND "AUTO" CACHE STRING "AUTO | CPU | METAL | CUDA")
+
+if(LLAMA_BACKEND STREQUAL "AUTO")
+    if(APPLE)
+        set(LLAMA_BACKEND_SELECTED "METAL")
+    else()
+        find_package(CUDAToolkit QUIET)
+        if(CUDAToolkit_FOUND)
+            set(LLAMA_BACKEND_SELECTED "CUDA")
+        else()
+            set(LLAMA_BACKEND_SELECTED "CPU")
+        endif()
+    endif()
+else()
+    set(LLAMA_BACKEND_SELECTED "${LLAMA_BACKEND}")
+endif()
+message(STATUS "Llama backend: ${LLAMA_BACKEND_SELECTED}")
+
+if(LLAMA_BACKEND_SELECTED STREQUAL "METAL")
+    set(GGML_METAL ON CACHE BOOL "" FORCE)
+elseif(LLAMA_BACKEND_SELECTED STREQUAL "CUDA")
+    set(GGML_CUDA ON CACHE BOOL "" FORCE)
+endif()
+
 FetchContent_Declare(
   spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
@@ -99,4 +123,5 @@ endif()
 
 target_compile_definitions(run PRIVATE
     PROJECT_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    "LLAMA_BACKEND_${LLAMA_BACKEND_SELECTED}=1"
 )
