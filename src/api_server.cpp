@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include <httplib.h>
-#include <spdlog/spdlog.h
+#include <spdlog/spdlog.h>
 
 import globals;
 import lifecycle;

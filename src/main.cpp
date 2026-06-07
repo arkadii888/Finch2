@@ -1,6 +1,4 @@
 #include <thread>
-#include <csignal>
-#include <atomic>
 
 #include "agent.hpp"
 #include "api_server.hpp"
@@ -10,7 +8,7 @@
 
 import lifecycle;
 
-int main()
+int main() {
     lifecycle::Init();
 
     Logger logger;
