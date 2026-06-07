@@ -13,6 +13,7 @@
 void LlamaService::Run() {
     client_.set_connection_timeout(10, 0);
     client_.set_read_timeout(300, 0);
+    client_.set_keep_alive(false);
 
     if ((pid_ = fork()) < 0) {
         spdlog::error("LlamaService::Run: Fork failed.");
@@ -82,7 +83,7 @@ void LlamaService::Run() {
             return;
         }
 
-        auto result {client_.Get("/health")};
+        const auto result {client_.Get("/health")};
         if (result && result->status == 200) {
             spdlog::info("LlamaService::Run: Started on port {}", config.inference_server_port);
             return;
@@ -100,16 +101,31 @@ void LlamaService::Stop() {
     }
 }
 
-std::string LlamaService::Complete(const std::string& prompt) {
-    nlohmann::json request {
-        {"model", config.model_path},
-        {"messages", {{{"role", "user"}, {"content", prompt}}}},
-        {"stream", false}
-    };
+std::string LlamaService::Complete(const CompletionRequest& request) {
+    if (request.user_prompt.empty()) {
+        spdlog::error("LlamaService::Complete: User prompt is empty.");
+        return "";
+    }
 
-    auto result {client_.Post("/v1/chat/completions", request.dump(), "application/json")};
-    if (!result || result->status != 200) {
+    nlohmann::json body {
+        {"model", config.model_path},
+        {"stream", false},
+        {"messages", nlohmann::json::array()},
+    };
+    auto& messages {body["messages"]};
+    if (!request.system_prompt.empty()) {
+        messages.push_back({{"role", "system"}, {"content", request.system_prompt}});
+    }
+    messages.push_back({{"role", "user"}, {"content", request.user_prompt}});
+    const std::string payload {body.dump()};
+
+    const auto result {client_.Post("/v1/chat/completions", payload, "application/json")};
+    if (!result) {
         spdlog::error("LlamaService::Complete: Connection error.");
+        return "";
+    }
+    if (result->status != 200) {
+        spdlog::error("LlamaService::Complete: HTTP {}: {}", result->status, result->body);
         return "";
     }
 

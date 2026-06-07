@@ -108,6 +108,8 @@ add_executable(run
     src/config.hpp
 )
 
+target_include_directories(run PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 target_link_libraries(run PRIVATE
     mavsdk
     httplib

@@ -4,6 +4,10 @@
 #include <thread>
 
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
+
+#include "behavior_tree/node.hpp"
+#include "intents/intent.hpp"
 
 Agent::Agent(Drone& drone, LlmService& llm_service) : drone_ {drone}, llm_service_ {llm_service} {}
 
@@ -41,12 +45,28 @@ void Agent::ProcessInput(const std::string& input) {
         return;
     }
 
-    std::thread([this, input] {
-        HandleOutput(llm_service_.Complete(input));
+    const CompletionRequest request {
+        .system_prompt = SystemPrompt(),
+        .user_prompt = input,
+    };
+
+    std::thread([this, request] {
+        HandleOutput(llm_service_.Complete(request));
         is_processing_ = false;
     }).detach();
 }
 
 void Agent::HandleOutput(std::string output) {
+    try {
+        const std::string error {ValidateBtJson(nlohmann::json::parse(output), RegisteredIntents())};
+        if (error.empty()) {
+            spdlog::info("Agent::HandleOutput: Behavior tree validation passed.");
+        } else {
+            spdlog::error("Agent::HandleOutput: Behavior tree validation failed: {}", error);
+        }
+    } catch (const std::exception& e) {
+        spdlog::error("Agent::HandleOutput: Failed to parse LLM output as JSON: {}", e.what());
+    }
+
     llm_output_.Set(std::move(output));
 }

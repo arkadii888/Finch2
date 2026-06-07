@@ -18,7 +18,7 @@ class LlamaService : public LlmService {
     void Run() override;
     void Stop() override;
 
-    std::string Complete(const std::string& prompt) override;
+    std::string Complete(const CompletionRequest& request) override;
 
  private:
     struct BackendConfig {
@@ -32,16 +32,16 @@ class LlamaService : public LlmService {
             int gpu_layers {0};
         #endif
 
-        int batch_size {2'048};
         bool cont_batching {true};
-        std::string flash_attn {"on"};  // on | off | auto
         bool log_disable {true};
         bool mlock {false};
         bool no_mmap {false};
+        int batch_size {2'048};
         int parallel {1};
         int threads {-1};
         int threads_batch {-1};
         int ubatch_size {512};
+        std::string flash_attn {"on"};  // on | off | auto
     };
 
     BackendConfig backend_config_ {};
