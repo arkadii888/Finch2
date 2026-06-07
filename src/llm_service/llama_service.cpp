@@ -2,6 +2,8 @@
 
 #include <unistd.h>
 
+#include <chrono>
+#include <thread>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -12,41 +14,59 @@ void LlamaService::Run() {
     client_.set_read_timeout(300, 0);
 
     if ((pid_ = fork()) < 0) {
-        spdlog::error("LlmService::Run: Fork failed.");
+        spdlog::error("LlamaService::Run: Fork failed.");
         return;
     }
 
     if (pid_ == 0) {
-        const InferenceConfig& inference {config.inference};
-        const LlamaBackendConfig& llama {llama_backend_config};
-
         std::vector<std::string> args {
             "llama-server",
             "-m",         config.model_path,
             "--port",     std::to_string(config.inference_server_port),
-            "-c",         std::to_string(inference.context_size),
-            "-b",         std::to_string(llama.batch_size),
-            "-ub",        std::to_string(llama.ubatch_size),
-            "--parallel", std::to_string(llama.parallel),
-            "--temp",     std::to_string(inference.temperature),
+            "-c",         std::to_string(backend_config_.context_size),
+            "-b",         std::to_string(backend_config_.batch_size),
+            "-ub",        std::to_string(backend_config_.ubatch_size),
+            "--parallel", std::to_string(backend_config_.parallel),
+            "--temp",     std::to_string(backend_config_.temperature),
         };
 
-        auto flag = [&](bool cond, auto... a) {
-            if (cond) (args.push_back(std::string{a}), ...);
-        };
+        if (backend_config_.max_tokens >= 0) {
+            args.push_back("-n");
+            args.push_back(std::to_string(backend_config_.max_tokens));
+        }
+        if (backend_config_.gpu_layers > 0) {
+            args.push_back("-ngl");
+            args.push_back(std::to_string(backend_config_.gpu_layers));
+        }
+        if (backend_config_.threads >= 0) {
+            args.push_back("-t");
+            args.push_back(std::to_string(backend_config_.threads));
+        }
+        if (backend_config_.threads_batch >= 0) {
+            args.push_back("-tb");
+            args.push_back(std::to_string(backend_config_.threads_batch));
+        }
+        if (backend_config_.cont_batching) {
+            args.push_back("--cont-batching");
+        }
+        if (!backend_config_.flash_attn.empty()) {
+            args.push_back("--flash-attn");
+            args.push_back(backend_config_.flash_attn);
+        }
+        if (backend_config_.mlock) {
+            args.push_back("--mlock");
+        }
+        if (backend_config_.no_mmap) {
+            args.push_back("--no-mmap");
+        }
+        if (backend_config_.log_disable) {
+            args.push_back("--log-disable");
+        }
 
-        flag(inference.max_tokens >= 0,  "-n",   std::to_string(inference.max_tokens));
-        flag(inference.gpu_layers > 0,   "-ngl", std::to_string(inference.gpu_layers));
-        flag(llama.threads >= 0,        "-t",   std::to_string(llama.threads));
-        flag(llama.threads_batch >= 0,  "-tb",  std::to_string(llama.threads_batch));
-        flag(llama.cont_batching,       "--cont-batching");
-        flag(!llama.flash_attn.empty(), "--flash-attn", llama.flash_attn);
-        flag(llama.mlock,               "--mlock");
-        flag(llama.no_mmap,             "--no-mmap");
-        flag(llama.log_disable,         "--log-disable");
-
-        std::vector<char*> argv;
-        for (auto& arg : args) argv.push_back(arg.data());
+        std::vector<char*> argv {};
+        for (auto& arg : args) {
+            argv.push_back(arg.data());
+        }
         argv.push_back(nullptr);
 
         execv(LLAMA_SERVER_PATH, argv.data());
@@ -54,20 +74,20 @@ void LlamaService::Run() {
         _exit(1);
     }
 
-    auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(120);
+    auto deadline {std::chrono::steady_clock::now() + std::chrono::seconds {120}};
     while (std::chrono::steady_clock::now() < deadline) {
         if (waitpid(pid_, nullptr, WNOHANG) > 0) {
-            spdlog::error("LlmService::Run: Llama server crashed.");
+            spdlog::error("LlamaService::Run: Llama server crashed.");
             return;
         }
 
         auto result {client_.Get("/health")};
-        if(result && result->status == 200) {
-            spdlog::info("LlmService::Run: Started on port {}", config.inference_server_port);
+        if (result && result->status == 200) {
+            spdlog::info("LlamaService::Run: Started on port {}", config.inference_server_port);
             return;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds {500});
     }
 }
 
@@ -75,12 +95,12 @@ void LlamaService::Stop() {
     if (pid_ > 0) {
         kill(pid_, SIGTERM);
         waitpid(pid_, nullptr, 0);
-        spdlog::info("LlmService::~Stop: Stopped.");
+        spdlog::info("LlamaService::Stop: Stopped.");
     }
 }
 
 std::string LlamaService::Complete(const std::string& prompt) {
-    nlohmann::json request = {
+    nlohmann::json request {
         {"model", config.model_path},
         {"messages", {{{"role", "user"}, {"content", prompt}}}},
         {"stream", false}
@@ -88,7 +108,7 @@ std::string LlamaService::Complete(const std::string& prompt) {
 
     auto result {client_.Post("/v1/chat/completions", request.dump(), "application/json")};
     if (!result || result->status != 200) {
-        spdlog::error("LlmService::Complete: Connection error.");
+        spdlog::error("LlamaService::Complete: Connection error.");
         return "";
     }
 
@@ -100,27 +120,26 @@ std::string LlamaService::Complete(const std::string& prompt) {
         }
 
         if (root.contains("error")) {
-            const auto& err {root["error"]};
-            if (err.is_object() && err.contains("message") && err["message"].is_string()) {
-                throw std::runtime_error {err["message"].get<std::string>()};
+            if (root["error"].is_object()
+                    && root["error"].contains("message")
+                    && root["error"]["message"].is_string()) {
+                throw std::runtime_error {root["error"]["message"].get<std::string>()};
             }
-            throw std::runtime_error {err.dump()};
+            throw std::runtime_error {root["error"].dump()};
         }
 
-        const auto& choices {root["choices"]};
-        if (!choices.is_array() || choices.empty()) {
+        if (!root["choices"].is_array() || root["choices"].empty()) {
             throw std::runtime_error {"missing choices"};
         }
 
-        const auto& content {choices[0]["message"]["content"]};
-        if (!content.is_string()) {
+        if (!root["choices"][0]["message"]["content"].is_string()) {
             throw std::runtime_error {"expected string content"};
         }
 
-        return content.get<std::string>();
+        return root["choices"][0]["message"]["content"].get<std::string>();
 
     } catch (const std::exception& e) {
-        spdlog::error("LlmService::Complete: Error: {}", e.what());
+        spdlog::error("LlamaService::Complete: Error: {}", e.what());
         return "";
     }
 }

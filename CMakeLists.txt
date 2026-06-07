@@ -57,6 +57,30 @@ set(LLAMA_BUILD_COMMON ON CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_TOOLS ON CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_SERVER ON CACHE BOOL "" FORCE)
 
+set(LLAMA_BACKEND "AUTO" CACHE STRING "AUTO | CPU | METAL | CUDA")
+
+if(LLAMA_BACKEND STREQUAL "AUTO")
+    if(APPLE)
+        set(LLAMA_BACKEND_SELECTED "METAL")
+    else()
+        find_package(CUDAToolkit QUIET)
+        if(CUDAToolkit_FOUND)
+            set(LLAMA_BACKEND_SELECTED "CUDA")
+        else()
+            set(LLAMA_BACKEND_SELECTED "CPU")
+        endif()
+    endif()
+else()
+    set(LLAMA_BACKEND_SELECTED "${LLAMA_BACKEND}")
+endif()
+message(STATUS "Llama backend: ${LLAMA_BACKEND_SELECTED}")
+
+if(LLAMA_BACKEND_SELECTED STREQUAL "METAL")
+    set(GGML_METAL ON CACHE BOOL "" FORCE)
+elseif(LLAMA_BACKEND_SELECTED STREQUAL "CUDA")
+    set(GGML_CUDA ON CACHE BOOL "" FORCE)
+endif()
+
 FetchContent_Declare(
   spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
@@ -65,30 +89,6 @@ FetchContent_Declare(
 set(SPDLOG_BUILD_TESTS OFF CACHE INTERNAL "")
 set(SPDLOG_BUILD_EXAMPLE OFF CACHE INTERNAL "")
 set(SPDLOG_BUILD_COMPILED ON CACHE INTERNAL "")
-
-set(FINCH_BACKEND "AUTO" CACHE STRING "AUTO | CPU | METAL | CUDA")
-
-if(FINCH_BACKEND STREQUAL "AUTO")
-    if(APPLE)
-        set(_backend "METAL")
-    else()
-        find_package(CUDAToolkit QUIET)
-        if(CUDAToolkit_FOUND)
-            set(_backend "CUDA")
-        else()
-            set(_backend "CPU")
-        endif()
-    endif()
-else()
-    set(_backend "${FINCH_BACKEND}")
-endif()
-message(STATUS "Finch2 backend: ${_backend}")
-
-if(_backend STREQUAL "METAL")
-    set(GGML_METAL ON CACHE BOOL "" FORCE)
-elseif(_backend STREQUAL "CUDA")
-    set(GGML_CUDA ON CACHE BOOL "" FORCE)
-endif()
 
 FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp spdlog)
 
@@ -123,5 +123,5 @@ endif()
 
 target_compile_definitions(run PRIVATE
     PROJECT_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
-    "FINCH_BACKEND_${_backend}=1"
+    "LLAMA_BACKEND_${LLAMA_BACKEND_SELECTED}=1"
 )
