@@ -83,7 +83,7 @@ void LlamaService::Run() {
             return;
         }
 
-        const auto result {client_.Get("/health")};
+        auto result {client_.Get("/health")};
         if (result && result->status == 200) {
             spdlog::info("LlamaService::Run: Started on port {}", config.inference_server_port);
             return;
@@ -119,7 +119,7 @@ std::string LlamaService::Complete(const CompletionRequest& request) {
     messages.push_back({{"role", "user"}, {"content", request.user_prompt}});
     const std::string payload {body.dump()};
 
-    const auto result {client_.Post("/v1/chat/completions", payload, "application/json")};
+    auto result {client_.Post("/v1/chat/completions", payload, "application/json")};
     if (!result) {
         spdlog::error("LlamaService::Complete: Connection error.");
         return "";
