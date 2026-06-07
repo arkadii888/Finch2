@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "api_server.hpp"
 
 #include <thread>
 #include <chrono>
@@ -8,9 +8,9 @@
 
 #include "config.hpp"
 
-Server::Server(Agent& agent) : agent_ {agent} {}
+ApiServer::ApiServer(Agent& agent) : agent_ {agent} {}
 
-void Server::Run() {
+void ApiServer::Run() {
     httplib::Server server;
 
     server.Post("/input", [this](const httplib::Request& req, httplib::Response& res) {
@@ -41,10 +41,10 @@ void Server::Run() {
         server.stop();
     }};
 
-    spdlog::info("Server::Run: Started on port {}", config.http_server_port);
+    spdlog::info("ApiServer::Run: Started on port {}", config.http_server_port);
 
     server.listen("0.0.0.0", config.http_server_port);
 
     monitor.join();
-    spdlog::info("Server::Run: Stopped");
+    spdlog::info("ApiServer::Run: Stopped");
 }
