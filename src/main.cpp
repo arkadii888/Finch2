@@ -3,9 +3,9 @@
 #include <atomic>
 
 #include "agent.hpp"
+#include "api_server.hpp"
 #include "drone/dummy_drone.hpp"
 #include "llm_service/llama_service.hpp"
-#include "server.hpp"
 #include "logger.hpp"
 
 std::atomic<bool> global_running {true};
@@ -27,7 +27,7 @@ int main() {
     llama.Run();
 
     Agent agent {drone, llama};
-    Server server {agent};
+    ApiServer server {agent};
 
     std::thread agent_thread {[&agent](){agent.Run();}};
     std::thread server_thread {[&server](){server.Run();}};
