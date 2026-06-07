@@ -112,6 +112,7 @@ target_sources(run
         FILE_SET CXX_MODULES
         BASE_DIRS src
         FILES src/globals.cppm
+        FILES src/lifecycle.cppm
 )
 
 target_link_libraries(run PRIVATE

@@ -4,10 +4,6 @@
 
 #include "agent.hpp"
 
-import globals;
-
-extern std::atomic<bool> global_running;
-
 class ApiServer {
  public:
     ApiServer(Agent& agent);

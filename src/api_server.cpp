@@ -4,7 +4,10 @@
 #include <chrono>
 
 #include <httplib.h>
-#include <spdlog/spdlog.h>
+#include <spdlog/spdlog.h
+
+import globals;
+import lifecycle;
 
 ApiServer::ApiServer(Agent& agent) : agent_ {agent} {}
 
@@ -33,7 +36,7 @@ void ApiServer::Run() {
     });
 
     std::thread monitor {[&server]() {
-        while (global_running) {
+        while (lifecycle::is_alive_public) {
             std::this_thread::sleep_for(std::chrono::milliseconds {200});
         }
         server.stop();

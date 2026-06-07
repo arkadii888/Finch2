@@ -7,8 +7,6 @@
 #include "drone/drone.hpp"
 #include "llm_service/llm_service.hpp"
 
-extern std::atomic<bool> global_running;
-
 class Output {
  public:
     std::string Get() const {

@@ -8,17 +8,12 @@
 #include "llm_service/llama_service.hpp"
 #include "logger.hpp"
 
-std::atomic<bool> global_running {true};
+import lifecycle;
 
-void signal_handler(int signum) {
-    global_running = false;
-}
+int main()
+    lifecycle::Init();
 
-int main() {
     Logger logger;
-
-    std::signal(SIGINT, signal_handler);
-    std::signal(SIGTERM, signal_handler);
 
     DummyDrone drone;
     drone.Init();
