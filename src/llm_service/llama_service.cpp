@@ -1,6 +1,7 @@
 #include "llama_service.hpp"
 
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include <chrono>
 #include <thread>
