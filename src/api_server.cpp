@@ -6,8 +6,6 @@
 #include <httplib.h>
 #include <spdlog/spdlog.h>
 
-#include "config.hpp"
-
 ApiServer::ApiServer(Agent& agent) : agent_ {agent} {}
 
 void ApiServer::Run() {
@@ -41,9 +39,9 @@ void ApiServer::Run() {
         server.stop();
     }};
 
-    spdlog::info("ApiServer::Run: Started on port {}", config.http_server_port);
+    spdlog::info("ApiServer::Run: Started on port {}", globals::api_server_port);
 
-    server.listen("0.0.0.0", config.http_server_port);
+    server.listen("0.0.0.0", globals::api_server_port);
 
     monitor.join();
     spdlog::info("ApiServer::Run: Stopped");

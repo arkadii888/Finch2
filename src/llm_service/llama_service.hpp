@@ -7,7 +7,8 @@
 #include <httplib.h>
 
 #include "llm_service.hpp"
-#include "../config.hpp"
+
+import globals;
 
 #ifndef LLAMA_SERVER_PATH
 #error "LLAMA_SERVER_PATH is not defined!"
@@ -46,5 +47,5 @@ class LlamaService : public LlmService {
 
     BackendConfig backend_config_ {};
     pid_t pid_ {-1};
-    httplib::Client client_ {"127.0.0.1", config.inference_server_port};
+    httplib::Client client_ {"127.0.0.1", globals::llm_server_port};
 };

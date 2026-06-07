@@ -103,9 +103,15 @@ add_executable(run
     src/llm_service/llama_service.cpp
 
     src/agent.cpp
-    src/server.cpp
+    src/api_server.cpp
     src/logger.hpp
-    src/config.hpp
+)
+
+target_sources(run
+    PUBLIC
+        FILE_SET CXX_MODULES
+        BASE_DIRS src
+        FILES src/globals.cppm
 )
 
 target_link_libraries(run PRIVATE
