@@ -1,12 +1,10 @@
-#pragma once
-
-#include <string>
+#include "behavior_tree/behavior_tree.hpp"
 
 #include <nlohmann/json.hpp>
 
-#include "intents/intent.hpp"
+#include "intents/intent_catalog.hpp"
 
-inline std::string ValidateBtJson(const nlohmann::json& node, const IntentRegistry& registry) {
+std::string BehaviorTree::ValidateNode(const nlohmann::json& node, const IntentCatalog& catalog) {
     if (!node.is_object()) {
         return "node must be a JSON object";
     }
@@ -27,7 +25,7 @@ inline std::string ValidateBtJson(const nlohmann::json& node, const IntentRegist
             return type + " node must have a \"children\" array";
         }
         for (const auto& child : node["children"]) {
-            const std::string error {ValidateBtJson(child, registry)};
+            const std::string error {ValidateNode(child, catalog)};
             if (!error.empty()) {
                 return error;
             }
@@ -46,7 +44,7 @@ inline std::string ValidateBtJson(const nlohmann::json& node, const IntentRegist
             }
             intent_name = key;
         }
-        if (intent_name.empty() || registry.find(intent_name) == registry.end()) {
+        if (intent_name.empty() || catalog.Find(intent_name) == nullptr) {
             return intent_name.empty()
                 ? "action node must have exactly one intent key besides \"type\""
                 : "unknown action intent: " + intent_name;

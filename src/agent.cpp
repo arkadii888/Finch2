@@ -6,10 +6,10 @@
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "behavior_tree/node.hpp"
-#include "intents/intent.hpp"
+#include "behavior_tree/behavior_tree.hpp"
 
-Agent::Agent(Drone& drone, LlmService& llm_service) : drone_ {drone}, llm_service_ {llm_service} {}
+Agent::Agent(Drone& drone, LlmService& llm_service)
+    : drone_ {drone}, llm_service_ {llm_service}, intent_catalog_ {IntentCatalog::MakeDefault()} {}
 
 void Agent::Run() {
     while (global_running) {
@@ -46,7 +46,7 @@ void Agent::ProcessInput(const std::string& input) {
     }
 
     const CompletionRequest request {
-        .system_prompt = SystemPrompt(),
+        .system_prompt = BuildSystemPrompt(),
         .user_prompt = input,
     };
 
@@ -58,7 +58,8 @@ void Agent::ProcessInput(const std::string& input) {
 
 void Agent::HandleOutput(std::string output) {
     try {
-        const std::string error {ValidateBtJson(nlohmann::json::parse(output), RegisteredIntents())};
+        const std::string error {
+            BehaviorTree::ValidateNode(nlohmann::json::parse(output), intent_catalog_)};
         if (error.empty()) {
             spdlog::info("Agent::HandleOutput: Behavior tree validation passed.");
         } else {
@@ -69,4 +70,25 @@ void Agent::HandleOutput(std::string output) {
     }
 
     llm_output_.Set(std::move(output));
+}
+
+std::string Agent::BuildSystemPrompt() const {
+    std::string prompt {
+        "You are a drone mission planner. Output ONLY a single JSON behavior tree.\n\n"
+        "Allowed node types:\n"
+        "  sequence, parallel (requires \"success_threshold\"), fallback, action, condition\n\n"
+        "Available actions (use as the key inside an \"action\" node):\n"
+    };
+
+    for (const auto& [name, intent] : intent_catalog_.All()) {
+        prompt += "  " + name + ": " + intent.arg_description + "\n";
+    }
+
+    prompt +=
+        "\nExample:\n"
+        "{ \"type\": \"sequence\", \"children\": [\n"
+        "    { \"type\": \"action\", \"move_to\": {\"lat\": 48.1, \"lon\": 11.6} }\n"
+        "]}\n";
+
+    return prompt;
 }

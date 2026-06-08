@@ -5,6 +5,7 @@
 #include <string>
 
 #include "drone/drone.hpp"
+#include "intents/intent_catalog.hpp"
 #include "llm_service/llm_service.hpp"
 
 extern std::atomic<bool> global_running;
@@ -40,9 +41,11 @@ class Agent {
 
  private:
     void HandleOutput(std::string output);
+    std::string BuildSystemPrompt() const;
 
     Drone& drone_;
     LlmService& llm_service_;
+    IntentCatalog intent_catalog_;
     Output llm_output_;
     std::atomic<bool> is_processing_ {false};
 };

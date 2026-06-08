@@ -102,6 +102,10 @@ add_executable(run
     src/llm_service/llm_service.hpp
     src/llm_service/llama_service.cpp
 
+    src/behavior_tree/behavior_tree.cpp
+
+    src/intents/intent_catalog.cpp
+
     src/agent.cpp
     src/server.cpp
     src/logger.hpp
