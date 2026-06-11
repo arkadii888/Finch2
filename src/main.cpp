@@ -1,24 +1,17 @@
 #include <thread>
-#include <csignal>
-#include <atomic>
 
 #include "agent.hpp"
+#include "api_server.hpp"
 #include "drone/dummy_drone.hpp"
 #include "llm_service/llama_service.hpp"
-#include "server.hpp"
 #include "logger.hpp"
 
-std::atomic<bool> global_running {true};
-
-void signal_handler(int signum) {
-    global_running = false;
-}
+import lifecycle;
 
 int main() {
-    Logger logger;
+    lifecycle::Init();
 
-    std::signal(SIGINT, signal_handler);
-    std::signal(SIGTERM, signal_handler);
+    Logger logger;
 
     DummyDrone drone;
     drone.Init();
@@ -27,7 +20,7 @@ int main() {
     llama.Run();
 
     Agent agent {drone, llama};
-    Server server {agent};
+    ApiServer server {agent};
 
     std::thread agent_thread {[&agent](){agent.Run();}};
     std::thread server_thread {[&server](){server.Run();}};

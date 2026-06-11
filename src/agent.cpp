@@ -5,10 +5,12 @@
 
 #include <nlohmann/json.hpp>
 
+import lifecycle;
+
 Agent::Agent(Drone& drone, LlmService& llm_service) : drone_ {drone}, llm_service_ {llm_service} {}
 
 void Agent::Run() {
-    while (global_running) {
+    while (lifecycle::is_alive_public) {
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
 }

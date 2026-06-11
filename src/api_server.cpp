@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "api_server.hpp"
 
 #include <thread>
 #include <chrono>
@@ -6,11 +6,12 @@
 #include <httplib.h>
 #include <spdlog/spdlog.h>
 
-#include "config.hpp"
+import globals;
+import lifecycle;
 
-Server::Server(Agent& agent) : agent_ {agent} {}
+ApiServer::ApiServer(Agent& agent) : agent_ {agent} {}
 
-void Server::Run() {
+void ApiServer::Run() {
     httplib::Server server;
 
     server.Post("/input", [this](const httplib::Request& req, httplib::Response& res) {
@@ -35,16 +36,16 @@ void Server::Run() {
     });
 
     std::thread monitor {[&server]() {
-        while (global_running) {
+        while (lifecycle::is_alive_public) {
             std::this_thread::sleep_for(std::chrono::milliseconds {200});
         }
         server.stop();
     }};
 
-    spdlog::info("Server::Run: Started on port {}", config.http_server_port);
+    spdlog::info("ApiServer::Run: Started on port {}", globals::api_server_port);
 
-    server.listen("0.0.0.0", config.http_server_port);
+    server.listen("0.0.0.0", globals::api_server_port);
 
     monitor.join();
-    spdlog::info("Server::Run: Stopped");
+    spdlog::info("ApiServer::Run: Stopped");
 }

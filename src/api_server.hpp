@@ -4,11 +4,9 @@
 
 #include "agent.hpp"
 
-extern std::atomic<bool> global_running;
-
-class Server {
+class ApiServer {
  public:
-    Server(Agent& agent);
+    ApiServer(Agent& agent);
 
     void Run();
 

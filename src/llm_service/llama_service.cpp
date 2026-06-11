@@ -22,8 +22,8 @@ void LlamaService::Run() {
     if (pid_ == 0) {
         std::vector<std::string> args {
             "llama-server",
-            "-m",         config.model_path,
-            "--port",     std::to_string(config.inference_server_port),
+            "-m",         globals::model_path,
+            "--port",     std::to_string(globals::llm_server_port),
             "-c",         std::to_string(backend_config_.context_size),
             "-b",         std::to_string(backend_config_.batch_size),
             "-ub",        std::to_string(backend_config_.ubatch_size),
@@ -84,7 +84,7 @@ void LlamaService::Run() {
 
         auto result {client_.Get("/health")};
         if (result && result->status == 200) {
-            spdlog::info("LlamaService::Run: Started on port {}", config.inference_server_port);
+            spdlog::info("LlamaService::Run: Started on port {}", globals::llm_server_port);
             return;
         }
 
@@ -102,7 +102,7 @@ void LlamaService::Stop() {
 
 std::string LlamaService::Complete(const std::string& prompt) {
     nlohmann::json request {
-        {"model", config.model_path},
+        {"model", globals::model_path},
         {"messages", {{{"role", "user"}, {"content", prompt}}}},
         {"stream", false}
     };
