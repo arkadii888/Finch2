@@ -25,7 +25,7 @@ const Intent* IntentCatalog::Find(const std::string& name) const {
     return it == intents_.end() ? nullptr : &it->second;
 }
 
-const std::unordered_map<std::string, Intent>& IntentCatalog::All() const {
+const std::unordered_map<std::string, Intent>& IntentCatalog::GetIntents() const {
     return intents_;
 }
 

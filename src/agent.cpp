@@ -80,7 +80,7 @@ std::string Agent::BuildSystemPrompt() const {
         "Available actions (use as the key inside an \"action\" node):\n"
     };
 
-    for (const auto& [name, intent] : intent_catalog_.All()) {
+    for (const auto& [name, intent] : intent_catalog_.GetIntents()) {
         prompt += "  " + name + ": " + intent.arg_description + "\n";
     }
 
