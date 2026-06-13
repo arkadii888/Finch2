@@ -67,3 +67,27 @@ cmake --build build-release
 
 ./build-release/run
 ```
+
+### Unit Tests
+
+Unit tests use the same CMake configure step as the main app (GoogleTest is fetched automatically on first configure). Build the `btree_test` target and run the executable:
+
+```bash
+cmake --build build-debug --target btree_test && ./build-debug/btree_test
+```
+
+## Behavior Tree
+
+### Adding a move action
+
+1. Subclass `Move`: implement `GetMissionItem()`, `Validate()`, and `FromJson()` (append items, then `SetMissionRange(start, count)`).
+2. Register with `REGISTER_MOVE_ACTION("intent_key", YourClass)` and `REGISTER_NODE_DESCRIPTOR(YourClass)`.
+
+Discovered via `MoveRegistry` at parse time. See `MoveTo` in `move_node.hpp`.
+
+### Adding a task action
+
+1. Subclass `Task`: implement `Tick()` (`Running` / `Success` / `Failure`) and `FromJson()`.
+2. Register with `REGISTER_TASK_ACTION("intent_key", YourClass)` and `REGISTER_NODE_DESCRIPTOR(YourClass)`.
+
+Unknown action keys throw at parse time. See `ComputeFibonacci` in `task_node.hpp`.
