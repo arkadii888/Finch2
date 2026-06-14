@@ -1,23 +1,6 @@
 #include "task_node.hpp"
 
-#include <map>
 #include <stdexcept>
-
-#include "node_descriptors.hpp"
-
-std::map<std::string, TaskFactory>& TaskRegistry::entries() {
-    static std::map<std::string, TaskFactory> m;
-    return m;
-}
-
-void TaskRegistry::Register(std::string key, TaskFactory factory) {
-    entries().emplace(std::move(key), std::move(factory));
-}
-
-TaskFactory* TaskRegistry::Find(const std::string& key) {
-    auto it = entries().find(key);
-    return it != entries().end() ? &it->second : nullptr;
-}
 
 Task::Task(std::string name) : Action {std::move(name)} {}
 
@@ -28,11 +11,8 @@ NodeStatus Task::GetStatus() const {
 ComputeFibonacci::ComputeFibonacci(int target_n)
     : Task {"compute_fibonacci"}, target_n_ {target_n} {}
 
-NodeDescriptor ComputeFibonacci::Descriptor() {
-    return {
-        "action/compute_fibonacci",
-        R"({"type": "action", "compute_fibonacci": {"n": <int>}})",
-    };
+std::string ComputeFibonacci::GetPrompt() {
+    return R"(action/compute_fibonacci: {"type": "action", "compute_fibonacci": {"n": <int>}})";
 }
 
 bool ComputeFibonacci::Validate() const {
@@ -66,6 +46,3 @@ std::unique_ptr<Node> ComputeFibonacci::FromJson(const nlohmann::json& args) {
     }
     return std::make_unique<ComputeFibonacci>(args["n"].get<int>());
 }
-
-REGISTER_NODE_DESCRIPTOR(ComputeFibonacci)
-REGISTER_TASK_ACTION("compute_fibonacci", ComputeFibonacci)

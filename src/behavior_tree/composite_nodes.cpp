@@ -1,14 +1,9 @@
 #include "composite_nodes.hpp"
 
-#include "node_descriptors.hpp"
-
 SequenceNode::SequenceNode() : Node {"sequence"} {}
 
-NodeDescriptor SequenceNode::Descriptor() {
-    return {
-        "sequence",
-        R"({"type": "sequence", "children": [...]})",
-    };
+std::string SequenceNode::GetPrompt() {
+    return R"(sequence: {"type": "sequence", "children": [...]})";
 }
 
 bool SequenceNode::Validate() const {
@@ -21,19 +16,20 @@ bool SequenceNode::Validate() const {
 NodeStatus SequenceNode::GetStatus() const {
     for (const auto& child : children_) {
         const NodeStatus s {child->GetStatus()};
-        if (s == NodeStatus::Failure) return NodeStatus::Failure;
-        if (s == NodeStatus::Running)  return NodeStatus::Running;
+        if (s == NodeStatus::Failure) {
+            return NodeStatus::Failure;
+        }
+        if (s == NodeStatus::Running) { 
+            return NodeStatus::Running;
+        }
     }
     return NodeStatus::Success;
 }
 
 FallbackNode::FallbackNode() : Node {"fallback"} {}
 
-NodeDescriptor FallbackNode::Descriptor() {
-    return {
-        "fallback",
-        R"({"type": "fallback", "children": [...]})",
-    };
+std::string FallbackNode::GetPrompt() {
+    return R"(fallback: {"type": "fallback", "children": [...]})";
 }
 
 bool FallbackNode::Validate() const {
@@ -55,11 +51,8 @@ NodeStatus FallbackNode::GetStatus() const {
 ParallelNode::ParallelNode(int success_threshold)
     : Node {"parallel"}, success_threshold_ {success_threshold} {}
 
-NodeDescriptor ParallelNode::Descriptor() {
-    return {
-        "parallel",
-        R"({"type": "parallel", "success_threshold": 1, "children": [...]})",
-    };
+std::string ParallelNode::GetPrompt() {
+    return R"(parallel: {"type": "parallel", "success_threshold": 1, "children": [...]})";
 }
 
 bool ParallelNode::Validate() const {
@@ -89,7 +82,3 @@ NodeStatus ParallelNode::GetStatus() const {
     }
     return NodeStatus::Running;
 }
-
-REGISTER_NODE_DESCRIPTOR(SequenceNode)
-REGISTER_NODE_DESCRIPTOR(FallbackNode)
-REGISTER_NODE_DESCRIPTOR(ParallelNode)

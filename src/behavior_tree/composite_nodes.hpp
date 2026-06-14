@@ -5,7 +5,7 @@
 class SequenceNode : public Node {
  public:
     SequenceNode();
-    static NodeDescriptor Descriptor();
+    static std::string GetPrompt();
     bool Validate() const override;
     NodeStatus GetStatus() const override;
 };
@@ -13,7 +13,7 @@ class SequenceNode : public Node {
 class FallbackNode : public Node {
  public:
     FallbackNode();
-    static NodeDescriptor Descriptor();
+    static std::string GetPrompt();
     bool Validate() const override;
     NodeStatus GetStatus() const override;
 };
@@ -21,7 +21,7 @@ class FallbackNode : public Node {
 class ParallelNode : public Node {
  public:
     explicit ParallelNode(int success_threshold);
-    static NodeDescriptor Descriptor();
+    static std::string GetPrompt();
     bool Validate() const override;
     NodeStatus GetStatus() const override;
 

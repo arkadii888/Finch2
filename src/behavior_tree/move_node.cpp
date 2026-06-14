@@ -1,23 +1,6 @@
 #include "move_node.hpp"
 
-#include <map>
 #include <stdexcept>
-
-#include "node_descriptors.hpp"
-
-std::map<std::string, MoveFactory>& MoveRegistry::entries() {
-    static std::map<std::string, MoveFactory> m;
-    return m;
-}
-
-void MoveRegistry::Register(std::string key, MoveFactory factory) {
-    entries().emplace(std::move(key), std::move(factory));
-}
-
-MoveFactory* MoveRegistry::Find(const std::string& key) {
-    auto it = entries().find(key);
-    return it != entries().end() ? &it->second : nullptr;
-}
 
 Move::Move(std::string name) : Action {std::move(name)} {}
 
@@ -39,11 +22,8 @@ NodeStatus Move::GetStatus() const {
 MoveTo::MoveTo(double lat, double lon, float alt_m)
     : Move {"move_to"}, lat_ {lat}, lon_ {lon}, alt_m_ {alt_m} {}
 
-NodeDescriptor MoveTo::Descriptor() {
-    return {
-        "action/move_to",
-        R"({"type": "action", "move_to": {"lat": <degrees_float>, "lon": <degrees_float>, "alt_m": <meters_float>}})",
-    };
+std::string MoveTo::GetPrompt() {
+    return R"(action/move_to: {"type": "action", "move_to": {"lat": <degrees_float>, "lon": <degrees_float>, "alt_m": <meters_float>}})";
 }
 
 std::vector<MissionItem> MoveTo::GetMissionItem() const {
@@ -91,5 +71,3 @@ double MoveTo::GetLat() const { return lat_; }
 double MoveTo::GetLon() const { return lon_; }
 float MoveTo::GetAltM() const { return alt_m_; }
 
-REGISTER_NODE_DESCRIPTOR(MoveTo)
-REGISTER_MOVE_ACTION("move_to", MoveTo)

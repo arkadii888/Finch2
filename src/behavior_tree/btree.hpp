@@ -11,6 +11,7 @@
 
 class BTree {
  public:
+     // create constructor with json so that someone doesnt create btree without json
     static BTree Parse(const nlohmann::json& json);
 
     bool Validate() const;
@@ -18,7 +19,6 @@ class BTree {
     NodeStatus GetStatus(int current_wp, int total_wp) const;
 
     const std::vector<MissionItem>& GetMissionItems() const;
-
     const Node& GetRoot() const;
 
  private:

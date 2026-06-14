@@ -6,8 +6,7 @@
 #include <nlohmann/json.hpp>
 
 #include "composite_nodes.hpp"
-#include "move_node.hpp"
-#include "task_node.hpp"
+#include "node_catalog.hpp"
 
 static std::unique_ptr<Node> ParseNode(
     const nlohmann::json& j,
@@ -67,17 +66,7 @@ static std::unique_ptr<Node> ParseAction(
             "action node must have exactly one intent key besides \"type\""};
     }
 
-    if (auto* factory = MoveRegistry::Find(intent_key)) {
-        auto node = (*factory)(j[intent_key], mission_items);
-        moves.push_back(static_cast<Move*>(node.get()));
-        return node;
-    }
-
-    if (auto* factory = TaskRegistry::Find(intent_key)) {
-        return (*factory)(j[intent_key]);
-    }
-
-    throw std::runtime_error {"unknown action: " + intent_key};
+    return ParseActionNode(intent_key, j[intent_key], mission_items, moves);
 }
 
 static std::unique_ptr<Node> ParseNode(

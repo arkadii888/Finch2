@@ -106,7 +106,7 @@ set(BTREE_SOURCES
     src/behavior_tree/task_node.cpp
     src/behavior_tree/move_node.cpp
     src/behavior_tree/btree.cpp
-    src/behavior_tree/node_descriptors.cpp
+    src/behavior_tree/node_catalog.cpp
 )
 
 add_executable(run

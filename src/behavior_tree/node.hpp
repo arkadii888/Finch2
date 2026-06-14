@@ -10,17 +10,12 @@ enum class NodeStatus {
     Failure,
 };
 
-struct NodeDescriptor {
-    std::string type_name;
-    std::string json_example;
-};
-
 class Node {
  public:
-    explicit Node(std::string name);
+    Node(std::string name);
     virtual ~Node() = default;
 
-    virtual bool Validate() const;
+    virtual bool Validate() const = 0;
 
     virtual NodeStatus GetStatus() const = 0;
 

@@ -100,14 +100,17 @@ void LlamaService::Stop() {
     }
 }
 
-std::string LlamaService::Complete(const std::string& prompt) {
-    nlohmann::json request {
+std::string LlamaService::Complete(const CompletionRequest& request) {
+    nlohmann::json body {
         {"model", globals::model_path},
-        {"messages", {{{"role", "user"}, {"content", prompt}}}},
+        {"messages", {
+            {{"role", "system"}, {"content", request.system_prompt}},
+            {{"role", "user"},   {"content", request.user_prompt}},
+        }},
         {"stream", false}
     };
 
-    auto result {client_.Post("/v1/chat/completions", request.dump(), "application/json")};
+    auto result {client_.Post("/v1/chat/completions", body.dump(), "application/json")};
     if (!result || result->status != 200) {
         spdlog::error("LlamaService::Complete: Connection error.");
         return "";
