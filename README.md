@@ -78,16 +78,8 @@ cmake --build build-debug --target btree_test && ./build-debug/btree_test
 
 ## Behavior Tree
 
-### Adding a move action
+**Move** — drone mission items. Subclass `Move`. **Task** software-only action. Subclass `Task`.
 
-1. Subclass `Move`: implement `GetMissionItem()`, `Validate()`, and `FromJson()` (append items, then `SetMissionRange(start, count)`).
-2. Register with `REGISTER_MOVE_ACTION("intent_key", YourClass)` and `REGISTER_NODE_DESCRIPTOR(YourClass)`.
+To add either: implement `GetPrompt()`, `FromJson()`, and the base-class methods (`GetMissionItem`/`Validate` for moves; `Tick`/`Validate` for tasks). Register only in [`node_catalog.cpp`](src/behavior_tree/node_catalog.cpp) — add `GetPrompt()` to `GetActionPrompts()` and an `if (key == "...")` branch to `ParseActionNode()` (for moves, also push into `moves`). No changes to `btree.cpp` or `agent.cpp`.
 
-Discovered via `MoveRegistry` at parse time. See `MoveTo` in `move_node.hpp`.
-
-### Adding a task action
-
-1. Subclass `Task`: implement `Tick()` (`Running` / `Success` / `Failure`) and `FromJson()`.
-2. Register with `REGISTER_TASK_ACTION("intent_key", YourClass)` and `REGISTER_NODE_DESCRIPTOR(YourClass)`.
-
-Unknown action keys throw at parse time. See `ComputeFibonacci` in `task_node.hpp`.
+Examples: `MoveTo` (`move_node.hpp`), `ComputeFibonacci` (`task_node.hpp`).
