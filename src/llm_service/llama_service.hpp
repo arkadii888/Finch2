@@ -19,7 +19,7 @@ class LlamaService : public LlmService {
     void Run() override;
     void Stop() override;
 
-    std::string Complete(const std::string& prompt) override;
+    std::string Complete(const CompletionRequest& request) override;
 
  private:
     struct BackendConfig {
