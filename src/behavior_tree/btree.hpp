@@ -11,7 +11,6 @@
 
 class BTree {
  public:
-     // create constructor with json so that someone doesnt create btree without json
     static BTree Parse(const nlohmann::json& json);
 
     bool Validate() const;
@@ -22,6 +21,7 @@ class BTree {
     const Node& GetRoot() const;
 
  private:
+    Btree() = default;
     std::vector<MissionItem> mission_items_;
     std::vector<Move*> moves_;
     std::unique_ptr<Node> root_;
