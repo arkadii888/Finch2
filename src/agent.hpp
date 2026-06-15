@@ -6,6 +6,7 @@
 #include <string>
 
 #include "behavior_tree/btree.hpp"
+#include "behavior_tree/node_catalog.hpp"
 #include "drone/drone.hpp"
 #include "llm_service/llm_service.hpp"
 
@@ -44,7 +45,8 @@ class Agent {
 
     Drone& drone_;
     LlmService& llm_service_;
+    NodeCatalog node_catalog_;
     Output llm_output_;
-    std::unique_ptr<BTree> btree_;
     std::atomic<bool> is_processing_ {false};
+    std::unique_ptr<BTree> btree_;
 };

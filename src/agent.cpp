@@ -7,7 +7,6 @@
 #include <spdlog/spdlog.h>
 
 #include "behavior_tree/composite_nodes.hpp"
-#include "behavior_tree/node_catalog.hpp"
 
 import lifecycle;
 
@@ -90,12 +89,8 @@ std::string Agent::BuildSystemPrompt() const {
         "Available node types:\n"
     };
 
-    prompt += "  " + SequenceNode::GetPrompt() + "\n";
-    prompt += "  " + FallbackNode::GetPrompt() + "\n";
-    prompt += "  " + ParallelNode::GetPrompt() + "\n";
-
-    for (const auto& p : GetActionPrompts()) {
-        prompt += "  " + p + "\n";
+    for (auto node : node_catalog_.GetNodes()) {
+        prompt += node->GetPrompt() + "\n";
     }
 
     prompt +=
