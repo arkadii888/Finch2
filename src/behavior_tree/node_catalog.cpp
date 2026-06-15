@@ -1,30 +1,15 @@
 #include "node_catalog.hpp"
 
-#include <stdexcept>
+#include "behavior_tree/nodes/sequence_node.hpp"
+#include "behavior_tree/nodes/fallback_node.hpp"
+#include "behavior_tree/nodes/parallel_node.hpp"
 
-#include "move_node.hpp"
-#include "task_node.hpp"
-
-std::vector<std::string> GetActionPrompts() {
-    return {
-        MoveTo::GetPrompt(),
-        ComputeFibonacci::GetPrompt(),
-    };
+NodeCatalog::NodeCatalog() {
+    nodes_.push_back(std::make_unique<SequenceNode>());
+    nodes_.push_back(std::make_unique<FallbackNode>());
+    nodes_.push_back(std::make_unique<ParallelNode>(1));
 }
 
-std::unique_ptr<Node> ParseActionNode(
-    const std::string& key,
-    const nlohmann::json& args,
-    std::vector<MissionItem>& mission_items,
-    std::vector<Move*>& moves)
-{
-    if (key == "move_to") {
-        auto node = MoveTo::FromJson(args, mission_items);
-        moves.push_back(static_cast<Move*>(node.get()));
-        return node;
-    }
-    if (key == "compute_fibonacci") {
-        return ComputeFibonacci::FromJson(args);
-    }
-    throw std::runtime_error {"unknown action: " + key};
+const std::vector<std::unique_ptr<Node>>& NodeCatalog::GetNodes() const {
+    return nodes_;
 }
