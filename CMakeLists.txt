@@ -90,7 +90,24 @@ set(SPDLOG_BUILD_TESTS OFF CACHE INTERNAL "")
 set(SPDLOG_BUILD_EXAMPLE OFF CACHE INTERNAL "")
 set(SPDLOG_BUILD_COMPILED ON CACHE INTERNAL "")
 
-FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp spdlog)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG v1.15.2
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp spdlog googletest)
+
+set(BTREE_SOURCES
+    src/behavior_tree/node.cpp
+    src/behavior_tree/composite_nodes.cpp
+    src/behavior_tree/action_node.cpp
+    src/behavior_tree/task_node.cpp
+    src/behavior_tree/move_node.cpp
+    src/behavior_tree/btree.cpp
+    src/behavior_tree/node_catalog.cpp
+)
 
 add_executable(run
     src/main.cpp
@@ -105,6 +122,14 @@ add_executable(run
     src/agent.cpp
     src/api_server.cpp
     src/logger.hpp
+
+    ${BTREE_SOURCES}
+)
+
+add_executable(btree_test
+    tests/btree_test.cpp
+    ${BTREE_SOURCES}
+    src/drone/drone.hpp
 )
 
 target_sources(run
@@ -115,11 +140,20 @@ target_sources(run
         FILES src/lifecycle.cppm
 )
 
+target_include_directories(run PRIVATE src)
+
 target_link_libraries(run PRIVATE
     mavsdk
     httplib
     nlohmann_json::nlohmann_json
     spdlog
+)
+
+target_include_directories(btree_test PRIVATE src)
+
+target_link_libraries(btree_test PRIVATE
+    nlohmann_json::nlohmann_json
+    GTest::gtest_main
 )
 
 if (TARGET llama-server)

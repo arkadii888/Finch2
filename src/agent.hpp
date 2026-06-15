@@ -1,9 +1,11 @@
 #pragma once
 
 #include <atomic>
+#include <memory>
 #include <mutex>
 #include <string>
 
+#include "behavior_tree/btree.hpp"
 #include "drone/drone.hpp"
 #include "llm_service/llm_service.hpp"
 
@@ -38,9 +40,11 @@ class Agent {
 
  private:
     void HandleOutput(std::string output);
+    std::string BuildSystemPrompt() const;
 
     Drone& drone_;
     LlmService& llm_service_;
     Output llm_output_;
+    std::unique_ptr<BTree> btree_;
     std::atomic<bool> is_processing_ {false};
 };

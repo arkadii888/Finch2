@@ -4,10 +4,15 @@
 #include <thread>
 
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
+
+#include "behavior_tree/composite_nodes.hpp"
+#include "behavior_tree/node_catalog.hpp"
 
 import lifecycle;
 
-Agent::Agent(Drone& drone, LlmService& llm_service) : drone_ {drone}, llm_service_ {llm_service} {}
+Agent::Agent(Drone& drone, LlmService& llm_service)
+    : drone_ {drone}, llm_service_ {llm_service} {}
 
 void Agent::Run() {
     while (lifecycle::is_alive_public) {
@@ -43,12 +48,62 @@ void Agent::ProcessInput(const std::string& input) {
         return;
     }
 
-    std::thread([this, input] {
-        HandleOutput(llm_service_.Complete(input));
+    const CompletionRequest request {
+        .system_prompt = BuildSystemPrompt(),
+        .user_prompt = input,
+    };
+
+    std::thread([this, request] {
+        HandleOutput(llm_service_.Complete(request));
         is_processing_ = false;
     }).detach();
 }
 
 void Agent::HandleOutput(std::string output) {
+    try {
+        BTree btree {BTree::Parse(nlohmann::json::parse(output))};
+
+        if (!btree.Validate()) {
+            spdlog::error("Agent::HandleOutput: Behavior tree validation failed.");
+            llm_output_.Set(std::move(output));
+            return;
+        }
+
+        spdlog::info("Agent::HandleOutput: Tree valid. {} mission item(s).",
+            btree.GetMissionItems().size());
+
+        drone_.UploadMission(btree.GetMissionItems());
+        drone_.LaunchMission();
+
+        btree_ = std::make_unique<BTree>(std::move(btree));
+
+    } catch (const std::exception& e) {
+        spdlog::error("Agent::HandleOutput: Parse error: {}", e.what());
+    }
+
     llm_output_.Set(std::move(output));
+}
+
+std::string Agent::BuildSystemPrompt() const {
+    std::string prompt {
+        "You are a drone mission planner. Output ONLY a single valid JSON behavior tree.\n\n"
+        "Available node types:\n"
+    };
+
+    prompt += "  " + SequenceNode::GetPrompt() + "\n";
+    prompt += "  " + FallbackNode::GetPrompt() + "\n";
+    prompt += "  " + ParallelNode::GetPrompt() + "\n";
+
+    for (const auto& p : GetActionPrompts()) {
+        prompt += "  " + p + "\n";
+    }
+
+    prompt +=
+        "\nRules:\n"
+        "  - sequence, fallback, parallel must have a non-empty \"children\" array\n"
+        "  - parallel requires an integer \"success_threshold\" >= 1\n"
+        "  - action nodes have exactly one intent key besides \"type\"\n"
+        "  - Output raw JSON only. No markdown fences, no explanation.\n";
+
+    return prompt;
 }

@@ -67,3 +67,19 @@ cmake --build build-release
 
 ./build-release/run
 ```
+
+### Unit Tests
+
+Unit tests use the same CMake configure step as the main app (GoogleTest is fetched automatically on first configure). Build the `btree_test` target and run the executable:
+
+```bash
+cmake --build build-debug --target btree_test && ./build-debug/btree_test
+```
+
+## Behavior Tree
+
+**Move** — drone mission items. Subclass `Move`. **Task** software-only action. Subclass `Task`.
+
+To add either: implement `GetPrompt()`, `FromJson()`, and the base-class methods (`GetMissionItem`/`Validate` for moves; `Tick`/`Validate` for tasks). Register only in [`node_catalog.cpp`](src/behavior_tree/node_catalog.cpp) — add `GetPrompt()` to `GetActionPrompts()` and an `if (key == "...")` branch to `ParseActionNode()` (for moves, also push into `moves`). No changes to `btree.cpp` or `agent.cpp`.
+
+Examples: `MoveTo` (`move_node.hpp`), `ComputeFibonacci` (`task_node.hpp`).
