@@ -6,12 +6,12 @@
 
 #include <nlohmann/json.hpp>
 
-#include "action_node.hpp"
+#include "behavior_tree/nodes/action_node.hpp"
 #include "drone/drone.hpp"
 
-class Move : public Action {
+class MoveNode : public ActionNode {
  public:
-    explicit Move(std::string name);
+    explicit MoveNode(std::string name);
 
     void SetMissionRange(int start_idx, int count);
     void UpdateProgress(int current_wp);
@@ -28,7 +28,7 @@ class Move : public Action {
     NodeStatus cached_status_ {NodeStatus::Running};
 };
 
-class MoveTo : public Move {
+class MoveTo : public MoveNode {
  public:
     MoveTo(double lat, double lon, float alt_m);
     static std::string GetPrompt();
