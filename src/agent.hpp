@@ -1,7 +1,6 @@
 #pragma once
 
 #include <atomic>
-#include <memory>
 #include <mutex>
 #include <string>
 
@@ -10,7 +9,7 @@
 #include "drone/drone.hpp"
 #include "llm_service/llm_service.hpp"
 
-class Output {
+class LlmOutput {
  public:
     std::string Get() const {
         std::lock_guard lock {mutex_};
@@ -43,10 +42,10 @@ class Agent {
     void HandleOutput(std::string output);
     std::string BuildSystemPrompt() const;
 
+    BTree btree_;
     Drone& drone_;
     LlmService& llm_service_;
     NodeCatalog node_catalog_;
-    Output llm_output_;
+    LlmOutput llm_output_;
     std::atomic<bool> is_processing_ {false};
-    std::unique_ptr<BTree> btree_;
 };
