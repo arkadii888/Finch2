@@ -58,27 +58,9 @@ void Agent::ProcessInput(const std::string& input) {
     }).detach();
 }
 
-void Agent::HandleOutput(std::string output) {
-    try {
-        BTree btree {BTree::Parse(nlohmann::json::parse(output))};
-
-        if (!btree.Validate()) {
-            spdlog::error("Agent::HandleOutput: Behavior tree validation failed.");
-            llm_output_.Set(std::move(output));
-            return;
-        }
-
-        spdlog::info("Agent::HandleOutput: Tree valid. {} mission item(s).",
-            btree.GetMissionItems().size());
-
-        drone_.UploadMission(btree.GetMissionItems());
-        drone_.LaunchMission();
-
-        btree_ = std::make_unique<BTree>(std::move(btree));
-
-    } catch (const std::exception& e) {
-        spdlog::error("Agent::HandleOutput: Parse error: {}", e.what());
-    }
+void Agent::HandleOutput(std::string output) { // TODO: think
+    drone_.UploadMission();
+    drone_.LaunchMission();
 
     llm_output_.Set(std::move(output));
 }
