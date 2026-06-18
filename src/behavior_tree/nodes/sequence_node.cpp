@@ -1,7 +1,5 @@
 #include "sequence_node.hpp"
 
-SequenceNode::SequenceNode() : Node {"sequence"} {}
-
 NodeStatus SequenceNode::GetStatus() const {
     for (const auto& child : children_) {
         const NodeStatus s {child->GetStatus()};

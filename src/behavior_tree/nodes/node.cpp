@@ -1,7 +1,5 @@
 #include "node.hpp"
 
-Node::Node(std::string name) : name_ {std::move(name)} {}
-
 bool Node::Validate() const {
     for (const auto& child : children_) {
         if (!child->Validate()) {
@@ -13,10 +11,6 @@ bool Node::Validate() const {
 
 void Node::AddChild(std::unique_ptr<Node> child) {
     children_.push_back(std::move(child));
-}
-
-const std::string& Node::GetName() const {
-    return name_;
 }
 
 const std::vector<std::unique_ptr<Node>>& Node::GetChildren() const {

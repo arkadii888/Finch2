@@ -1,7 +1,6 @@
 #include "parallel_node.hpp"
 
-ParallelNode::ParallelNode(int success_threshold)
-    : Node {"parallel"}, success_threshold_ {success_threshold} {}
+ParallelNode::ParallelNode(int success_threshold) : success_threshold_ {success_threshold} {}
 
 NodeStatus ParallelNode::GetStatus() const {
     int successes {0};

@@ -1,7 +1,5 @@
 #include "fallback_node.hpp"
 
-FallbackNode::FallbackNode() : Node {"fallback"} {}
-
 NodeStatus FallbackNode::GetStatus() const {
     for (const auto& child : children_) {
         const NodeStatus s {child->GetStatus()};
