@@ -1,38 +1,14 @@
 #pragma once
 
-#include <chrono>
-#include <memory>
 #include <string>
 
-#include <nlohmann/json.hpp>
+#include "behavior_tree/nodes/action_node.hpp"
 
-#include "action_node.hpp"
-
-class Task : public Action {
+class TaskNode : public ActionNode {
  public:
-    explicit Task(std::string name);
-    NodeStatus GetStatus() const final;
+    virtual void Execute() = 0;
 
- protected:
-    virtual NodeStatus Tick() const = 0;
-};
-
-class ComputeFibonacci : public Task {
- public:
-    explicit ComputeFibonacci(int target_n);
-    static std::string GetPrompt();
-    static std::unique_ptr<Node> FromJson(const nlohmann::json& args);
+    NodeStatus GetStatus() const override;
     bool Validate() const override;
-
-    int GetTargetN() const;
-
- protected:
-    NodeStatus Tick() const override;
-
- private:
-    static constexpr int kPauseMs {40};
-
-    mutable bool started_ {false};
-    mutable std::chrono::steady_clock::time_point start_time_ {};
-    int target_n_;
+    std::string GetPrompt() const override;
 };
