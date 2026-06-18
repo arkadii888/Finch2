@@ -11,7 +11,7 @@
 #include "behavior_tree/nodes/sequence_node.hpp"
 
 void BTree::Build(const nlohmann::json& tree) {
-    root_ = std::move(CreateNode(tree));
+    root_ = CreateNode(tree);
 }
 
 void BTree::Destroy() {
@@ -35,28 +35,7 @@ std::unique_ptr<Node> BTree::CreateNode(const nlohmann::json& json_node) {
             int threshold = json_node.at("success_threshold").get<int>();
             node = std::make_unique<ParallelNode>(threshold);
         } else if (type == "action") {
-            std::string intent;
-            nlohmann::json intent_arguments;
-
-            for (const auto& [key, value] : json_node.items()) {
-                if (key != "type") {
-                    intent = key;
-                    intent_arguments = value;
-                    break;
-                }
-            }
-
-            if (intent.empty()) {
-                spdlog::error("BTree::CreateNode: Action node missing intent key.");
-                return nullptr;
-            }
-
-            if (intent == "move_to") {
-                double latitude_deg {intent_arguments.at("latitude_deg").get<double>()};
-                double longitude_deg {intent_arguments.at("longitude_deg").get<double>()};
-                float relative_altitude_m {intent_arguments.at("relative_altitude_m").get<float>()};
-                node = std::make_unique<MoveToNode>(latitude_deg, longitude_deg, relative_altitude_m);
-            }
+            node = CreateActionNode(json_node);
         }
 
         if (node == nullptr) {
@@ -93,3 +72,31 @@ std::unique_ptr<Node> BTree::CreateNode(const nlohmann::json& json_node) {
         return nullptr;
     }
 };
+
+std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_node) {
+    std::unique_ptr<Node> node {nullptr};
+    std::string intent;
+    nlohmann::json intent_arguments;
+
+    for (const auto& [key, value] : json_action_node.items()) {
+        if (key != "type") {
+            intent = key;
+            intent_arguments = value;
+            break;
+        }
+    }
+
+    if (intent.empty()) {
+        spdlog::error("BTree::CreateActionNode: Action node missing intent key.");
+        return nullptr;
+    }
+
+    if (intent == "move_to") {
+        double latitude_deg {intent_arguments.at("latitude_deg").get<double>()};
+        double longitude_deg {intent_arguments.at("longitude_deg").get<double>()};
+        float relative_altitude_m {intent_arguments.at("relative_altitude_m").get<float>()};
+        node = std::make_unique<MoveToNode>(latitude_deg, longitude_deg, relative_altitude_m);
+    }
+
+    return node;
+}

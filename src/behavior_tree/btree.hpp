@@ -15,6 +15,7 @@ class BTree {
 
  private:
     std::unique_ptr<Node> CreateNode(const nlohmann::json& json_node);
+    std::unique_ptr<Node> CreateActionNode(const nlohmann::json& json_action_node);
 
     std::unique_ptr<Node> root_;
 };
