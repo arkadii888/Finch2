@@ -27,7 +27,7 @@ bool ParallelNode::Validate() const {
             || success_threshold_ > static_cast<int>(children_.size())) {
         return false;
     }
-    return Node::Validate();
+    return true;
 }
 
 std::string ParallelNode::GetPrompt() const {

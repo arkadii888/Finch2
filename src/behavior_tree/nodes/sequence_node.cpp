@@ -17,7 +17,7 @@ bool SequenceNode::Validate() const {
     if (children_.empty()) {
         return false;
     }
-    return Node::Validate();
+    return true;
 }
 
 std::string SequenceNode::GetPrompt() const {
