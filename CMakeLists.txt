@@ -60,25 +60,25 @@ set(LLAMA_BUILD_SERVER ON CACHE BOOL "" FORCE)
 set(LLAMA_BACKEND "AUTO" CACHE STRING "AUTO | CPU | METAL | CUDA")
 
 if(LLAMA_BACKEND STREQUAL "AUTO")
-    if(APPLE)
-        set(LLAMA_BACKEND_SELECTED "METAL")
+  if(APPLE)
+    set(LLAMA_BACKEND_SELECTED "METAL")
+  else()
+    find_package(CUDAToolkit QUIET)
+    if(CUDAToolkit_FOUND)
+      set(LLAMA_BACKEND_SELECTED "CUDA")
     else()
-        find_package(CUDAToolkit QUIET)
-        if(CUDAToolkit_FOUND)
-            set(LLAMA_BACKEND_SELECTED "CUDA")
-        else()
-            set(LLAMA_BACKEND_SELECTED "CPU")
-        endif()
+      set(LLAMA_BACKEND_SELECTED "CPU")
     endif()
+  endif()
 else()
-    set(LLAMA_BACKEND_SELECTED "${LLAMA_BACKEND}")
+  set(LLAMA_BACKEND_SELECTED "${LLAMA_BACKEND}")
 endif()
 message(STATUS "Llama backend: ${LLAMA_BACKEND_SELECTED}")
 
 if(LLAMA_BACKEND_SELECTED STREQUAL "METAL")
-    set(GGML_METAL ON CACHE BOOL "" FORCE)
+  set(GGML_METAL ON CACHE BOOL "" FORCE)
 elseif(LLAMA_BACKEND_SELECTED STREQUAL "CUDA")
-    set(GGML_CUDA ON CACHE BOOL "" FORCE)
+  set(GGML_CUDA ON CACHE BOOL "" FORCE)
 endif()
 
 FetchContent_Declare(
@@ -100,13 +100,19 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp spdlog googletest)
 
 set(BTREE_SOURCES
-    src/behavior_tree/node.cpp
-    src/behavior_tree/composite_nodes.cpp
-    src/behavior_tree/action_node.cpp
-    src/behavior_tree/task_node.cpp
-    src/behavior_tree/move_node.cpp
     src/behavior_tree/btree.cpp
     src/behavior_tree/node_catalog.cpp
+
+    src/behavior_tree/nodes/node.cpp
+    src/behavior_tree/nodes/action_node.cpp
+    src/behavior_tree/nodes/fallback_node.cpp
+    src/behavior_tree/nodes/parallel_node.cpp
+    src/behavior_tree/nodes/sequence_node.cpp
+
+    src/behavior_tree/nodes/move_nodes/move_node.cpp
+    src/behavior_tree/nodes/move_nodes/move_to_node.cpp
+
+    src/behavior_tree/nodes/task_nodes/task_node.cpp
 )
 
 add_executable(run
@@ -128,8 +134,8 @@ add_executable(run
 
 add_executable(btree_test
     tests/btree_test.cpp
-    ${BTREE_SOURCES}
     src/drone/drone.hpp
+    ${BTREE_SOURCES}
 )
 
 target_sources(run
@@ -152,8 +158,9 @@ target_link_libraries(run PRIVATE
 target_include_directories(btree_test PRIVATE src)
 
 target_link_libraries(btree_test PRIVATE
-    nlohmann_json::nlohmann_json
     GTest::gtest_main
+    nlohmann_json::nlohmann_json
+    spdlog
 )
 
 if (TARGET llama-server)

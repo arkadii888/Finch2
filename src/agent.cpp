@@ -6,9 +6,6 @@
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "behavior_tree/composite_nodes.hpp"
-#include "behavior_tree/node_catalog.hpp"
-
 import lifecycle;
 
 Agent::Agent(Drone& drone, LlmService& llm_service)
@@ -60,27 +57,7 @@ void Agent::ProcessInput(const std::string& input) {
 }
 
 void Agent::HandleOutput(std::string output) {
-    try {
-        BTree btree {BTree::Parse(nlohmann::json::parse(output))};
-
-        if (!btree.Validate()) {
-            spdlog::error("Agent::HandleOutput: Behavior tree validation failed.");
-            llm_output_.Set(std::move(output));
-            return;
-        }
-
-        spdlog::info("Agent::HandleOutput: Tree valid. {} mission item(s).",
-            btree.GetMissionItems().size());
-
-        drone_.UploadMission(btree.GetMissionItems());
-        drone_.LaunchMission();
-
-        btree_ = std::make_unique<BTree>(std::move(btree));
-
-    } catch (const std::exception& e) {
-        spdlog::error("Agent::HandleOutput: Parse error: {}", e.what());
-    }
-
+    btree_.Build(nlohmann::json::parse(output));
     llm_output_.Set(std::move(output));
 }
 
@@ -90,12 +67,8 @@ std::string Agent::BuildSystemPrompt() const {
         "Available node types:\n"
     };
 
-    prompt += "  " + SequenceNode::GetPrompt() + "\n";
-    prompt += "  " + FallbackNode::GetPrompt() + "\n";
-    prompt += "  " + ParallelNode::GetPrompt() + "\n";
-
-    for (const auto& p : GetActionPrompts()) {
-        prompt += "  " + p + "\n";
+    for (const auto& node : node_catalog_.GetNodes()) {
+        prompt += node->GetPrompt() + "\n";
     }
 
     prompt +=
