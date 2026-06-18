@@ -23,5 +23,5 @@ class Node {
     const std::vector<std::unique_ptr<Node>>& GetChildren() const;
 
  protected:
-    std::vector<std::unique_ptr<Node>> children_;
+    std::vector<std::unique_ptr<Node>> childrens_;
 };

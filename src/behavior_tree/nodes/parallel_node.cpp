@@ -5,7 +5,7 @@ ParallelNode::ParallelNode(int success_threshold) : success_threshold_ {success_
 NodeStatus ParallelNode::GetStatus() const {
     int successes {0};
     int failures {0};
-    for (const auto& child : children_) {
+    for (const auto& child : childrens_) {
         const NodeStatus s {child->GetStatus()};
         if (s == NodeStatus::Success) ++successes;
         else if (s == NodeStatus::Failure) ++failures;
@@ -13,18 +13,18 @@ NodeStatus ParallelNode::GetStatus() const {
     if (successes >= success_threshold_) {
         return NodeStatus::Success;
     }
-    if (failures > static_cast<int>(children_.size()) - success_threshold_) {
+    if (failures > static_cast<int>(childrens_.size()) - success_threshold_) {
         return NodeStatus::Failure;
     }
     return NodeStatus::Running;
 }
 
 bool ParallelNode::Validate() const {
-    if (children_.empty()) {
+    if (childrens_.empty()) {
         return false;
     }
     if (success_threshold_ < 1
-            || success_threshold_ > static_cast<int>(children_.size())) {
+            || success_threshold_ > static_cast<int>(childrens_.size())) {
         return false;
     }
     return true;
