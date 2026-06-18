@@ -6,8 +6,6 @@
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "behavior_tree/composite_nodes.hpp"
-
 import lifecycle;
 
 Agent::Agent(Drone& drone, LlmService& llm_service)
@@ -59,8 +57,8 @@ void Agent::ProcessInput(const std::string& input) {
 }
 
 void Agent::HandleOutput(std::string output) { // TODO: think
-    drone_.UploadMission();
-    drone_.LaunchMission();
+    //drone_.UploadMission();
+    //drone_.LaunchMission();
 
     llm_output_.Set(std::move(output));
 }
@@ -71,7 +69,7 @@ std::string Agent::BuildSystemPrompt() const {
         "Available node types:\n"
     };
 
-    for (auto node : node_catalog_.GetNodes()) {
+    for (const auto& node : node_catalog_.GetNodes()) {
         prompt += node->GetPrompt() + "\n";
     }
 
