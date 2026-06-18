@@ -11,11 +11,12 @@
 #include "behavior_tree/nodes/sequence_node.hpp"
 
 void BTree::Build(const nlohmann::json& tree) {
+    Destroy();
     root_ = CreateNode(tree);
 }
 
 void BTree::Destroy() {
-
+    root_.reset();
 }
 
 const Node& BTree::GetRoot() const {
