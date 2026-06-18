@@ -71,7 +71,10 @@ std::unique_ptr<Node> BTree::CreateNode(const nlohmann::json& json_node) {
             }
 
             for (const auto& json_child : json_node.at("children")) {
-                auto child_node = CreateNode(json_child);
+                auto child_node {CreateNode(json_child)};
+                if (child_node == nullptr) {
+                    return nullptr;
+                }
                 node->AddChild(std::move(child_node));
             }
         }
