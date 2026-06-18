@@ -28,7 +28,7 @@ bool MoveToNode::Validate() const {
 
 std::string MoveToNode::GetPrompt() const {
     return R"(action/move_to: {"type": "action", "move_to": {
-        "latitude_deg": <degrees_float>,
-        "longitude_deg": <degrees_float>,
+        "latitude_deg": <degrees_double>,
+        "longitude_deg": <degrees_double>,
         "relative_altitude_m": <meters_float>}})";
 }
