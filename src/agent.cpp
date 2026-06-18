@@ -57,6 +57,7 @@ void Agent::ProcessInput(const std::string& input) {
 }
 
 void Agent::HandleOutput(std::string output) {
+    btree_.Build(nlohmann::json::parse(output));
     llm_output_.Set(std::move(output));
 }
 
