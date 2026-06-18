@@ -77,17 +77,17 @@ cmake --build build-debug --target btree_test && ./build-debug/btree_test
 ## API Communication
 
 ```bash
-curl -X POST http://localhost:8080/input -d "Text"
+curl -X POST http://localhost:8888/input -d "Text"
 ```
 
 ```bash
-curl http://localhost:8080/output
+curl http://localhost:8888/output
 ```
 
 ```bash
-curl -X POST http://localhost:8080/kill
+curl -X POST http://localhost:8888/kill
 ```
 
 ```bash
-curl http://localhost:8080/telemetry
+curl http://localhost:8888/telemetry
 ```
