@@ -78,25 +78,33 @@ std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_
     std::string intent;
     nlohmann::json intent_arguments;
 
-    for (const auto& [key, value] : json_action_node.items()) {
-        if (key != "type") {
-            intent = key;
-            intent_arguments = value;
-            break;
+    try {
+        for (const auto& [key, value] : json_action_node.items()) {
+            if (key != "type") {
+                intent = key;
+                intent_arguments = value;
+                break;
+            }
         }
-    }
 
-    if (intent.empty()) {
-        spdlog::error("BTree::CreateActionNode: Action node missing intent key.");
+        if (intent.empty()) {
+            spdlog::error("BTree::CreateActionNode: Action node missing intent key.");
+            return nullptr;
+        }
+
+        if (intent == "move_to") {
+            double latitude_deg {intent_arguments.at("latitude_deg").get<double>()};
+            double longitude_deg {intent_arguments.at("longitude_deg").get<double>()};
+            float relative_altitude_m {intent_arguments.at("relative_altitude_m").get<float>()};
+            node = std::make_unique<MoveToNode>(latitude_deg, longitude_deg, relative_altitude_m);
+        }
+
+        return node;
+    } catch (const nlohmann::json::exception& e) {
+        spdlog::error("BTree::CreateActionNode: Error: {}", e.what());
+        return nullptr;
+    } catch (const std::exception& e) {
+        spdlog::error("BTree::CreateActionNode: Error: {}", e.what());
         return nullptr;
     }
-
-    if (intent == "move_to") {
-        double latitude_deg {intent_arguments.at("latitude_deg").get<double>()};
-        double longitude_deg {intent_arguments.at("longitude_deg").get<double>()};
-        float relative_altitude_m {intent_arguments.at("relative_altitude_m").get<float>()};
-        node = std::make_unique<MoveToNode>(latitude_deg, longitude_deg, relative_altitude_m);
-    }
-
-    return node;
 }
