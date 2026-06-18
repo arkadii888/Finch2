@@ -56,10 +56,7 @@ void Agent::ProcessInput(const std::string& input) {
     }).detach();
 }
 
-void Agent::HandleOutput(std::string output) { // TODO: think
-    //drone_.UploadMission();
-    //drone_.LaunchMission();
-
+void Agent::HandleOutput(std::string output) {
     llm_output_.Set(std::move(output));
 }
 
