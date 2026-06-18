@@ -9,6 +9,7 @@ NodeCatalog::NodeCatalog() {
     nodes_.push_back(std::make_unique<SequenceNode>());
     nodes_.push_back(std::make_unique<FallbackNode>());
     nodes_.push_back(std::make_unique<ParallelNode>(1));
+
     nodes_.push_back(std::make_unique<MoveToNode>(1.0, 1.0, 1.f));
 }
 
