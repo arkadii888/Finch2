@@ -20,7 +20,7 @@ class Node {
 
     void AddChild(std::unique_ptr<Node> child);
 
-    const std::vector<std::unique_ptr<Node>>& GetChildren() const;
+    const std::vector<std::unique_ptr<Node>>& GetChildrens() const;
 
  protected:
     std::vector<std::unique_ptr<Node>> childrens_;
