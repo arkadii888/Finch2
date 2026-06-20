@@ -19,8 +19,8 @@ void BTree::Destroy() {
     root_.reset();
 }
 
-const Node& BTree::GetRoot() const {
-    return *root_;
+const Node* BTree::GetRoot() const {
+    return root_.get();
 }
 
 std::unique_ptr<Node> BTree::CreateNode(const nlohmann::json& json_node) {
