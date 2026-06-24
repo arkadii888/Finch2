@@ -6,7 +6,7 @@ class MoveToNode : public MoveNode {
  public:
     MoveToNode(double latitude_deg, double longitude_deg, float relative_altitude_m);
 
-    std::vector<MissionItem> GetMissionItems() const override;
+    //std::vector<MissionItem> GetMissionItems() const override;
 
     NodeStatus GetStatus() const override;
     bool Validate() const override;

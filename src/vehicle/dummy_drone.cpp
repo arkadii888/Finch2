@@ -18,18 +18,6 @@ void DummyDrone::Kill() {
     spdlog::info("DummyDrone::Kill: Done.");
 }
 
-void DummyDrone::LaunchMission() {
-    spdlog::info("DummyDrone::LaunchMission: Done.");
-}
-
-void DummyDrone::UploadMission(const std::vector<MissionItem>& mission_items) {
-    spdlog::info("DummyDrone::UploadMission: Done.");
-}
-
-std::pair<int, int> DummyDrone::GetMissionProgress() {
-    return {2, 6};
-}
-
 Telemetry DummyDrone::GetTelemetry() {
     Telemetry t;
     t.latitude_deg = 45.467'1;

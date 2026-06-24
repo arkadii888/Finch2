@@ -24,4 +24,5 @@ class Node {
 
  protected:
     std::vector<std::unique_ptr<Node>> childrens_;
+    NodeStatus status_ {NodeStatus::Running};
 };

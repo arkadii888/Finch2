@@ -6,7 +6,7 @@
 
 #include "behavior_tree/btree.hpp"
 #include "behavior_tree/node_catalog.hpp"
-#include "drone/drone.hpp"
+#include "vehicle/vehicle.hpp"
 #include "llm_service/llm_service.hpp"
 
 class LlmOutput {
@@ -28,22 +28,23 @@ class LlmOutput {
 
 class Agent {
  public:
-    Agent(Drone& drone, LlmService& llm_service);
+    Agent(Vehicle& vehicle, LlmService& llm_service);
 
     void Run();
 
-    std::string GetDroneTelemetry();
+    std::string GetVehicleTelemetry() const;
     std::string GetOutput();
 
-    void KillDrone();
+    void KillVehicle();
     void ProcessInput(const std::string& input);
 
  private:
-    void HandleOutput(std::string output);
     std::string BuildSystemPrompt() const;
+    void HandleOutput(std::string output);
+    void WalkOnTree(const Node* root);
 
     BTree btree_;
-    Drone& drone_;
+    Vehicle& vehicle_;
     LlmService& llm_service_;
     NodeCatalog node_catalog_;
     LlmOutput llm_output_;

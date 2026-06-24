@@ -1,25 +1,20 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
 #include <mavsdk.h>
 #include <plugins/action/action.h>
 #include <plugins/mission/mission.h>
 #include <plugins/telemetry/telemetry.h>
 
-#include "drone.hpp"
+#include "vehicle.hpp"
 
-class Px4Drone : public Drone {
+class Px4Drone : public Vehicle {
  public:
     void Arm() override;
     void Disarm() override;
     void Init() override;
     void Kill() override;
-    void LaunchMission() override;
-    void UploadMission(const std::vector<MissionItem>& mission_items) override;
-
-    std::pair<int, int> GetMissionProgress() override;
 
     Telemetry GetTelemetry() override;
 

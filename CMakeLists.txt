@@ -118,9 +118,9 @@ set(BTREE_SOURCES
 add_executable(run
     src/main.cpp
 
-    src/drone/drone.hpp
-    src/drone/dummy_drone.cpp
-    src/drone/px4_drone.cpp
+    src/vehicle/vehicle.hpp
+    src/vehicle/dummy_drone.cpp
+    src/vehicle/px4_drone.cpp
 
     src/llm_service/llm_service.hpp
     src/llm_service/llama_service.cpp
@@ -134,7 +134,7 @@ add_executable(run
 
 add_executable(btree_test
     tests/btree_test.cpp
-    src/drone/drone.hpp
+    src/vehicle/vehicle.hpp
     ${BTREE_SOURCES}
 )
 

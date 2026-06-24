@@ -8,17 +8,20 @@
 
 import lifecycle;
 
-Agent::Agent(Drone& drone, LlmService& llm_service)
-    : drone_ {drone}, llm_service_ {llm_service} {}
+Agent::Agent(Vehicle& vehicle, LlmService& llm_service)
+    : vehicle_ {vehicle}, llm_service_ {llm_service} {}
 
 void Agent::Run() {
     while (lifecycle::is_alive_public) {
+        if(!llm_output_.Get().empty()) {
+            WalkOnTree(btree_.GetRoot());
+        }
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
 }
 
-std::string Agent::GetDroneTelemetry() {
-    nlohmann::json telemetry {drone_.GetTelemetry()};
+std::string Agent::GetVehicleTelemetry() const {
+    nlohmann::json telemetry {vehicle_.GetTelemetry()};
     return telemetry.dump();
 }
 
@@ -35,8 +38,8 @@ std::string Agent::GetOutput() {
     return output;
 }
 
-void Agent::KillDrone() {
-    drone_.Kill();
+void Agent::KillVehicle() {
+    vehicle_.Kill();
 }
 
 void Agent::ProcessInput(const std::string& input) {
@@ -45,10 +48,7 @@ void Agent::ProcessInput(const std::string& input) {
         return;
     }
 
-    const CompletionRequest request {
-        .system_prompt = BuildSystemPrompt(),
-        .user_prompt = input,
-    };
+    const CompletionRequest request {BuildSystemPrompt(), input};
 
     std::thread([this, request] {
         HandleOutput(llm_service_.Complete(request));
@@ -62,11 +62,11 @@ void Agent::HandleOutput(std::string output) {
 }
 
 std::string Agent::BuildSystemPrompt() const {
-    std::string prompt {
-        "You are a drone mission planner. Output ONLY a single valid JSON behavior tree.\n\n"
-        "Available node types:\n"
-    };
+    std::string prompt {"You are a drone mission planner. Output ONLY a single valid JSON behavior tree.\n"};
 
+    prompt += "\nYour initial telemetry is: " + GetVehicleTelemetry() + "\n";
+
+    prompt += "Available node types:\n";
     for (const auto& node : node_catalog_.GetNodes()) {
         prompt += node->GetPrompt() + "\n";
     }
@@ -79,4 +79,16 @@ std::string Agent::BuildSystemPrompt() const {
         "  - Output raw JSON only. No markdown fences, no explanation.\n";
 
     return prompt;
+}
+
+void Agent::WalkOnTree(const Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+
+    spdlog::info("Agent::WalkOnTree: Node type is '{}'.", typeid(root).name());
+
+    for (const auto& child : root->GetChildrens()) {
+        WalkOnTree(child.get());
+    }
 }
