@@ -6,7 +6,7 @@
 #include <spdlog/spdlog.h>
 
 #include "behavior_tree/nodes/fallback_node.hpp"
-#include "behavior_tree/nodes/move_nodes/move_to_node.hpp"
+#include "behavior_tree/nodes/move_nodes/go_to_node.hpp"
 #include "behavior_tree/nodes/parallel_node.hpp"
 #include "behavior_tree/nodes/sequence_node.hpp"
 
@@ -93,11 +93,13 @@ std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_
             return nullptr;
         }
 
-        if (intent == "move_to") {
+        if (intent == "go_to") {
             double latitude_deg {intent_arguments.at("latitude_deg").get<double>()};
             double longitude_deg {intent_arguments.at("longitude_deg").get<double>()};
-            float relative_altitude_m {intent_arguments.at("relative_altitude_m").get<float>()};
-            node = std::make_unique<MoveToNode>(latitude_deg, longitude_deg, relative_altitude_m);
+            float absolute_altitude_m {intent_arguments.at("absolute_altitude_m").get<float>()};
+            float yaw_deg {intent_arguments.at("yaw_deg").get<float>()};
+
+            node = std::make_unique<GoToNode>(latitude_deg, longitude_deg, absolute_altitude_m, yaw_deg);
         }
 
         return node;
