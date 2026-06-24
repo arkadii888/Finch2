@@ -110,7 +110,7 @@ set(BTREE_SOURCES
     src/behavior_tree/nodes/sequence_node.cpp
 
     src/behavior_tree/nodes/move_nodes/move_node.cpp
-    src/behavior_tree/nodes/move_nodes/move_to_node.cpp
+    src/behavior_tree/nodes/move_nodes/go_to_node.cpp
 
     src/behavior_tree/nodes/task_nodes/task_node.cpp
 )
