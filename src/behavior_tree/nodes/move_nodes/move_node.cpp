@@ -1,5 +1,9 @@
 #include "move_node.hpp"
 
+void MoveNode::Execute() {
+
+}
+
 NodeStatus MoveNode::GetStatus() const {
     return NodeStatus::Running;
 }

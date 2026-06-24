@@ -6,8 +6,7 @@
 
 class TaskNode : public ActionNode {
  public:
-    virtual void Execute() = 0;
-
+    void Execute() override;
     NodeStatus GetStatus() const override;
     bool Validate() const override;
     std::string GetPrompt() const override;

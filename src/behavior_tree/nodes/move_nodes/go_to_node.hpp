@@ -2,12 +2,11 @@
 
 #include "move_node.hpp"
 
-class MoveToNode : public MoveNode {
+class GoToNode : public MoveNode {
  public:
-    MoveToNode(double latitude_deg, double longitude_deg, float relative_altitude_m);
+    GoToNode(double latitude_deg, double longitude_deg, float absolute_altitude_m, float yaw_deg);
 
-    //std::vector<MissionItem> GetMissionItems() const override;
-
+    void Execute() override;
     NodeStatus GetStatus() const override;
     bool Validate() const override;
     std::string GetPrompt() const override;
@@ -15,5 +14,6 @@ class MoveToNode : public MoveNode {
  private:
     double latitude_deg_;
     double longitude_deg_;
-    float relative_altitude_m_;
+    float absolute_altitude_m_;
+    float yaw_deg_;
 };

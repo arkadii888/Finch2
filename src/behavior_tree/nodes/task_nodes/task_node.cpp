@@ -1,5 +1,9 @@
 #include "task_node.hpp"
 
+void TaskNode::Execute() {
+
+}
+
 NodeStatus TaskNode::GetStatus() const {
     return NodeStatus::Running;
 }
