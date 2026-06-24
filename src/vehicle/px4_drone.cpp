@@ -5,6 +5,33 @@
 
 #include <spdlog/spdlog.h>
 
+void Px4Drone::Arm() {
+    if (action_->arm() != mavsdk::Action::Result::Success) {
+        spdlog::error("Px4Drone::Arm: Failed.");
+        return;
+    }
+
+    spdlog::info("Px4Drone::Arm: Done.");
+}
+
+void Px4Drone::Disarm() {
+    if (action_->disarm() != mavsdk::Action::Result::Success) {
+        spdlog::error("Px4Drone::Disarm: Failed.");
+        return;
+    }
+
+    spdlog::info("Px4Drone::Disarm: Done.");
+}
+
+void Px4Drone::GoTo(double latitude_deg, double longitude_deg, float absolute_altitude_m, float yaw_deg) {
+    if (action_->goto_location(latitude_deg, longitude_deg, absolute_altitude_m, yaw_deg) != mavsdk::Action::Result::Success) {
+        spdlog::error("Px4Drone::GoTo: Failed.");
+        return;
+    }
+
+    spdlog::info("Px4Drone::GoTo: Done.");
+}
+
 void Px4Drone::Init() {
     mavsdk_.add_any_connection("udpin://127.0.0.1:14540");
 
@@ -35,22 +62,27 @@ void Px4Drone::Kill() {
     spdlog::info("Px4Drone::Kill: Done.");
 }
 
-void Px4Drone::Arm() {
-    if (action_->arm() != mavsdk::Action::Result::Success) {
-        spdlog::error("Px4Drone::Arm: Failed.");
+void Px4Drone::Land() {
+    if (action_->land() != mavsdk::Action::Result::Success) {
+        spdlog::error("Px4Drone::Land: Failed.");
         return;
     }
 
-    spdlog::info("Px4Drone::Arm: Done.");
+    spdlog::info("Px4Drone::Land: Done.");
 }
 
-void Px4Drone::Disarm() {
-    if (action_->disarm() != mavsdk::Action::Result::Success) {
-        spdlog::error("Px4Drone::Disarm: Failed.");
+void Px4Drone::Takeoff() {
+    while (!telemetry_->armed()) {
+        spdlog::info("Px4Drone::Takeoff: Waiting for arm command...");
+        std::this_thread::sleep_for(std::chrono::milliseconds {500});
+    }
+
+    if (action_->takeoff() != mavsdk::Action::Result::Success) {
+        spdlog::error("Px4Drone::Takeoff: Failed.");
         return;
     }
 
-    spdlog::info("Px4Drone::Disarm: Done.");
+    spdlog::info("Px4Drone::Takeoff: Done.");
 }
 
 Telemetry Px4Drone::GetTelemetry() {

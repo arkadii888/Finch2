@@ -30,8 +30,11 @@ class Vehicle {
 
     virtual void Arm() = 0;
     virtual void Disarm() = 0;
+    virtual void GoTo(double latitude_deg, double longitude_deg, float absolute_altitude_m, float yaw_deg) = 0;
     virtual void Init() = 0;
     virtual void Kill() = 0;
+    virtual void Land() = 0;
+    virtual void Takeoff() = 0;
 
     virtual Telemetry GetTelemetry() = 0;
 };
