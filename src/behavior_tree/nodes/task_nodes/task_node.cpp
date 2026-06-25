@@ -1,6 +1,6 @@
 #include "task_node.hpp"
 
-void TaskNode::Execute() {
+void TaskNode::Execute(std::any context) {
 
 }
 

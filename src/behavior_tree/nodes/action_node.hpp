@@ -1,10 +1,12 @@
 #pragma once
 
+#include <any>
+
 #include "node.hpp"
 
 class ActionNode : public Node {
  public:
-    virtual void Execute() = 0;
+    virtual void Execute(std::any context) = 0;
 
     NodeStatus GetStatus() const override;
     bool Validate() const override;

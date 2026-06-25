@@ -1,11 +1,15 @@
 #include "move_node.hpp"
 
-void MoveNode::Execute() {
-
+void MoveNode::Execute(std::any context) {
+    if (context.type() == typeid(Vehicle*)) {
+        vehicle_ = std::any_cast<Vehicle*>(context);
+    } else {
+        vehicle_ = nullptr;
+    }
 }
 
 NodeStatus MoveNode::GetStatus() const {
-    return NodeStatus::Running;
+    return status_;
 }
 
 bool MoveNode::Validate() const {

@@ -1,7 +1,7 @@
 #include "action_node.hpp"
 
 NodeStatus ActionNode::GetStatus() const {
-    return NodeStatus::Running;
+    return status_;
 }
 
 bool ActionNode::Validate() const {

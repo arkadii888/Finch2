@@ -3,12 +3,12 @@
 GoToNode::GoToNode(double latitude_deg, double longitude_deg, float absolute_altitude_m, float yaw_deg) : latitude_deg_(latitude_deg),
     longitude_deg_(longitude_deg), absolute_altitude_m_(absolute_altitude_m), yaw_deg_(yaw_deg) {}
 
-void GoToNode::Execute() {
+void GoToNode::Execute(std::any context) {
 
 }
 
 NodeStatus GoToNode::GetStatus() const {
-
+    return status_;
 }
 
 bool GoToNode::Validate() const {
