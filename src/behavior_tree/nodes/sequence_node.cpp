@@ -1,16 +1,7 @@
 #include "sequence_node.hpp"
 
 NodeStatus SequenceNode::GetStatus() const {
-    for (const auto& child : childrens_) {
-        const NodeStatus s {child->GetStatus()};
-        if (s == NodeStatus::Failure) {
-            return NodeStatus::Failure;
-        }
-        if (s == NodeStatus::Running) {
-            return NodeStatus::Running;
-        }
-    }
-    return NodeStatus::Success;
+    return status_;
 }
 
 bool SequenceNode::Validate() const {

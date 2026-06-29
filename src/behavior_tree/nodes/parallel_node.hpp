@@ -9,6 +9,8 @@ class ParallelNode : public Node {
     bool Validate() const override;
     std::string GetPrompt() const override;
 
+    int GetSuccessThreshold() const;
+
  private:
     int success_threshold_;
 };

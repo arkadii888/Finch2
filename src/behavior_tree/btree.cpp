@@ -19,7 +19,7 @@ void BTree::Destroy() {
     root_.reset();
 }
 
-const Node* BTree::GetRoot() const {
+Node* BTree::GetRoot() const {
     return root_.get();
 }
 

@@ -12,6 +12,9 @@ class MoveNode : public ActionNode {
     bool Validate() const override;
     std::string GetPrompt() const override;
 
+    bool IsExecuted() const;
+
  protected:
     Vehicle* vehicle_ {nullptr};
+    bool is_executed {false};
 };

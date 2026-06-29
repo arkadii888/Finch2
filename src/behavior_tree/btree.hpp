@@ -11,7 +11,7 @@ class BTree {
     void Build(const nlohmann::json& tree);
     void Destroy();
 
-    const Node* GetRoot() const;
+    Node* GetRoot() const;
 
  private:
     std::unique_ptr<Node> CreateNode(const nlohmann::json& json_node);

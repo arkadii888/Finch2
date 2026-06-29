@@ -41,7 +41,7 @@ class Agent {
  private:
     std::string BuildSystemPrompt() const;
     void HandleOutput(std::string output);
-    void WalkOnTree(const Node* root);
+    NodeStatus TickNode(Node* node);
 
     BTree btree_;
     Vehicle& vehicle_;

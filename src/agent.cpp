@@ -6,6 +6,11 @@
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
+#include "behavior_tree/nodes/fallback_node.hpp"
+#include "behavior_tree/nodes/parallel_node.hpp"
+#include "behavior_tree/nodes/sequence_node.hpp"
+#include "behavior_tree/nodes/move_nodes/move_node.hpp"
+
 import lifecycle;
 
 Agent::Agent(Vehicle& vehicle, LlmService& llm_service)
@@ -13,8 +18,15 @@ Agent::Agent(Vehicle& vehicle, LlmService& llm_service)
 
 void Agent::Run() {
     while (lifecycle::is_alive_public) {
-        if(!llm_output_.Get().empty()) {
-            WalkOnTree(btree_.GetRoot());
+        if (btree_.GetRoot()) {
+            auto status {TickNode(btree_.GetRoot())};
+            if (status == NodeStatus::Success) {
+                spdlog::info("Agent::Run: Success");
+                btree_.Destroy();
+            } else if (status == NodeStatus::Failure) {
+                spdlog::info("Agent::Run: Failure");
+                btree_.Destroy();
+            }
         }
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
@@ -81,14 +93,70 @@ std::string Agent::BuildSystemPrompt() const {
     return prompt;
 }
 
-void Agent::WalkOnTree(const Node* root) {
-    if (root == nullptr) {
-        return;
+NodeStatus Agent::TickNode(Node* node) {
+    if (node == nullptr) {
+        return NodeStatus::Failure;
     }
 
-    spdlog::info("Agent::WalkOnTree: Node type is '{}'.", typeid(root).name());
-
-    for (const auto& child : root->GetChildrens()) {
-        WalkOnTree(child.get());
+    if (auto move {dynamic_cast<MoveNode*>(node)}) {
+        if (!move->IsExecuted()) {
+            move->Execute(&vehicle_);
+        }
+        return move->GetStatus();
     }
+
+    if (auto sequence {dynamic_cast<SequenceNode*>(node)}) {
+        for (auto& child : sequence->GetChildrens()) {
+            auto status {TickNode(child.get())};
+            if (status == NodeStatus::Failure) {
+                return status;
+            }
+            if (status == NodeStatus::Running) {
+                return status;
+            }
+        }
+        return NodeStatus::Success;
+    }
+
+    if (auto fallback {dynamic_cast<FallbackNode*>(node)}) {
+        for (auto& child : fallback->GetChildrens()) {
+            auto status {TickNode(child.get())};
+            if (status == NodeStatus::Success) {
+                return status;
+            }
+            if (status == NodeStatus::Running) {
+                return status;
+            }
+        }
+        return NodeStatus::Failure;
+    }
+
+    if (auto parallel {dynamic_cast<ParallelNode*>(node)}) {
+        int success_count {0};
+        int failure_count {0};
+        int success_threshold {parallel->GetSuccessThreshold()};
+
+        auto& childrens {parallel->GetChildrens()};
+        int childrens_count {static_cast<int>(childrens.size())};
+
+        for (auto& child : childrens) {
+            auto status {TickNode(child.get())};
+            if (status == NodeStatus::Success) {
+                ++success_count;
+            }
+            if (status == NodeStatus::Failure) {
+                ++failure_count;
+            }
+        }
+
+        if (success_count >= success_threshold) {
+            return NodeStatus::Success;
+        }
+        if (failure_count > childrens_count - success_threshold) {
+            return NodeStatus::Failure;
+        }
+        return NodeStatus::Running;
+    }
+
+    return NodeStatus::Success;
 }

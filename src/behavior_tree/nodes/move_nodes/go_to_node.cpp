@@ -4,10 +4,20 @@ GoToNode::GoToNode(double latitude_deg, double longitude_deg, float absolute_alt
     longitude_deg_(longitude_deg), absolute_altitude_m_(absolute_altitude_m), yaw_deg_(yaw_deg) {}
 
 void GoToNode::Execute(std::any context) {
+    MoveNode::Execute(context);
 
+    if (vehicle_) {
+        vehicle_->GoTo(latitude_deg_, longitude_deg_, absolute_altitude_m_, yaw_deg_);
+        status_ = NodeStatus::Running;
+        is_executed = true;
+    } else {
+        status_ = NodeStatus::Failure;
+    }
 }
 
 NodeStatus GoToNode::GetStatus() const {
+    // TODO: check position in acceptance radius
+
     return status_;
 }
 

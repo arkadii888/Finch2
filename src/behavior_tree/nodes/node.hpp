@@ -5,7 +5,6 @@
 #include <vector>
 
 enum class NodeStatus {
-    Idle,
     Running,
     Success,
     Failure,
@@ -25,5 +24,5 @@ class Node {
 
  protected:
     std::vector<std::unique_ptr<Node>> childrens_;
-    NodeStatus status_ {NodeStatus::Idle};
+    NodeStatus status_ {NodeStatus::Running};
 };

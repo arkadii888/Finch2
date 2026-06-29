@@ -19,3 +19,7 @@ bool MoveNode::Validate() const {
 std::string MoveNode::GetPrompt() const {
     return "";
 }
+
+bool MoveNode::IsExecuted() const {
+    return is_executed;
+}
