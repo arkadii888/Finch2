@@ -104,7 +104,7 @@ set(BTREE_SOURCES
     src/behavior_tree/node_catalog.cpp
 
     src/behavior_tree/nodes/node.cpp
-    src/behavior_tree/nodes/action_node.cpp
+    src/behavior_tree/nodes/action_node.hpp
     src/behavior_tree/nodes/fallback_node.cpp
     src/behavior_tree/nodes/parallel_node.cpp
     src/behavior_tree/nodes/sequence_node.cpp

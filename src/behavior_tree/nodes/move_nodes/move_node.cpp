@@ -8,18 +8,6 @@ void MoveNode::Execute(std::any context) {
     }
 }
 
-NodeStatus MoveNode::GetStatus() const {
-    return status_;
-}
-
-bool MoveNode::Validate() const {
-    return true;
-}
-
-std::string MoveNode::GetPrompt() const {
-    return "";
-}
-
 bool MoveNode::IsExecuted() const {
     return is_executed;
 }
