@@ -1,9 +1,12 @@
 #include "px4_drone.hpp"
+#include "plugins/param/param.h"
 
 #include <chrono>
 #include <thread>
 
 #include <spdlog/spdlog.h>
+
+import globals;
 
 void Px4Drone::Arm() {
     if (action_->arm() != mavsdk::Action::Result::Success) {
@@ -43,13 +46,17 @@ void Px4Drone::Init() {
 
     system_ = mavsdk_.systems().at(0);
     action_ = std::make_unique<mavsdk::Action>(system_);
-    mission_ = std::make_unique<mavsdk::Mission>(system_);
+    param_ = std::make_unique<mavsdk::Param>(system_);
     telemetry_ = std::make_unique<mavsdk::Telemetry>(system_);
 
     while (!telemetry_->health_all_ok()) {
         spdlog::info("Px4Drone::Init: Not ready to arm yet...");
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
+
+    action_->set_takeoff_altitude(globals::drone_takeoff_altitude_m);
+    param_->set_param_float("NAV_ACC_RAD", static_cast<float>(globals::drone_acceptance_radius_m));
+
     spdlog::info("Px4Drone::Init: Ready to arm.");
 }
 

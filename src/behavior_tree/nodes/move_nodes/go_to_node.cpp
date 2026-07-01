@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+import globals;
+
 GoToNode::GoToNode(double latitude_deg, double longitude_deg, float absolute_altitude_m, float yaw_deg) : latitude_deg_(latitude_deg),
     longitude_deg_(longitude_deg), absolute_altitude_m_(absolute_altitude_m), yaw_deg_(yaw_deg) {}
 
@@ -20,7 +22,6 @@ NodeStatus GoToNode::GetStatus() const {
     }
 
     auto telemetry {vehicle_->GetTelemetry()};
-    float acceptance_radius {vehicle_->GetAcceptanceRadius()};
 
     const double PI = 3.14159265358979323846;
 
@@ -35,7 +36,7 @@ NodeStatus GoToNode::GetStatus() const {
 
     double distanceSquared = (d_lat_m * d_lat_m) + (d_lon_m * d_lon_m) + (d_alt_m * d_alt_m);
 
-    if (distanceSquared <= (acceptance_radius * acceptance_radius)) {
+    if (distanceSquared <= (globals::drone_acceptance_radius_m * globals::drone_acceptance_radius_m)) {
         return NodeStatus::Success;
     }
 

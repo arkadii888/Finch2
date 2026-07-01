@@ -38,7 +38,5 @@ class Vehicle {
     virtual void Land() = 0;
     virtual void Takeoff() = 0;
 
-    virtual float GetAcceptanceRadius() = 0;
-
     virtual Telemetry GetTelemetry() = 0;
 };
