@@ -18,7 +18,7 @@ Agent::Agent(Vehicle& vehicle, LlmService& llm_service)
 
 void Agent::Run() {
     while (lifecycle::is_alive_public) {
-        if (btree_.GetRoot()) {
+        if (btree_.GetRoot()) { // TODO: make thread safe
             auto status {TickNode(btree_.GetRoot())};
             if (status == NodeStatus::Success) {
                 spdlog::info("Agent::Run: Success");
