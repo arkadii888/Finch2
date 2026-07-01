@@ -2,6 +2,8 @@
 
 #include "move_node.hpp"
 
+import globals;
+
 class GoToNode : public MoveNode {
  public:
     GoToNode(double latitude_deg, double longitude_deg, float absolute_altitude_m, float yaw_deg);

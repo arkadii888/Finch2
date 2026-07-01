@@ -9,6 +9,8 @@
 
 #include "vehicle.hpp"
 
+import globals;
+
 class Px4Drone : public Vehicle {
  public:
     void Arm() override;

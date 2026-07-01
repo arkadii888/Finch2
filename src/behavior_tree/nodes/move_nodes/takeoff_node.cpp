@@ -2,8 +2,6 @@
 
 #include <cstdlib>
 
-import globals;
-
 void TakeoffNode::Execute(std::any context) {
     if (vehicle_) {
         vehicle_->Takeoff();

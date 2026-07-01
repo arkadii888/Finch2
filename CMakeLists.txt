@@ -111,6 +111,8 @@ set(BTREE_SOURCES
 
     src/behavior_tree/nodes/move_nodes/move_node.cpp
     src/behavior_tree/nodes/move_nodes/go_to_node.cpp
+    src/behavior_tree/nodes/move_nodes/land_node.cpp
+    src/behavior_tree/nodes/move_nodes/takeoff_node.cpp
 
     src/behavior_tree/nodes/task_nodes/task_node.cpp
 )
@@ -132,12 +134,6 @@ add_executable(run
     ${BTREE_SOURCES}
 )
 
-add_executable(btree_test
-    tests/btree_test.cpp
-    src/vehicle/vehicle.hpp
-    ${BTREE_SOURCES}
-)
-
 target_sources(run
     PUBLIC
         FILE_SET CXX_MODULES
@@ -151,14 +147,6 @@ target_include_directories(run PRIVATE src)
 target_link_libraries(run PRIVATE
     mavsdk
     httplib
-    nlohmann_json::nlohmann_json
-    spdlog
-)
-
-target_include_directories(btree_test PRIVATE src)
-
-target_link_libraries(btree_test PRIVATE
-    GTest::gtest_main
     nlohmann_json::nlohmann_json
     spdlog
 )

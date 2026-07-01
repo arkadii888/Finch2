@@ -2,6 +2,8 @@
 
 #include "move_node.hpp"
 
+import globals;
+
 class TakeoffNode : public MoveNode {
  public:
     void Execute(std::any context) override;

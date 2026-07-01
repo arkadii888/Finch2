@@ -6,8 +6,6 @@
 
 #include <spdlog/spdlog.h>
 
-import globals;
-
 void Px4Drone::Arm() {
     if (action_->arm() != mavsdk::Action::Result::Success) {
         spdlog::error("Px4Drone::Arm: Failed.");
