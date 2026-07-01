@@ -1,120 +1,113 @@
 #include "btree.hpp"
 
-#include <stdexcept>
-#include <string>
+#include <memory>
+#include <utility>
 
-#include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 
-#include "composite_nodes.hpp"
-#include "node_catalog.hpp"
+#include "behavior_tree/nodes/fallback_node.hpp"
+#include "behavior_tree/nodes/move_nodes/go_to_node.hpp"
+#include "behavior_tree/nodes/parallel_node.hpp"
+#include "behavior_tree/nodes/sequence_node.hpp"
 
-static std::unique_ptr<Node> ParseNode(
-    const nlohmann::json& j,
-    std::vector<MissionItem>& mission_items,
-    std::vector<Move*>& moves);
+void BTree::Build(const nlohmann::json& tree) {
+    Destroy();
+    root_ = CreateNode(tree);
+}
 
-static std::unique_ptr<Node> ParseComposite(
-    const nlohmann::json& j,
-    const std::string& type,
-    std::vector<MissionItem>& mission_items,
-    std::vector<Move*>& moves)
-{
-    if (!j.contains("children") || !j["children"].is_array()) {
-        throw std::runtime_error {type + " node must have a \"children\" array"};
-    }
+void BTree::Destroy() {
+    root_.reset();
+}
 
-    std::unique_ptr<Node> node;
+Node* BTree::GetRoot() const {
+    return root_.get();
+}
 
-    if (type == "sequence") {
-        node = std::make_unique<SequenceNode>();
-    } else if (type == "fallback") {
-        node = std::make_unique<FallbackNode>();
-    } else {
-        // parallel
-        if (!j.contains("success_threshold")
-                || !j["success_threshold"].is_number_integer()) {
-            throw std::runtime_error {
-                "parallel node must have an integer \"success_threshold\" field"};
+std::unique_ptr<Node> BTree::CreateNode(const nlohmann::json& json_node) {
+    try {
+        std::string type {json_node.at("type").get<std::string>()};
+        std::unique_ptr<Node> node {nullptr};
+
+        if (type == "sequence") {
+            node = std::make_unique<SequenceNode>();
+        } else if (type == "fallback") {
+            node = std::make_unique<FallbackNode>();
+        } else if (type == "parallel") {
+            int threshold = json_node.at("success_threshold").get<int>();
+            node = std::make_unique<ParallelNode>(threshold);
+        } else if (type == "action") {
+            node = CreateActionNode(json_node);
         }
-        node = std::make_unique<ParallelNode>(
-            j["success_threshold"].get<int>());
-    }
 
-    for (const auto& child : j["children"]) {
-        node->AddChild(ParseNode(child, mission_items, moves));
-    }
-    return node;
-}
-
-static std::unique_ptr<Node> ParseAction(
-    const nlohmann::json& j,
-    std::vector<MissionItem>& mission_items,
-    std::vector<Move*>& moves)
-{
-    std::string intent_key;
-    for (const auto& [key, val] : j.items()) {
-        if (key == "type") continue;
-        if (!intent_key.empty()) {
-            throw std::runtime_error {
-                "action node must have exactly one intent key besides \"type\""};
+        if (node == nullptr) {
+            spdlog::error("BTree::CreateNode: Failed to create node for type '{}'.", type);
+            return nullptr;
         }
-        intent_key = key;
+
+        if (type == "sequence" || type == "fallback" || type == "parallel") {
+            if (!json_node.contains("children") || !json_node.at("children").is_array()) {
+                spdlog::error("BTree::CreateNode: Node with type '{}' missing childrens.", type);
+                return nullptr;
+            }
+
+            for (const auto& json_child : json_node.at("children")) {
+                auto child_node {CreateNode(json_child)};
+                if (child_node == nullptr) {
+                    return nullptr;
+                }
+                node->AddChild(std::move(child_node));
+            }
+        }
+
+        if (!node->Validate()) {
+            spdlog::error("BTree::CreateNode: Node with '{}' type is not valid.", type);
+            return nullptr;
+        }
+
+        return node;
+    } catch (const nlohmann::json::exception& e) {
+        spdlog::error("BTree::CreateNode: Error: {}", e.what());
+        return nullptr;
+    } catch (const std::exception& e) {
+        spdlog::error("BTree::CreateNode: Error: {}", e.what());
+        return nullptr;
     }
+};
 
-    if (intent_key.empty()) {
-        throw std::runtime_error {
-            "action node must have exactly one intent key besides \"type\""};
+std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_node) {
+    std::unique_ptr<Node> node {nullptr};
+    std::string intent;
+    nlohmann::json intent_arguments;
+
+    try {
+        for (const auto& [key, value] : json_action_node.items()) {
+            if (key != "type") {
+                intent = key;
+                intent_arguments = value;
+                break;
+            }
+        }
+
+        if (intent.empty()) {
+            spdlog::error("BTree::CreateActionNode: Action node missing intent key.");
+            return nullptr;
+        }
+
+        if (intent == "go_to") {
+            double latitude_deg {intent_arguments.at("latitude_deg").get<double>()};
+            double longitude_deg {intent_arguments.at("longitude_deg").get<double>()};
+            float absolute_altitude_m {intent_arguments.at("absolute_altitude_m").get<float>()};
+            float yaw_deg {intent_arguments.at("yaw_deg").get<float>()};
+
+            node = std::make_unique<GoToNode>(latitude_deg, longitude_deg, absolute_altitude_m, yaw_deg);
+        }
+
+        return node;
+    } catch (const nlohmann::json::exception& e) {
+        spdlog::error("BTree::CreateActionNode: Error: {}", e.what());
+        return nullptr;
+    } catch (const std::exception& e) {
+        spdlog::error("BTree::CreateActionNode: Error: {}", e.what());
+        return nullptr;
     }
-
-    return ParseActionNode(intent_key, j[intent_key], mission_items, moves);
-}
-
-static std::unique_ptr<Node> ParseNode(
-    const nlohmann::json& j,
-    std::vector<MissionItem>& mission_items,
-    std::vector<Move*>& moves)
-{
-    if (!j.is_object()) {
-        throw std::runtime_error {"node must be a JSON object"};
-    }
-    if (!j.contains("type") || !j["type"].is_string()) {
-        throw std::runtime_error {"node must have a string \"type\" field"};
-    }
-
-    const std::string type {j["type"].get<std::string>()};
-
-    if (type == "sequence" || type == "fallback" || type == "parallel") {
-        return ParseComposite(j, type, mission_items, moves);
-    }
-    if (type == "action") {
-        return ParseAction(j, mission_items, moves);
-    }
-
-    throw std::runtime_error {"unknown node type: " + type};
-}
-
-BTree BTree::Parse(const nlohmann::json& json) {
-    BTree btree;
-    btree.root_ = ParseNode(json, btree.mission_items_, btree.moves_);
-    return btree;
-}
-
-bool BTree::Validate() const {
-    if (!root_) return false;
-    return root_->Validate();
-}
-
-NodeStatus BTree::GetStatus(int current_wp, int total_wp) const {
-    for (Move* move : moves_) {
-        move->UpdateProgress(current_wp);
-    }
-    return root_->GetStatus();
-}
-
-const std::vector<MissionItem>& BTree::GetMissionItems() const {
-    return mission_items_;
-}
-
-const Node& BTree::GetRoot() const {
-    return *root_;
 }
