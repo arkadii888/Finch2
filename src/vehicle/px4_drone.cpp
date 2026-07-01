@@ -1,5 +1,4 @@
 #include "px4_drone.hpp"
-#include "plugins/param/param.h"
 
 #include <chrono>
 #include <thread>
