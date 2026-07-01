@@ -56,7 +56,7 @@ bool GoToNode::Validate() const {
 }
 
 std::string GoToNode::GetPrompt() const {
-    return R"(Command to move the drone to a specific location: {"type": "action", "go_to": {
+    return R"({"type": "action", "go_to": {
         "latitude_deg": <degrees_double>,
         "longitude_deg": <degrees_double>,
         "absolute_altitude_m": <meters_float>,

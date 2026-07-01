@@ -11,6 +11,7 @@ struct Telemetry {
     float remaining_percent {0.0f};
     float voltage_v {0.0f};
     float yaw_deg {0.0f};
+    bool is_armed {false};
 };
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Telemetry,
@@ -21,7 +22,8 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Telemetry,
     relative_altitude_m,
     remaining_percent,
     voltage_v,
-    yaw_deg
+    yaw_deg,
+    is_armed
 )
 
 class Vehicle {

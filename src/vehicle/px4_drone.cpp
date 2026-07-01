@@ -103,5 +103,7 @@ Telemetry Px4Drone::GetTelemetry() {
 
     t.yaw_deg = euler.yaw_deg;
 
+    t.is_armed = telemetry_->armed();
+
     return t;
 }
