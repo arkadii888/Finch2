@@ -2,7 +2,7 @@
 
 ParallelNode::ParallelNode(int success_threshold) : success_threshold_ {success_threshold} {}
 
-NodeStatus ParallelNode::GetStatus() const {
+NodeStatus ParallelNode::GetStatus() {
     return status_;
 }
 

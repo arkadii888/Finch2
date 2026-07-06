@@ -1,6 +1,6 @@
 #include "sequence_node.hpp"
 
-NodeStatus SequenceNode::GetStatus() const {
+NodeStatus SequenceNode::GetStatus() {
     return status_;
 }
 

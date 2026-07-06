@@ -5,7 +5,7 @@
 class ParallelNode : public Node {
  public:
     explicit ParallelNode(int success_threshold);
-    NodeStatus GetStatus() const override;
+    NodeStatus GetStatus() override;
     bool Validate() const override;
     std::string GetPrompt() const override;
 

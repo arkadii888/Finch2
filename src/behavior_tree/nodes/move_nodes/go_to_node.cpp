@@ -14,9 +14,14 @@ void GoToNode::Execute(std::any context) {
     }
 }
 
-NodeStatus GoToNode::GetStatus() const {
+NodeStatus GoToNode::GetStatus() {
+    if (status_ == NodeStatus::Success || status_ == NodeStatus::Failure) {
+        return status_;
+    }
+
     if (vehicle_ == nullptr) {
-        return NodeStatus::Failure;
+        status_ = NodeStatus::Failure;
+        return status_;
     }
 
     auto telemetry {vehicle_->GetTelemetry()};
@@ -35,10 +40,11 @@ NodeStatus GoToNode::GetStatus() const {
     double distanceSquared = (d_lat_m * d_lat_m) + (d_lon_m * d_lon_m) + (d_alt_m * d_alt_m);
 
     if (distanceSquared <= (globals::drone_acceptance_radius_m * globals::drone_acceptance_radius_m)) {
-        return NodeStatus::Success;
+        status_ = NodeStatus::Success;
+        return status_;
     }
 
-    return NodeStatus::Running;
+    return status_;
 }
 
 bool GoToNode::Validate() const {

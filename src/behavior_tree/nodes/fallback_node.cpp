@@ -1,6 +1,6 @@
 #include "fallback_node.hpp"
 
-NodeStatus FallbackNode::GetStatus() const {
+NodeStatus FallbackNode::GetStatus() {
     return status_;
 }
 

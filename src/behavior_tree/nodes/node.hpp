@@ -14,7 +14,7 @@ class Node {
  public:
     virtual ~Node() = default;
 
-    virtual NodeStatus GetStatus() const = 0;
+    virtual NodeStatus GetStatus() = 0;
     virtual bool Validate() const = 0;
     virtual std::string GetPrompt() const = 0;
 

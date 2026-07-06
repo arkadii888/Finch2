@@ -7,7 +7,7 @@ import globals;
 class TakeoffNode : public MoveNode {
  public:
     void Execute(std::any context) override;
-    NodeStatus GetStatus() const override;
+    NodeStatus GetStatus() override;
     bool Validate() const override;
     std::string GetPrompt() const override;
 };

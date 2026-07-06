@@ -11,7 +11,7 @@ void TakeoffNode::Execute(std::any context) {
     }
 }
 
-NodeStatus TakeoffNode::GetStatus() const {
+NodeStatus TakeoffNode::GetStatus() {
     if (vehicle_ == nullptr) {
         return NodeStatus::Failure;
     }

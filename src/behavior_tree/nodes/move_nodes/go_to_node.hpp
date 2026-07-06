@@ -9,7 +9,7 @@ class GoToNode : public MoveNode {
     GoToNode(double latitude_deg, double longitude_deg, float absolute_altitude_m, float yaw_deg);
 
     void Execute(std::any context) override;
-    NodeStatus GetStatus() const override;
+    NodeStatus GetStatus() override;
     bool Validate() const override;
     std::string GetPrompt() const override;
 

@@ -9,7 +9,7 @@ void LandNode::Execute(std::any context) {
     }
 }
 
-NodeStatus LandNode::GetStatus() const {
+NodeStatus LandNode::GetStatus() {
     if (vehicle_ == nullptr) {
         return NodeStatus::Failure;
     }
