@@ -10,8 +10,13 @@ void LandNode::Execute(std::any context) {
 }
 
 NodeStatus LandNode::GetStatus() {
+    if (status_ == NodeStatus::Success || status_ == NodeStatus::Failure) {
+        return status_;
+    }
+
     if (vehicle_ == nullptr) {
-        return NodeStatus::Failure;
+        status_ = NodeStatus::Failure;
+        return status_;
     }
 
     auto telemetry {vehicle_->GetTelemetry()};
@@ -19,7 +24,8 @@ NodeStatus LandNode::GetStatus() {
         return NodeStatus::Running;
     }
 
-    return NodeStatus::Success;
+    status_ = NodeStatus::Success;
+    return status_;
 }
 
 bool LandNode::Validate() const {
