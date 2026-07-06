@@ -70,6 +70,8 @@ cmake --build build-release
 
 ### Unit Tests Build
 
+> Currently disabled.
+
 ```bash
 cmake --build build-debug --target btree_test && ./build-debug/btree_test
 ```
