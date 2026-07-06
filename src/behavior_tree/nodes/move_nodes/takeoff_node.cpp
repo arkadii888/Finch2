@@ -3,6 +3,8 @@
 #include <cstdlib>
 
 void TakeoffNode::Execute(std::any context) {
+    MoveNode::Execute(context);
+
     if (vehicle_) {
         vehicle_->Takeoff();
         is_executed = true;

@@ -6,9 +6,12 @@
 #include <spdlog/spdlog.h>
 
 #include "behavior_tree/nodes/fallback_node.hpp"
-#include "behavior_tree/nodes/move_nodes/go_to_node.hpp"
 #include "behavior_tree/nodes/parallel_node.hpp"
 #include "behavior_tree/nodes/sequence_node.hpp"
+
+#include "behavior_tree/nodes/move_nodes/go_to_node.hpp"
+#include "behavior_tree/nodes/move_nodes/land_node.hpp"
+#include "behavior_tree/nodes/move_nodes/takeoff_node.hpp"
 
 void BTree::Build(const nlohmann::json& tree) {
     Destroy();
@@ -100,6 +103,12 @@ std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_
             float yaw_deg {intent_arguments.at("yaw_deg").get<float>()};
 
             node = std::make_unique<GoToNode>(latitude_deg, longitude_deg, absolute_altitude_m, yaw_deg);
+        } else if (intent == "land") {
+            node = std::make_unique<LandNode>();
+        } else if (intent == "takeoff") {
+            node = std::make_unique<TakeoffNode>();
+        } else {
+            spdlog::error("BTree::CreateActionNode: Unknown intent '{}'.", intent);
         }
 
         return node;
