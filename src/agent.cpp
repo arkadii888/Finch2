@@ -53,6 +53,14 @@ std::string Agent::GetOutput() {
     return output;
 }
 
+void Agent::ArmVehicle() {
+    vehicle_.Arm();
+}
+
+void Agent::DisarmVehicle() {
+    vehicle_.Disarm();
+}
+
 void Agent::KillVehicle() {
     vehicle_.Kill();
 }
