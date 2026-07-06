@@ -44,6 +44,7 @@ class Agent {
     NodeStatus TickNode(Node* node);
 
     BTree btree_;
+    std::mutex btree_mutex_;
     Vehicle& vehicle_;
     LlmService& llm_service_;
     NodeCatalog node_catalog_;

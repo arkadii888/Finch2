@@ -18,17 +18,20 @@ Agent::Agent(Vehicle& vehicle, LlmService& llm_service)
 
 void Agent::Run() {
     while (lifecycle::is_alive_public) {
-        if (btree_.GetRoot()) { // TODO: make thread safe
-            auto status {TickNode(btree_.GetRoot())};
-            if (status == NodeStatus::Success) {
-                spdlog::info("Agent::Run: Success");
-                btree_.Destroy();
-            } else if (status == NodeStatus::Failure) {
-                spdlog::info("Agent::Run: Failure");
-                btree_.Destroy();
+        {
+            std::lock_guard lock {btree_mutex_};
+            if (btree_.GetRoot()) {
+                auto status {TickNode(btree_.GetRoot())};
+                if (status == NodeStatus::Success) {
+                    spdlog::info("Agent::Run: Success");
+                    btree_.Destroy();
+                } else if (status == NodeStatus::Failure) {
+                    spdlog::info("Agent::Run: Failure");
+                    btree_.Destroy();
+                }
             }
         }
-        std::this_thread::sleep_for(std::chrono::seconds {1});
+        std::this_thread::sleep_for(std::chrono::milliseconds {200});
     }
 }
 
@@ -69,6 +72,7 @@ void Agent::ProcessInput(const std::string& input) {
 }
 
 void Agent::HandleOutput(std::string output) {
+    std::lock_guard lock {btree_mutex_};
     btree_.Build(nlohmann::json::parse(output));
     llm_output_.Set(std::move(output));
 }
