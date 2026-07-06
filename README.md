@@ -83,11 +83,19 @@ curl -X POST http://localhost:8888/input -d "Text"
 ```
 
 ```bash
-curl http://localhost:8888/output
+curl -X POST http://localhost:8888/kill
 ```
 
 ```bash
-curl -X POST http://localhost:8888/kill
+curl -X POST http://localhost:8888/arm
+```
+
+```bash
+curl -X POST http://localhost:8888/disarm
+```
+
+```bash
+curl http://localhost:8888/output
 ```
 
 ```bash

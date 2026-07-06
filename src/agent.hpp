@@ -35,6 +35,8 @@ class Agent {
     std::string GetVehicleTelemetry() const;
     std::string GetOutput();
 
+    void ArmVehicle();
+    void DisarmVehicle();
     void KillVehicle();
     void ProcessInput(const std::string& input);
 
