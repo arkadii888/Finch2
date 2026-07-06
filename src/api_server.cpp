@@ -21,7 +21,7 @@ void ApiServer::Run() {
     });
 
     server.Post("/kill", [this](const httplib::Request& req, httplib::Response& res) {
-        agent_.KillDrone();
+        agent_.KillVehicle();
         res.set_content("Recieved", "application/json");
     });
 
@@ -31,7 +31,7 @@ void ApiServer::Run() {
     });
 
     server.Get("/telemetry", [this](const httplib::Request& req, httplib::Response& res) {
-        std::string telemetry {agent_.GetDroneTelemetry()};
+        std::string telemetry {agent_.GetVehicleTelemetry()};
         res.set_content(telemetry, "application/json");
     });
 

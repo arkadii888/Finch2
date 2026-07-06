@@ -14,4 +14,7 @@ export namespace globals {
     const std::string model_path {
         std::string {PROJECT_ROOT_DIR} + "/models/gemma-4-E2B-it-Q4_K_M.gguf"
     };
+
+    const float drone_acceptance_radius_m = 0.5f;
+    const float drone_takeoff_altitude_m = 5.f;
 }

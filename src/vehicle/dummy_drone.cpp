@@ -10,6 +10,10 @@ void DummyDrone::Disarm() {
     spdlog::info("DummyDrone::Disarm: Done.");
 }
 
+void DummyDrone::GoTo(double latitude_deg, double longitude_deg, float absolute_altitude_m, float yaw_deg) {
+    spdlog::info("DummyDrone::GoTo: Done.");
+}
+
 void DummyDrone::Init() {
     spdlog::info("DummyDrone::Init: Drone is ready to arm.");
 }
@@ -18,16 +22,12 @@ void DummyDrone::Kill() {
     spdlog::info("DummyDrone::Kill: Done.");
 }
 
-void DummyDrone::LaunchMission() {
-    spdlog::info("DummyDrone::LaunchMission: Done.");
+void DummyDrone::Land() {
+    spdlog::info("DummyDrone::Land: Done.");
 }
 
-void DummyDrone::UploadMission(const std::vector<MissionItem>& mission_items) {
-    spdlog::info("DummyDrone::UploadMission: Done.");
-}
-
-std::pair<int, int> DummyDrone::GetMissionProgress() {
-    return {2, 6};
+void DummyDrone::Takeoff() {
+    spdlog::info("DummyDrone::Takeoff: Done.");
 }
 
 Telemetry DummyDrone::GetTelemetry() {

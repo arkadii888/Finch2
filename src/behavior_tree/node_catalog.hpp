@@ -1,19 +1,15 @@
 #pragma once
 
 #include <memory>
-#include <string>
-#include <vector>
 
-#include <nlohmann/json.hpp>
+#include "nodes/node.hpp"
 
-#include "drone/drone.hpp"
-#include "move_node.hpp"
-#include "node.hpp"
+class NodeCatalog {
+ public:
+    NodeCatalog();
 
-std::vector<std::string> GetActionPrompts();
+    const std::vector<std::unique_ptr<Node>>& GetNodes() const;
 
-std::unique_ptr<Node> ParseActionNode(
-    const std::string& key,
-    const nlohmann::json& args,
-    std::vector<MissionItem>& mission_items,
-    std::vector<Move*>& moves);
+ private:
+    std::vector<std::unique_ptr<Node>> nodes_;
+};
