@@ -7,10 +7,6 @@ void Node::AddChild(std::unique_ptr<Node> child) {
     childrens_.push_back(std::move(child));
 }
 
-void Node::SetStatus(NodeStatus status) {
-    status_ = status;
-}
-
 const std::vector<std::unique_ptr<Node>>& Node::GetChildrens() const {
     return childrens_;
 }
