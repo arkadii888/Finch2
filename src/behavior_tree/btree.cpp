@@ -1,6 +1,7 @@
 #include "btree.hpp"
 
 #include <memory>
+#include <optional>
 #include <utility>
 
 #include <spdlog/spdlog.h>
@@ -12,6 +13,8 @@
 #include "behavior_tree/nodes/move_nodes/go_to_node.hpp"
 #include "behavior_tree/nodes/move_nodes/land_node.hpp"
 #include "behavior_tree/nodes/move_nodes/takeoff_node.hpp"
+
+#include "behavior_tree/nodes/task_nodes/fib_node.hpp"
 
 void BTree::Build(const nlohmann::json& tree) {
     Destroy();
@@ -100,13 +103,21 @@ std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_
             double latitude_deg {intent_arguments.at("latitude_deg").get<double>()};
             double longitude_deg {intent_arguments.at("longitude_deg").get<double>()};
             float absolute_altitude_m {intent_arguments.at("absolute_altitude_m").get<float>()};
-            float yaw_deg {intent_arguments.at("yaw_deg").get<float>()};
+
+            std::optional<float> yaw_deg;
+            if (intent_arguments.contains("yaw_deg")) {
+                yaw_deg = intent_arguments.at("yaw_deg").get<float>();
+            }
 
             node = std::make_unique<GoToNode>(latitude_deg, longitude_deg, absolute_altitude_m, yaw_deg);
         } else if (intent == "land") {
             node = std::make_unique<LandNode>();
         } else if (intent == "takeoff") {
             node = std::make_unique<TakeoffNode>();
+        } else if (intent == "fib") {
+            int n {intent_arguments.at("n").get<int>()};
+
+            node = std::make_unique<FibNode>(n);
         } else {
             spdlog::error("BTree::CreateActionNode: Unknown intent '{}'.", intent);
         }

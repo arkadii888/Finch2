@@ -115,6 +115,7 @@ set(BTREE_SOURCES
     src/behavior_tree/nodes/move_nodes/takeoff_node.cpp
 
     src/behavior_tree/nodes/task_nodes/task_node.cpp
+    src/behavior_tree/nodes/task_nodes/fib_node.cpp
 )
 
 add_executable(run

@@ -10,6 +10,7 @@
 #include "behavior_tree/nodes/parallel_node.hpp"
 #include "behavior_tree/nodes/sequence_node.hpp"
 #include "behavior_tree/nodes/move_nodes/move_node.hpp"
+#include "behavior_tree/nodes/task_nodes/task_node.hpp"
 
 import lifecycle;
 
@@ -115,6 +116,11 @@ NodeStatus Agent::TickNode(Node* node) {
             move->Execute(&vehicle_);
         }
         return move->GetStatus();
+    }
+
+    if (auto task {dynamic_cast<TaskNode*>(node)}) {
+        task->Execute({});
+        return task->GetStatus();
     }
 
     if (auto sequence {dynamic_cast<SequenceNode*>(node)}) {
