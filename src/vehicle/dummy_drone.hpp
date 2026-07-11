@@ -10,6 +10,7 @@ class DummyDrone : public Vehicle {
     void Init() override;
     void Kill() override;
     void Land() override;
+    void Rtl() override;
     void Takeoff() override;
 
     Telemetry GetTelemetry() override;

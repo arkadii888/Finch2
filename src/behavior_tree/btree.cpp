@@ -12,6 +12,7 @@
 
 #include "behavior_tree/nodes/move_nodes/go_to_node.hpp"
 #include "behavior_tree/nodes/move_nodes/land_node.hpp"
+#include "behavior_tree/nodes/move_nodes/rtl_node.hpp"
 #include "behavior_tree/nodes/move_nodes/takeoff_node.hpp"
 
 #include "behavior_tree/nodes/task_nodes/fib_node.hpp"
@@ -112,6 +113,8 @@ std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_
             node = std::make_unique<GoToNode>(latitude_deg, longitude_deg, absolute_altitude_m, yaw_deg);
         } else if (intent == "land") {
             node = std::make_unique<LandNode>();
+        } else if (intent == "rtl") {
+            node = std::make_unique<RtlNode>();
         } else if (intent == "takeoff") {
             node = std::make_unique<TakeoffNode>();
         } else if (intent == "fib") {
