@@ -75,6 +75,15 @@ void Px4Drone::Land() {
     spdlog::info("Px4Drone::Land: Done.");
 }
 
+void Px4Drone::Rtl() {
+    if (action_->return_to_launch() != mavsdk::Action::Result::Success) {
+        spdlog::error("Px4Drone::Rtl: Failed.");
+        return;
+    }
+
+    spdlog::info("Px4Drone::Rtl: Done.");
+}
+
 void Px4Drone::Takeoff() {
     while (!telemetry_->armed()) {
         spdlog::info("Px4Drone::Takeoff: Waiting for arm command...");

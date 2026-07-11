@@ -6,6 +6,7 @@
 
 #include "behavior_tree/nodes/move_nodes/go_to_node.hpp"
 #include "behavior_tree/nodes/move_nodes/land_node.hpp"
+#include "behavior_tree/nodes/move_nodes/rtl_node.hpp"
 #include "behavior_tree/nodes/move_nodes/takeoff_node.hpp"
 
 #include "behavior_tree/nodes/task_nodes/fib_node.hpp"
@@ -17,6 +18,7 @@ NodeCatalog::NodeCatalog() {
 
     nodes_.push_back(std::make_unique<GoToNode>(1.0, 1.0, 1.f, 1.f));
     nodes_.push_back(std::make_unique<LandNode>());
+    nodes_.push_back(std::make_unique<RtlNode>());
     nodes_.push_back(std::make_unique<TakeoffNode>());
 
     nodes_.push_back(std::make_unique<FibNode>(1));

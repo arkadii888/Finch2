@@ -36,6 +36,7 @@ class Vehicle {
     virtual void Init() = 0;
     virtual void Kill() = 0;
     virtual void Land() = 0;
+    virtual void Rtl() = 0;
     virtual void Takeoff() = 0;
 
     virtual Telemetry GetTelemetry() = 0;

@@ -112,6 +112,7 @@ set(BTREE_SOURCES
     src/behavior_tree/nodes/move_nodes/move_node.cpp
     src/behavior_tree/nodes/move_nodes/go_to_node.cpp
     src/behavior_tree/nodes/move_nodes/land_node.cpp
+    src/behavior_tree/nodes/move_nodes/rtl_node.cpp
     src/behavior_tree/nodes/move_nodes/takeoff_node.cpp
 
     src/behavior_tree/nodes/task_nodes/task_node.cpp
