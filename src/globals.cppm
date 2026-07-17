@@ -16,5 +16,5 @@ export namespace globals {
     };
 
     const float drone_acceptance_radius_m = 0.5f;
-    const float drone_takeoff_altitude_m = 5.f;
+    const float drone_takeoff_altitude_m = 10.f;
 }
