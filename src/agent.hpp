@@ -46,10 +46,10 @@ class Agent {
     NodeStatus TickNode(Node* node);
 
     BTree btree_;
-    std::mutex btree_mutex_;
-    Vehicle& vehicle_;
+    LlmOutput llm_output_;
     LlmService& llm_service_;
     NodeCatalog node_catalog_;
-    LlmOutput llm_output_;
+    Vehicle& vehicle_;
     std::atomic<bool> is_processing_ {false};
+    std::mutex btree_mutex_;
 };
