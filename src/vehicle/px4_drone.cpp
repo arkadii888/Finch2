@@ -110,10 +110,12 @@ Telemetry Px4Drone::GetTelemetry() {
     auto position {telemetry_->position()};
     auto battery {telemetry_->battery()};
     auto euler {telemetry_->attitude_euler()};
+    auto home {telemetry_->home()};
 
     t.latitude_deg = position.latitude_deg;
     t.longitude_deg = position.longitude_deg;
     t.absolute_altitude_m = position.absolute_altitude_m;
+    t.home_absolute_altitude_m = home.absolute_altitude_m;
     t.relative_altitude_m = position.relative_altitude_m;
 
     t.voltage_v = battery.voltage_v;

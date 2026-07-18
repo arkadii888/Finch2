@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "spdlog/spdlog.h"
+
 namespace {
 
 constexpr double kPi = 3.14159265358979323846;
@@ -30,11 +32,18 @@ void GoToNode::Execute(std::any context) {
     MoveNode::Execute(context);
 
     if (vehicle_) {
+        auto telemetry {vehicle_->GetTelemetry()};
+        if (absolute_altitude_m_ - telemetry.home_absolute_altitude_m >= 120.f) {
+            vehicle_->Rtl();
+            spdlog::info("GoToNode::Execute: Emergency return (120m hit).");
+            is_executed = true;
+            return;
+        }
+
         float yaw_deg {0.f};
         if (yaw_deg_.has_value()) {
             yaw_deg = *yaw_deg_;
         } else {
-            auto telemetry {vehicle_->GetTelemetry()};
             yaw_deg = ComputeBearingDeg(telemetry.latitude_deg, telemetry.longitude_deg, latitude_deg_, longitude_deg_);
         }
 
