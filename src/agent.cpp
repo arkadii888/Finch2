@@ -82,7 +82,7 @@ void Agent::ProcessInput(const std::string& input) {
 
 void Agent::HandleOutput(std::string output) {
     try {
-        auto json_tree {nlohmann::json::parse(output)};
+        auto json_tree = nlohmann::json::parse(output);
         std::lock_guard lock {btree_mutex_};
         btree_.Build(json_tree);
         llm_output_.Set(std::move(output));
