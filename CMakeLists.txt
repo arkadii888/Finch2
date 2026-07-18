@@ -90,16 +90,22 @@ set(SPDLOG_BUILD_TESTS OFF CACHE INTERNAL "")
 set(SPDLOG_BUILD_EXAMPLE OFF CACHE INTERNAL "")
 set(SPDLOG_BUILD_COMPILED ON CACHE INTERNAL "")
 
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG v1.15.2
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp spdlog)
 
-FetchContent_MakeAvailable(mavsdk cpp_httplib nlohmann_json llama_cpp spdlog googletest)
+add_executable(run
+    src/main.cpp
 
-set(BTREE_SOURCES
+    src/vehicle/vehicle.hpp
+    src/vehicle/dummy_drone.cpp
+    src/vehicle/px4_drone.cpp
+
+    src/llm_service/llm_service.hpp
+    src/llm_service/llama_service.cpp
+
+    src/agent.cpp
+    src/api_server.cpp
+    src/logger.hpp
+
     src/behavior_tree/btree.cpp
     src/behavior_tree/node_catalog.cpp
 
@@ -117,23 +123,6 @@ set(BTREE_SOURCES
 
     src/behavior_tree/nodes/task_nodes/task_node.cpp
     src/behavior_tree/nodes/task_nodes/fib_node.cpp
-)
-
-add_executable(run
-    src/main.cpp
-
-    src/vehicle/vehicle.hpp
-    src/vehicle/dummy_drone.cpp
-    src/vehicle/px4_drone.cpp
-
-    src/llm_service/llm_service.hpp
-    src/llm_service/llama_service.cpp
-
-    src/agent.cpp
-    src/api_server.cpp
-    src/logger.hpp
-
-    ${BTREE_SOURCES}
 )
 
 target_sources(run
