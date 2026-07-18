@@ -72,9 +72,6 @@ std::unique_ptr<Node> BTree::CreateNode(const nlohmann::json& json_node) {
         }
 
         return node;
-    } catch (const nlohmann::json::exception& e) {
-        spdlog::error("BTree::CreateNode: Error: {}", e.what());
-        return nullptr;
     } catch (const std::exception& e) {
         spdlog::error("BTree::CreateNode: Error: {}", e.what());
         return nullptr;
@@ -126,9 +123,6 @@ std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_
         }
 
         return node;
-    } catch (const nlohmann::json::exception& e) {
-        spdlog::error("BTree::CreateActionNode: Error: {}", e.what());
-        return nullptr;
     } catch (const std::exception& e) {
         spdlog::error("BTree::CreateActionNode: Error: {}", e.what());
         return nullptr;
