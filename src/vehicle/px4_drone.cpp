@@ -5,6 +5,8 @@
 
 #include <spdlog/spdlog.h>
 
+import lifecycle;
+
 void Px4Drone::Arm() {
     if (action_->arm() != mavsdk::Action::Result::Success) {
         spdlog::error("Px4Drone::Arm: Failed.");
@@ -85,7 +87,7 @@ void Px4Drone::Rtl() {
 }
 
 void Px4Drone::Takeoff() {
-    while (!telemetry_->armed()) {
+    while (!telemetry_->armed() && lifecycle::is_alive_public) {
         spdlog::info("Px4Drone::Takeoff: Waiting for arm command...");
         std::this_thread::sleep_for(std::chrono::milliseconds {500});
     }
