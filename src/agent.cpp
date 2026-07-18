@@ -10,6 +10,7 @@
 #include "behavior_tree/nodes/parallel_node.hpp"
 #include "behavior_tree/nodes/sequence_node.hpp"
 #include "behavior_tree/nodes/move_nodes/move_node.hpp"
+#include "behavior_tree/nodes/task_nodes/task_node.hpp"
 
 import lifecycle;
 
@@ -81,6 +82,7 @@ void Agent::ProcessInput(const std::string& input) {
 
 void Agent::HandleOutput(std::string output) {
     std::lock_guard lock {btree_mutex_};
+    spdlog::info(output);
     btree_.Build(nlohmann::json::parse(output));
     llm_output_.Set(std::move(output));
 }
@@ -89,6 +91,8 @@ std::string Agent::BuildSystemPrompt() const {
     std::string prompt {"You are a drone mission planner. Output ONLY a single valid JSON behavior tree.\n"};
 
     prompt += "\nYour initial telemetry is: " + GetVehicleTelemetry() + "\n";
+
+    prompt += "\nAcross all movements altitude should be initial altitude + 10m\n";
 
     prompt += "Available node types:\n";
     for (const auto& node : node_catalog_.GetNodes()) {
@@ -115,6 +119,11 @@ NodeStatus Agent::TickNode(Node* node) {
             move->Execute(&vehicle_);
         }
         return move->GetStatus();
+    }
+
+    if (auto task {dynamic_cast<TaskNode*>(node)}) {
+        task->Execute({});
+        return task->GetStatus();
     }
 
     if (auto sequence {dynamic_cast<SequenceNode*>(node)}) {

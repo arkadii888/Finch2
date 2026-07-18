@@ -26,6 +26,10 @@ void DummyDrone::Land() {
     spdlog::info("DummyDrone::Land: Done.");
 }
 
+void DummyDrone::Rtl() {
+    spdlog::info("DummyDrone::Rtl: Done.");
+}
+
 void DummyDrone::Takeoff() {
     spdlog::info("DummyDrone::Takeoff: Done.");
 }
