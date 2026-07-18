@@ -81,10 +81,15 @@ void Agent::ProcessInput(const std::string& input) {
 }
 
 void Agent::HandleOutput(std::string output) {
-    std::lock_guard lock {btree_mutex_};
-    spdlog::info(output);
-    btree_.Build(nlohmann::json::parse(output));
-    llm_output_.Set(std::move(output));
+    try {
+        auto json_tree {nlohmann::json::parse(output)};
+        std::lock_guard lock {btree_mutex_};
+        btree_.Build(json_tree);
+        llm_output_.Set(std::move(output));
+
+    } catch (const std::exception& e) {
+        spdlog::error("Agent::HandleOutput: Parse error.");
+    }
 }
 
 std::string Agent::BuildSystemPrompt() const {
