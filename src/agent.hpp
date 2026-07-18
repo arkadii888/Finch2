@@ -38,7 +38,9 @@ class Agent {
     void ArmVehicle();
     void DisarmVehicle();
     void KillVehicle();
+    void LandVehicle();
     void ProcessInput(const std::string& input);
+    void ReturnVehicle();
 
  private:
     std::string BuildSystemPrompt() const;

@@ -91,6 +91,14 @@ curl -X POST http://localhost:8888/disarm
 ```
 
 ```bash
+curl -X POST http://localhost:8888/return
+```
+
+```bash
+curl -X POST http://localhost:8888/land
+```
+
+```bash
 curl http://localhost:8888/output
 ```
 

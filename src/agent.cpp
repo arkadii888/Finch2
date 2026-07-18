@@ -66,6 +66,10 @@ void Agent::KillVehicle() {
     vehicle_.Kill();
 }
 
+void Agent::LandVehicle() {
+    vehicle_.Land();
+}
+
 void Agent::ProcessInput(const std::string& input) {
     bool expected {false};
     if (!is_processing_.compare_exchange_strong(expected, true)) {
@@ -78,6 +82,10 @@ void Agent::ProcessInput(const std::string& input) {
         HandleOutput(llm_service_.Complete(request));
         is_processing_ = false;
     }).detach();
+}
+
+void Agent::ReturnVehicle() {
+    vehicle_.Rtl();
 }
 
 void Agent::HandleOutput(std::string output) {
