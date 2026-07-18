@@ -5,11 +5,15 @@
 🛠️ **CMake:** 3.28+
 
 🍏 **Mac:** 
-Apple Clang 15.0+ [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=macos-14%20-%20apple-clang)](https://github.com/arkadii888/Finch2/actions)
+Apple Clang 15.0+ 
 
 🐧 **Linux:** 
-GCC 13.1+ [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20gcc)](https://github.com/arkadii888/Finch2/actions)
-Clang 16.0+ [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20clang)](https://github.com/arkadii888/Finch2/actions)
+GCC 13.1+ 
+Clang 16.0+ 
+
+[comment]: <> ([![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=macos-14%20-%20apple-clang)](https://github.com/arkadii888/Finch2/actions))
+[comment]: <> ([![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20gcc)](https://github.com/arkadii888/Finch2/actions))
+[comment]: <> ([![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20clang)](https://github.com/arkadii888/Finch2/actions))
 
 ## MAVProxy Setup
 
