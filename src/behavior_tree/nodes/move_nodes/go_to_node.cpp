@@ -4,21 +4,49 @@
 
 namespace {
 
-constexpr double kPi = 3.14159265358979323846;
+constexpr double PI = 3.14159265358979323846;
+constexpr double METERS_PER_DEGREE_LATITUDE = 111132.0;
+constexpr double MIN_BEARING_DISTANCE_M = 0.001;
 
-// Initial bearing (forward azimuth) in degrees [0, 360) from one geo point to another.
-float ComputeBearingDeg(double from_latitude_deg, double from_longitude_deg, double to_latitude_deg, double to_longitude_deg) {
-    const double from_lat_rad {from_latitude_deg * kPi / 180.0};
-    const double to_lat_rad {to_latitude_deg * kPi / 180.0};
-    const double delta_lon_rad {(to_longitude_deg - from_longitude_deg) * kPi / 180.0};
+struct LocalOffsetMeters {
+    double north;
+    double east;
+    double HorizontalDistanceSquared() const { return (north * north) + (east * east); }
+};
 
-    const double x {std::sin(delta_lon_rad) * std::cos(to_lat_rad)};
-    const double y {std::cos(from_lat_rad) * std::sin(to_lat_rad)
-        - std::sin(from_lat_rad) * std::cos(to_lat_rad) * std::cos(delta_lon_rad)};
+LocalOffsetMeters ComputeLocalOffsetMeters(double from_latitude_deg,
+    double from_longitude_deg,
+    double to_latitude_deg,
+    double to_longitude_deg) {
+    const double delta_longitude_deg {std::remainder(to_longitude_deg - from_longitude_deg, 360.0)};
+    const double mean_latitude_rad {((from_latitude_deg + to_latitude_deg) / 2.0) * PI / 180.0};
 
-    const double bearing_deg {std::fmod((std::atan2(x, y) * 180.0 / kPi) + 360.0, 360.0)};
+    return {
+        (to_latitude_deg - from_latitude_deg) * METERS_PER_DEGREE_LATITUDE,
+        delta_longitude_deg * METERS_PER_DEGREE_LATITUDE * std::cos(mean_latitude_rad),
+    };
+}
 
-    return static_cast<float>(bearing_deg);
+float ComputeBearingDeg(double from_latitude_deg,
+    double from_longitude_deg,
+    double to_latitude_deg,
+    double to_longitude_deg,
+    float current_yaw_deg) {
+    const auto offset {
+        ComputeLocalOffsetMeters(from_latitude_deg, from_longitude_deg, to_latitude_deg, to_longitude_deg)};
+    if (offset.HorizontalDistanceSquared() <= (MIN_BEARING_DISTANCE_M * MIN_BEARING_DISTANCE_M)) {
+        return current_yaw_deg;
+    }
+
+    const double from_latitude_rad {from_latitude_deg * PI / 180.0};
+    const double to_latitude_rad {to_latitude_deg * PI / 180.0};
+    const double delta_longitude_rad {(to_longitude_deg - from_longitude_deg) * PI / 180.0};
+
+    const double x {std::sin(delta_longitude_rad) * std::cos(to_latitude_rad)};
+    const double y {std::cos(from_latitude_rad) * std::sin(to_latitude_rad)
+        - std::sin(from_latitude_rad) * std::cos(to_latitude_rad) * std::cos(delta_longitude_rad)};
+
+    return static_cast<float>(std::fmod((std::atan2(x, y) * 180.0 / PI) + 360.0, 360.0));
 }
 
 }
@@ -35,7 +63,8 @@ void GoToNode::Execute(std::any context) {
             yaw_deg = *yaw_deg_;
         } else {
             auto telemetry {vehicle_->GetTelemetry()};
-            yaw_deg = ComputeBearingDeg(telemetry.latitude_deg, telemetry.longitude_deg, latitude_deg_, longitude_deg_);
+            yaw_deg = ComputeBearingDeg(
+                telemetry.latitude_deg, telemetry.longitude_deg, latitude_deg_, longitude_deg_, telemetry.yaw_deg);
         }
 
         vehicle_->GoTo(latitude_deg_, longitude_deg_, absolute_altitude_m_, yaw_deg);
@@ -55,24 +84,15 @@ NodeStatus GoToNode::GetStatus() {
 
     auto telemetry {vehicle_->GetTelemetry()};
 
-    const double PI = 3.14159265358979323846;
+    const auto offset {
+        ComputeLocalOffsetMeters(telemetry.latitude_deg, telemetry.longitude_deg, latitude_deg_, longitude_deg_)};
+    const double d_alt_m {absolute_altitude_m_ - telemetry.absolute_altitude_m};
+    const double distance_squared {offset.HorizontalDistanceSquared() + (d_alt_m * d_alt_m)};
 
-    double lat_mid_radians = ((longitude_deg_ + telemetry.longitude_deg) / 2.0) * PI / 180.0;
-
-    double meters_per_deg_lat = 111132.0;
-    double meters_per_deg_lon = 111132.0 * std::cos(lat_mid_radians);
-
-    double d_lat_m = (latitude_deg_ - telemetry.latitude_deg) * meters_per_deg_lat;
-    double d_lon_m = (longitude_deg_ - telemetry.longitude_deg) * meters_per_deg_lon;
-    double d_alt_m = absolute_altitude_m_ - telemetry.absolute_altitude_m;
-
-    double distanceSquared = (d_lat_m * d_lat_m) + (d_lon_m * d_lon_m) + (d_alt_m * d_alt_m);
-
-    if (distanceSquared <= (globals::drone_acceptance_radius_m * globals::drone_acceptance_radius_m)) {
+    if (distance_squared <= (globals::drone_acceptance_radius_m * globals::drone_acceptance_radius_m)) {
         status_ = NodeStatus::Success;
         return status_;
     }
-
     return status_;
 }
 
