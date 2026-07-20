@@ -35,6 +35,16 @@ void ApiServer::Run() {
         res.set_content("Recieved", "application/json");
     });
 
+    server.Post("/return", [this](const httplib::Request& req, httplib::Response& res) {
+        agent_.DisarmVehicle();
+        res.set_content("Recieved", "application/json");
+    });
+
+    server.Post("/land", [this](const httplib::Request& req, httplib::Response& res) {
+        agent_.DisarmVehicle();
+        res.set_content("Recieved", "application/json");
+    });
+
     server.Get("/output", [this](const httplib::Request& req, httplib::Response& res) {
         std::string output {agent_.GetOutput()};
         res.set_content(output, "application/json");

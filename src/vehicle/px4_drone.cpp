@@ -5,6 +5,8 @@
 
 #include <spdlog/spdlog.h>
 
+import lifecycle;
+
 void Px4Drone::Arm() {
     if (action_->arm() != mavsdk::Action::Result::Success) {
         spdlog::error("Px4Drone::Arm: Failed.");
@@ -85,7 +87,11 @@ void Px4Drone::Rtl() {
 }
 
 void Px4Drone::Takeoff() {
-    while (!telemetry_->armed()) {
+    while (!telemetry_->armed() ) {
+        if (!lifecycle::is_alive_public) {
+            spdlog::info("Px4Drone::Takeoff: Canceled.");
+            return;
+        }
         spdlog::info("Px4Drone::Takeoff: Waiting for arm command...");
         std::this_thread::sleep_for(std::chrono::milliseconds {500});
     }
@@ -104,10 +110,12 @@ Telemetry Px4Drone::GetTelemetry() {
     auto position {telemetry_->position()};
     auto battery {telemetry_->battery()};
     auto euler {telemetry_->attitude_euler()};
+    auto home {telemetry_->home()};
 
     t.latitude_deg = position.latitude_deg;
     t.longitude_deg = position.longitude_deg;
     t.absolute_altitude_m = position.absolute_altitude_m;
+    t.home_absolute_altitude_m = home.absolute_altitude_m;
     t.relative_altitude_m = position.relative_altitude_m;
 
     t.voltage_v = battery.voltage_v;

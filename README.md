@@ -5,11 +5,15 @@
 🛠️ **CMake:** 3.28+
 
 🍏 **Mac:** 
-Apple Clang 15.0+ [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=macos-14%20-%20apple-clang)](https://github.com/arkadii888/Finch2/actions)
+Apple Clang 15.0+ 
 
 🐧 **Linux:** 
-GCC 13.1+ [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20gcc)](https://github.com/arkadii888/Finch2/actions)
-Clang 16.0+ [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20clang)](https://github.com/arkadii888/Finch2/actions)
+GCC 13.1+ 
+Clang 16.0+ 
+
+<!--- [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=macos-14%20-%20apple-clang)](https://github.com/arkadii888/Finch2/actions) --->
+<!--- [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20gcc)](https://github.com/arkadii888/Finch2/actions) --->
+<!--- [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20clang)](https://github.com/arkadii888/Finch2/actions) --->
 
 ## MAVProxy Setup
 
@@ -42,7 +46,7 @@ mavproxy.py --master=/dev/tty.usbmodem101 --baudrate=921600 --out=udp:127.0.0.1:
 
 ## Building and Running
 
-CMake will automatically download and build **MAVSDK v3.17.1, cpp-httplib v0.46.0, nlohmann/json v3.11.3, llama.cpp b9442 (CUDA, Metal, CPU depending on your system), spdlog v1.17.0, GoogleTest v1.15.2** during the first configuration step.
+CMake will automatically download and build **MAVSDK v3.17.1, cpp-httplib v0.46.0, nlohmann/json v3.11.3, llama.cpp b9442 (CUDA, Metal, CPU depending on your system), spdlog v1.17.0** during the first configuration step.
 
 ### Debug Build
 
@@ -68,14 +72,6 @@ cmake --build build-release
 ./build-release/run
 ```
 
-### Unit Tests Build
-
-> Currently disabled.
-
-```bash
-cmake --build build-debug --target btree_test && ./build-debug/btree_test
-```
-
 ## API Communication
 
 ```bash
@@ -92,6 +88,14 @@ curl -X POST http://localhost:8888/arm
 
 ```bash
 curl -X POST http://localhost:8888/disarm
+```
+
+```bash
+curl -X POST http://localhost:8888/return
+```
+
+```bash
+curl -X POST http://localhost:8888/land
 ```
 
 ```bash

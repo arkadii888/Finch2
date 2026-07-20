@@ -140,7 +140,9 @@ std::string LlamaService::Complete(const CompletionRequest& request) {
             throw std::runtime_error {"expected string content"};
         }
 
-        return root["choices"][0]["message"]["content"].get<std::string>();
+        auto output {root["choices"][0]["message"]["content"].get<std::string>()};
+        spdlog::info("LlamaService::Complete: {}", output);
+        return output;
 
     } catch (const std::exception& e) {
         spdlog::error("LlamaService::Complete: Error: {}", e.what());
