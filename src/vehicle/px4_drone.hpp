@@ -20,7 +20,7 @@ class Px4Drone : public Vehicle {
     void Kill() override;
     void Land() override;
     void Rtl() override;
-    void Takeoff() override;
+    void Takeoff(float relative_altitude_m) override;
 
     Telemetry GetTelemetry() override;
 

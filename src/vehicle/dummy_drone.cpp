@@ -30,7 +30,7 @@ void DummyDrone::Rtl() {
     spdlog::info("DummyDrone::Rtl: Done.");
 }
 
-void DummyDrone::Takeoff() {
+void DummyDrone::Takeoff(float relative_altitude_m) {
     spdlog::info("DummyDrone::Takeoff: Done.");
 }
 
@@ -40,6 +40,7 @@ Telemetry DummyDrone::GetTelemetry() {
     t.longitude_deg = -73.757'8;
     t.absolute_altitude_m = 32.193f;
     t.current_battery_a = 10.0f;
+    t.home_absolute_altitude_m = 32.193f;
     t.relative_altitude_m = 0.000f;
     t.remaining_percent = 100.0f;
     t.voltage_v = 12.6f;

@@ -53,7 +53,6 @@ void Px4Drone::Init() {
         std::this_thread::sleep_for(std::chrono::seconds {1});
     }
 
-    action_->set_takeoff_altitude(globals::drone_takeoff_altitude_m);
     param_->set_param_float("NAV_ACC_RAD", static_cast<float>(globals::drone_acceptance_radius_m));
 
     spdlog::info("Px4Drone::Init: Ready to arm.");
@@ -86,7 +85,7 @@ void Px4Drone::Rtl() {
     spdlog::info("Px4Drone::Rtl: Done.");
 }
 
-void Px4Drone::Takeoff() {
+void Px4Drone::Takeoff(float relative_altitude_m) {
     while (!telemetry_->armed() ) {
         if (!lifecycle::is_alive_public) {
             spdlog::info("Px4Drone::Takeoff: Canceled.");
@@ -95,6 +94,8 @@ void Px4Drone::Takeoff() {
         spdlog::info("Px4Drone::Takeoff: Waiting for arm command...");
         std::this_thread::sleep_for(std::chrono::milliseconds {500});
     }
+
+    action_->set_takeoff_altitude(relative_altitude_m);
 
     if (action_->takeoff() != mavsdk::Action::Result::Success) {
         spdlog::error("Px4Drone::Takeoff: Failed.");

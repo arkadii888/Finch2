@@ -16,7 +16,7 @@ NodeCatalog::NodeCatalog() {
     nodes_.push_back(std::make_unique<FallbackNode>());
     nodes_.push_back(std::make_unique<ParallelNode>(1));
 
-    nodes_.push_back(std::make_unique<GoToNode>(1.0, 1.0, 1.f, 1.f));
+    nodes_.push_back(std::make_unique<GoToNode>(1.0, 1.0, 1.f, std::nullopt, 1.f));
     nodes_.push_back(std::make_unique<LandNode>());
     nodes_.push_back(std::make_unique<RtlNode>());
     nodes_.push_back(std::make_unique<TakeoffNode>());

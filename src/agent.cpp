@@ -105,7 +105,13 @@ std::string Agent::BuildSystemPrompt() const {
 
     prompt += "\nYour initial telemetry is: " + GetVehicleTelemetry() + "\n";
 
-    prompt += "\nAcross all movements altitude should be initial altitude + 10m\n";
+    prompt +=
+        "\nAltitudes are meters above ground, not sea level. The reference defaults to home's elevation - "
+        "omit \"reference_altitude_m\" unless the destination's ground differs (e.g. from a map), in which "
+        "case set it to that elevation and let \"relative_altitude_m\" be the clearance above it; never add "
+        "them yourself.\n"
+        "go_to always needs \"relative_altitude_m\" - reuse the previous movement's value (or the 10m "
+        "takeoff default) if the user didn't specify one.\n";
 
     prompt += "Available node types:\n";
     for (const auto& node : node_catalog_.GetNodes()) {

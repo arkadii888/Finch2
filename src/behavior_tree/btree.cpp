@@ -100,20 +100,29 @@ std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_
         if (intent == "go_to") {
             double latitude_deg {intent_arguments.at("latitude_deg").get<double>()};
             double longitude_deg {intent_arguments.at("longitude_deg").get<double>()};
-            float absolute_altitude_m {intent_arguments.at("absolute_altitude_m").get<float>()};
+            float relative_altitude_m {intent_arguments.at("relative_altitude_m").get<float>()};
+
+            std::optional<float> reference_altitude_m;
+            if (intent_arguments.contains("reference_altitude_m")) {
+                reference_altitude_m = intent_arguments.at("reference_altitude_m").get<float>();
+            }
 
             std::optional<float> yaw_deg;
             if (intent_arguments.contains("yaw_deg")) {
                 yaw_deg = intent_arguments.at("yaw_deg").get<float>();
             }
 
-            node = std::make_unique<GoToNode>(latitude_deg, longitude_deg, absolute_altitude_m, yaw_deg);
+            node = std::make_unique<GoToNode>(latitude_deg, longitude_deg, relative_altitude_m, reference_altitude_m, yaw_deg);
         } else if (intent == "land") {
             node = std::make_unique<LandNode>();
         } else if (intent == "rtl") {
             node = std::make_unique<RtlNode>();
         } else if (intent == "takeoff") {
-            node = std::make_unique<TakeoffNode>();
+            if (intent_arguments.contains("relative_altitude_m")) {
+                node = std::make_unique<TakeoffNode>(intent_arguments.at("relative_altitude_m").get<float>());
+            } else {
+                node = std::make_unique<TakeoffNode>();
+            }
         } else if (intent == "fib") {
             int n {intent_arguments.at("n").get<int>()};
 
