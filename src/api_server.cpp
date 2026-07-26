@@ -1,7 +1,7 @@
 #include "api_server.hpp"
 
-#include <thread>
 #include <chrono>
+#include <thread>
 
 #include <httplib.h>
 #include <spdlog/spdlog.h>
@@ -15,9 +15,16 @@ void ApiServer::Run() {
     httplib::Server server;
 
     server.Post("/input", [this](const httplib::Request& req, httplib::Response& res) {
-        std::string input {req.body};
-        agent_.ProcessInput(input);
-        res.set_content("Recieved", "application/json");
+        if (req.body.empty()) {
+            res.status = 400;
+            res.set_content(R"({"error":"Prompt cannot be empty"})", "application/json");
+        } else if (agent_.ProcessInput(req.body)) {
+            res.status = 202;
+            res.set_content(R"({"status":"accepted"})", "application/json");
+        } else {
+            res.status = 409;
+            res.set_content(R"({"error":"Another prompt is processing"})", "application/json");
+        }
     });
 
     server.Post("/kill", [this](const httplib::Request& req, httplib::Response& res) {
@@ -36,12 +43,12 @@ void ApiServer::Run() {
     });
 
     server.Post("/return", [this](const httplib::Request& req, httplib::Response& res) {
-        agent_.DisarmVehicle();
+        agent_.ReturnVehicle();
         res.set_content("Recieved", "application/json");
     });
 
     server.Post("/land", [this](const httplib::Request& req, httplib::Response& res) {
-        agent_.DisarmVehicle();
+        agent_.LandVehicle();
         res.set_content("Recieved", "application/json");
     });
 

@@ -37,16 +37,9 @@ float ComputeBearingDeg(double from_latitude_deg,
     if (offset.HorizontalDistanceSquared() <= (MIN_BEARING_DISTANCE_M * MIN_BEARING_DISTANCE_M)) {
         return current_yaw_deg;
     }
-
-    const double from_latitude_rad {from_latitude_deg * PI / 180.0};
-    const double to_latitude_rad {to_latitude_deg * PI / 180.0};
-    const double delta_longitude_rad {(to_longitude_deg - from_longitude_deg) * PI / 180.0};
-
-    const double x {std::sin(delta_longitude_rad) * std::cos(to_latitude_rad)};
-    const double y {std::cos(from_latitude_rad) * std::sin(to_latitude_rad)
-        - std::sin(from_latitude_rad) * std::cos(to_latitude_rad) * std::cos(delta_longitude_rad)};
-
-    return static_cast<float>(std::fmod((std::atan2(x, y) * 180.0 / PI) + 360.0, 360.0));
+    return static_cast<float>(
+        std::fmod((std::atan2(offset.east, offset.north) * 180.0 / PI) + 360.0, 360.0)
+    );
 }
 
 }

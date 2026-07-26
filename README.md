@@ -48,6 +48,13 @@ mavproxy.py --master=/dev/tty.usbmodem101 --baudrate=921600 --out=udp:127.0.0.1:
 
 CMake will automatically download and build **MAVSDK v3.17.1, cpp-httplib v0.46.0, nlohmann/json v3.11.3, llama.cpp b9442 (CUDA, Metal, CPU depending on your system), spdlog v1.17.0** during the first configuration step.
 
+### Multimodal map setup
+
+Map-grounded inference requires a matching model/projector pair, a local
+elevation GeoTIFF, cached OSM tiles, and the Python renderer environment. Follow
+the complete [multimodal map inference setup](docs/map-inference-setup.md)
+before starting Finch2.
+
 ### Debug Build
 
 ```cpp

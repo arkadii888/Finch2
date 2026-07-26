@@ -7,6 +7,7 @@
 #include <httplib.h>
 
 #include "llm_service.hpp"
+#include "runtime_config.hpp"
 
 import globals;
 
@@ -16,6 +17,8 @@ import globals;
 
 class LlamaService : public LlmService {
  public:
+    explicit LlamaService(RuntimeConfig config);
+
     void Run() override;
     void Stop() override;
 
@@ -23,10 +26,6 @@ class LlamaService : public LlmService {
 
  private:
     struct BackendConfig {
-        int context_size {4096};
-        int max_tokens {4096};
-        float temperature {0.8f};
-
         #if defined(LLAMA_BACKEND_METAL) || defined(LLAMA_BACKEND_CUDA)
             int gpu_layers {999};
         #else
@@ -46,6 +45,7 @@ class LlamaService : public LlmService {
     };
 
     BackendConfig backend_config_ {};
-    pid_t pid_ {-1};
     httplib::Client client_ {"127.0.0.1", globals::llm_server_port};
+    RuntimeConfig config_;
+    pid_t pid_ {-1};
 };

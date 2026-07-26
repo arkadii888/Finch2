@@ -67,5 +67,12 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+# Keep directory placeholders; ignore all contents
 models/*
 !models/.gitkeep
+data/*
+!data/.gitkeep
+inference_runs/
+tools/map_renderer/.venv/
+__pycache__/
+.ruff_cache/

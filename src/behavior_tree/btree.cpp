@@ -17,9 +17,10 @@
 
 #include "behavior_tree/nodes/task_nodes/fib_node.hpp"
 
-void BTree::Build(const nlohmann::json& tree) {
+bool BTree::Build(const nlohmann::json& tree) {
     Destroy();
     root_ = CreateNode(tree);
+    return root_ != nullptr;
 }
 
 void BTree::Destroy() {
@@ -112,14 +113,22 @@ std::unique_ptr<Node> BTree::CreateActionNode(const nlohmann::json& json_action_
                 yaw_deg = intent_arguments.at("yaw_deg").get<float>();
             }
 
-            node = std::make_unique<GoToNode>(latitude_deg, longitude_deg, relative_altitude_m, reference_altitude_m, yaw_deg);
+            node = std::make_unique<GoToNode>(
+                latitude_deg,
+                longitude_deg,
+                relative_altitude_m,
+                reference_altitude_m,
+                yaw_deg
+            );
         } else if (intent == "land") {
             node = std::make_unique<LandNode>();
         } else if (intent == "rtl") {
             node = std::make_unique<RtlNode>();
         } else if (intent == "takeoff") {
             if (intent_arguments.contains("relative_altitude_m")) {
-                node = std::make_unique<TakeoffNode>(intent_arguments.at("relative_altitude_m").get<float>());
+                node = std::make_unique<TakeoffNode>(
+                    intent_arguments.at("relative_altitude_m").get<float>()
+                );
             } else {
                 node = std::make_unique<TakeoffNode>();
             }

@@ -105,6 +105,8 @@ add_executable(run
     src/agent.cpp
     src/api_server.cpp
     src/logger.hpp
+    src/map_image_service.cpp
+    src/runtime_config.cpp
 
     src/behavior_tree/btree.cpp
     src/behavior_tree/node_catalog.cpp
