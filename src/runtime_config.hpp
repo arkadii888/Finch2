@@ -8,7 +8,9 @@ struct RuntimeConfig {
     std::filesystem::path inference_log_dir;
     int llama_context_size {8'192};
     int llama_image_tokens {1'024};
+    bool llama_jinja {true};
     int llama_max_tokens {2'048};
+    double llama_temperature {0.0};
     double map_half_window_m {1'000.0};
     int map_zoom {15};
     std::filesystem::path mmproj_path;

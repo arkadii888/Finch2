@@ -19,18 +19,7 @@ int main() {
     const RuntimeConfig config {RuntimeConfig::Make()};
     config.Validate();
 
-    // Bern coverage used by the offline DEM / OSM tile cache.
-    const Telemetry dummy_telemetry {
-        .latitude_deg = 46.982'426,
-        .longitude_deg = 7.431'551,
-        .absolute_altitude_m = 579.81f,
-        .current_battery_a = 10.0f,
-        .home_absolute_altitude_m = 579.81f,
-        .remaining_percent = 100.0f,
-        .voltage_v = 12.6f,
-        .yaw_deg = 180.0f,
-    };
-    DummyDrone vehicle {dummy_telemetry};
+    DummyDrone vehicle;
     vehicle.Init();
 
     LlamaService llama {config};

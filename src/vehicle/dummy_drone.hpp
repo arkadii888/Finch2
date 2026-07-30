@@ -4,7 +4,7 @@
 
 class DummyDrone : public Vehicle {
  public:
-    explicit DummyDrone(Telemetry telemetry);
+    DummyDrone();
 
     void Arm() override;
     void Disarm() override;

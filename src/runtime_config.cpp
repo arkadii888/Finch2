@@ -35,7 +35,7 @@ RuntimeConfig RuntimeConfig::Make() {
     config.mmproj_path = root / "models/mmproj-Qwen3VL-8B-Instruct-F16.gguf";
     config.model_path = root / "models/Qwen3VL-8B-Instruct-Q4_K_M.gguf";
     config.python_path = root / "tools/map_renderer/.venv/bin/python";
-    config.renderer_path = root / "tools/map_renderer/render_map.py";
+    config.renderer_path = root / "tools/map_renderer/cli.py";
     config.tile_cache_path = root / "data/maps/tiles/osm_de";
     return config;
 }

@@ -8,7 +8,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from map_render import render_snapshot
+from render import render_snapshot
 
 
 def main(argv: Sequence[str] | None = None) -> int:

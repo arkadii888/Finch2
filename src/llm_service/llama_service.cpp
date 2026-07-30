@@ -73,12 +73,14 @@ void LlamaService::Run() {
             "-b",         std::to_string(backend_config_.batch_size),
             "-ub",        std::to_string(backend_config_.ubatch_size),
             "--parallel", std::to_string(backend_config_.parallel),
-            "--temp",     "0",
-            "--jinja",
+            "--temp",     std::to_string(config_.llama_temperature),
             "--image-min-tokens", std::to_string(config_.llama_image_tokens),
             "--image-max-tokens", std::to_string(config_.llama_image_tokens),
         };
 
+        if (config_.llama_jinja) {
+            args.push_back("--jinja");
+        }
         if (backend_config_.gpu_layers > 0) {
             args.push_back("-ngl");
             args.push_back(std::to_string(backend_config_.gpu_layers));
@@ -151,73 +153,44 @@ void LlamaService::Stop() {
 }
 
 std::string LlamaService::Complete(const CompletionRequest& request) {
-    try {
-        nlohmann::json user_content = nlohmann::json::array();
+    nlohmann::json user_content = nlohmann::json::array();
+    user_content.push_back({
+        {"type", "text"},
+        {"text", request.user_prompt}
+    });
+    if (request.image_path) {
         user_content.push_back({
-            {"type", "text"},
-            {"text", request.user_prompt}
+            {"type", "image_url"},
+            {"image_url", {
+                {"url", "data:image/png;base64," + EncodeImage(*request.image_path)}
+            }}
         });
-        if (request.image_path) {
-            user_content.push_back({
-                {"type", "image_url"},
-                {"image_url", {
-                    {"url", "data:image/png;base64," + EncodeImage(*request.image_path)}
-                }}
-            });
-        }
-        const nlohmann::json body {
-            {"model", config_.model_path.string()},
-            {"messages", {
-                {{"role", "system"}, {"content", request.system_prompt}},
-                {{"role", "user"},   {"content", user_content}},
-            }},
-            {"response_format", {{"type", "json_object"}}},
-            {"stream", false},
-            {"temperature", 0.0}
-        };
-
-        auto result {
-            client_.Post("/v1/chat/completions", body.dump(), "application/json")
-        };
-        if (!result) {
-            throw std::runtime_error {"connection error"};
-        }
-        if (result->status != 200) {
-            throw std::runtime_error {
-                "HTTP " + std::to_string(result->status) + ": " + result->body
-            };
-        }
-
-        nlohmann::json root = nlohmann::json::parse(result->body);
-
-        if (!root.is_object()) {
-            throw std::runtime_error {
-                std::string {"expected JSON object, received "} + root.type_name()
-            };
-        }
-
-        if (root.contains("error")) {
-            if (root["error"].is_object()
-                    && root["error"].contains("message")
-                    && root["error"]["message"].is_string()) {
-                throw std::runtime_error {root["error"]["message"].get<std::string>()};
-            }
-            throw std::runtime_error {root["error"].dump()};
-        }
-
-        if (!root["choices"].is_array() || root["choices"].empty()) {
-            throw std::runtime_error {"missing choices"};
-        }
-
-        if (!root["choices"][0]["message"]["content"].is_string()) {
-            throw std::runtime_error {"expected string content"};
-        }
-
-        auto output {root["choices"][0]["message"]["content"].get<std::string>()};
-        spdlog::info("LlamaService::Complete: {}", output);
-        return output;
-    } catch (const std::exception& error) {
-        spdlog::error("LlamaService::Complete: Error: {}", error.what());
-        throw;
     }
+    const nlohmann::json body {
+        {"model", config_.model_path.string()},
+        {"messages", {
+            {{"role", "system"}, {"content", request.system_prompt}},
+            {{"role", "user"},   {"content", user_content}},
+        }},
+        {"response_format", {{"type", "json_object"}}},
+        {"stream", false},
+        {"temperature", config_.llama_temperature}
+    };
+
+    auto result {
+        client_.Post("/v1/chat/completions", body.dump(), "application/json")
+    };
+    if (!result) {
+        throw std::runtime_error {"connection error"};
+    }
+    if (result->status != 200) {
+        throw std::runtime_error {
+            "HTTP " + std::to_string(result->status) + ": " + result->body
+        };
+    }
+
+    const nlohmann::json root = nlohmann::json::parse(result->body);
+    auto output {root.at("choices").at(0).at("message").at("content").get<std::string>()};
+    spdlog::info("LlamaService::Complete: {}", output);
+    return output;
 }
