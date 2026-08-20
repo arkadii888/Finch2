@@ -122,7 +122,7 @@ void Agent::ProcessRequest(std::string input, Telemetry telemetry) {
         const CompletionRequest request {
             BuildSystemPrompt(telemetry),
             input,
-            RenderMapImage(config_, telemetry, request_dir)
+            RenderMapImage(config_, telemetry.latitude_deg, telemetry.longitude_deg, request_dir)
         };
         std::string output {llm_service_.Complete(request)};
         if (output.empty()) {
