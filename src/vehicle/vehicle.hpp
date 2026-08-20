@@ -40,7 +40,7 @@ class Vehicle {
     virtual void Kill() = 0;
     virtual void Land() = 0;
     virtual void Rtl() = 0;
-    virtual void Takeoff() = 0;
+    virtual void Takeoff(float relative_altitude_m) = 0;
 
     virtual Telemetry GetTelemetry() = 0;
 };

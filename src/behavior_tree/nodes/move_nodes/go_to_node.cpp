@@ -37,42 +37,39 @@ float ComputeBearingDeg(double from_latitude_deg,
     if (offset.HorizontalDistanceSquared() <= (MIN_BEARING_DISTANCE_M * MIN_BEARING_DISTANCE_M)) {
         return current_yaw_deg;
     }
-
-    const double from_latitude_rad {from_latitude_deg * PI / 180.0};
-    const double to_latitude_rad {to_latitude_deg * PI / 180.0};
-    const double delta_longitude_rad {(to_longitude_deg - from_longitude_deg) * PI / 180.0};
-
-    const double x {std::sin(delta_longitude_rad) * std::cos(to_latitude_rad)};
-    const double y {std::cos(from_latitude_rad) * std::sin(to_latitude_rad)
-        - std::sin(from_latitude_rad) * std::cos(to_latitude_rad) * std::cos(delta_longitude_rad)};
-
-    return static_cast<float>(std::fmod((std::atan2(x, y) * 180.0 / PI) + 360.0, 360.0));
+    return static_cast<float>(
+        std::fmod((std::atan2(offset.east, offset.north) * 180.0 / PI) + 360.0, 360.0)
+    );
 }
 
 }
 
-GoToNode::GoToNode(double latitude_deg, double longitude_deg, float absolute_altitude_m, std::optional<float> yaw_deg) : latitude_deg_(latitude_deg),
-    longitude_deg_(longitude_deg), absolute_altitude_m_(absolute_altitude_m), yaw_deg_(yaw_deg) {}
+GoToNode::GoToNode(double latitude_deg,
+    double longitude_deg,
+    float relative_altitude_m,
+    std::optional<float> reference_altitude_m,
+    std::optional<float> yaw_deg) : latitude_deg_(latitude_deg), longitude_deg_(longitude_deg),
+    relative_altitude_m_(relative_altitude_m), reference_altitude_m_(reference_altitude_m), yaw_deg_(yaw_deg) {}
+
+float GoToNode::ResolveAbsoluteAltitudeM(const Telemetry& telemetry) const {
+    return reference_altitude_m_.value_or(telemetry.home_absolute_altitude_m) + relative_altitude_m_;
+}
 
 void GoToNode::Execute(std::any context) {
     MoveNode::Execute(context);
 
     if (vehicle_) {
         auto telemetry {vehicle_->GetTelemetry()};
-        if (absolute_altitude_m_ - telemetry.home_absolute_altitude_m >= 110.f) {
-            absolute_altitude_m_ = telemetry.home_absolute_altitude_m + 110.f;
-        }
 
         float yaw_deg {0.f};
         if (yaw_deg_.has_value()) {
             yaw_deg = *yaw_deg_;
         } else {
-            auto telemetry {vehicle_->GetTelemetry()};
             yaw_deg = ComputeBearingDeg(
                 telemetry.latitude_deg, telemetry.longitude_deg, latitude_deg_, longitude_deg_, telemetry.yaw_deg);
         }
 
-        vehicle_->GoTo(latitude_deg_, longitude_deg_, absolute_altitude_m_, yaw_deg);
+        vehicle_->GoTo(latitude_deg_, longitude_deg_, ResolveAbsoluteAltitudeM(telemetry), yaw_deg);
         is_executed = true;
     }
 }
@@ -91,7 +88,7 @@ NodeStatus GoToNode::GetStatus() {
 
     const auto offset {
         ComputeLocalOffsetMeters(telemetry.latitude_deg, telemetry.longitude_deg, latitude_deg_, longitude_deg_)};
-    const double d_alt_m {absolute_altitude_m_ - telemetry.absolute_altitude_m};
+    const double d_alt_m {ResolveAbsoluteAltitudeM(telemetry) - telemetry.absolute_altitude_m};
     const double distance_squared {offset.HorizontalDistanceSquared() + (d_alt_m * d_alt_m)};
 
     if (distance_squared <= (globals::drone_acceptance_radius_m * globals::drone_acceptance_radius_m)) {
@@ -111,6 +108,9 @@ bool GoToNode::Validate() const {
     if (yaw_deg_.has_value() && (*yaw_deg_ < 0.f || *yaw_deg_ > 360.f)) {
         return false;
     }
+    if (relative_altitude_m_ <= 0.f || relative_altitude_m_ > 110.f) {
+        return false;
+    }
     return true;
 }
 
@@ -118,6 +118,7 @@ std::string GoToNode::GetPrompt() const {
     return R"({"type": "action", "go_to": {
         "latitude_deg": <degrees_double>,
         "longitude_deg": <degrees_double>,
-        "absolute_altitude_m": <meters_float>,
+        "relative_altitude_m": <meters_float, height above the reference altitude - always include this, even if unchanged from the previous movement>,
+        "reference_altitude_m": <meters_float AMSL, optional - omit to use home's ground elevation; only set this to a different location's ground elevation (e.g. read from a map) when relative_altitude_m should be measured above that location instead of home>,
         "yaw_deg": <degrees_float, optional - omit to face the direction of travel>}})";
 }

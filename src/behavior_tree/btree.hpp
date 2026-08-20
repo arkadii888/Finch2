@@ -8,7 +8,7 @@
 
 class BTree {
  public:
-    void Build(const nlohmann::json& tree);
+    bool Build(const nlohmann::json& tree);
     void Destroy();
 
     Node* GetRoot() const;

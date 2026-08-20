@@ -1,13 +1,17 @@
 #pragma once
 
 #include <atomic>
+#include <filesystem>
 #include <mutex>
 #include <string>
+#include <thread>
 
 #include "behavior_tree/btree.hpp"
 #include "behavior_tree/node_catalog.hpp"
-#include "vehicle/vehicle.hpp"
 #include "llm_service/llm_service.hpp"
+#include "map_image_service.hpp"
+#include "runtime_config.hpp"
+#include "vehicle/vehicle.hpp"
 
 class LlmOutput {
  public:
@@ -28,7 +32,7 @@ class LlmOutput {
 
 class Agent {
  public:
-    Agent(Vehicle& vehicle, LlmService& llm_service);
+    Agent(Vehicle& vehicle, LlmService& llm_service, RuntimeConfig config);
 
     void Run();
 
@@ -41,11 +45,12 @@ class Agent {
     void LandVehicle();
     void ReturnVehicle();
 
-    void ProcessInput(const std::string& input);
+    bool ProcessInput(const std::string& input);
 
  private:
-    std::string BuildSystemPrompt() const;
-    void HandleOutput(std::string output);
+    std::string BuildSystemPrompt(const Telemetry& telemetry) const;
+    void HandleOutput(std::string output, const std::filesystem::path& request_dir);
+    void ProcessRequest(std::string input, Telemetry telemetry);
     NodeStatus TickNode(Node* node);
 
     BTree btree_;
@@ -53,6 +58,8 @@ class Agent {
     LlmService& llm_service_;
     NodeCatalog node_catalog_;
     Vehicle& vehicle_;
+    RuntimeConfig config_;
     std::atomic<bool> is_processing_ {false};
     std::mutex btree_mutex_;
+    std::jthread request_thread_;
 };

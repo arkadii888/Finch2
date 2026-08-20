@@ -2,11 +2,13 @@
 
 #include <cstdlib>
 
+TakeoffNode::TakeoffNode(float relative_altitude_m) : relative_altitude_m_(relative_altitude_m) {}
+
 void TakeoffNode::Execute(std::any context) {
     MoveNode::Execute(context);
 
     if (vehicle_) {
-        vehicle_->Takeoff();
+        vehicle_->Takeoff(relative_altitude_m_);
         is_executed = true;
     }
 }
@@ -23,7 +25,7 @@ NodeStatus TakeoffNode::GetStatus() {
 
     auto telemetry {vehicle_->GetTelemetry()};
 
-    if (std::abs(telemetry.relative_altitude_m - globals::drone_takeoff_altitude_m) > globals::drone_acceptance_radius_m) {
+    if (std::abs(telemetry.relative_altitude_m - relative_altitude_m_) > globals::drone_acceptance_radius_m) {
         return NodeStatus::Running;
     }
 
@@ -32,9 +34,10 @@ NodeStatus TakeoffNode::GetStatus() {
 }
 
 bool TakeoffNode::Validate() const {
-    return true;
+    return relative_altitude_m_ > 0.f && relative_altitude_m_ <= 110.f;
 }
 
 std::string TakeoffNode::GetPrompt() const {
-    return R"({"type": "action", "takeoff": {}})";
+    return R"({"type": "action", "takeoff": {
+        "relative_altitude_m": <meters_float, optional - omit to use the default takeoff altitude>}})";
 }
