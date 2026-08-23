@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 DummyDrone::DummyDrone()
-    // Bern coverage used by the offline DEM / OSM tile cache.
+    // Bern coverage used by the offline DEM / GeoPackage map.
     : telemetry_ {
           .latitude_deg = 46.982'426,
           .longitude_deg = 7.431'551,
