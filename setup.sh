@@ -18,12 +18,13 @@ if [ "$OS" = "Darwin" ]; then
     fi
 
     echo "📦 Installing system packages via Homebrew..."
-    brew install cmake ninja python git
+    brew install llvm cmake ninja python git
+    BREW_LLVM_PATH="$(brew --prefix llvm)/bin"
 
-    export CC=clang
-    export CXX=clang++
-    CMAKE_C_FLAG="-DCMAKE_C_COMPILER=clang"
-    CMAKE_CXX_FLAG="-DCMAKE_CXX_COMPILER=clang++"
+    export CC="$BREW_LLVM_PATH/clang"
+    export CXX="$BREW_LLVM_PATH/clang++"
+    CMAKE_C_FLAG="-DCMAKE_C_COMPILER=$BREW_LLVM_PATH/clang"
+    CMAKE_CXX_FLAG="-DCMAKE_CXX_COMPILER=$BREW_LLVM_PATH/clang++"
 
 elif [ "$OS" = "Linux" ]; then
     echo "🐧 Linux detected ($ARCH)."
