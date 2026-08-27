@@ -14,7 +14,8 @@
 
 std::filesystem::path RenderMapImage(
     const RuntimeConfig& config,
-    const Telemetry& telemetry,
+    const double latitude_deg,
+    const double longitude_deg,
     const std::filesystem::path& request_dir
 ) {
     std::filesystem::create_directories(request_dir);
@@ -25,9 +26,9 @@ std::filesystem::path RenderMapImage(
         config.python_path.string(),
         config.renderer_path.string(),
         "--lat",
-        std::to_string(telemetry.latitude_deg),
+        std::to_string(latitude_deg),
         "--lon",
-        std::to_string(telemetry.longitude_deg),
+        std::to_string(longitude_deg),
         "--dem",
         config.dem_path.string(),
         "--map",
