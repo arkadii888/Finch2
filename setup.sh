@@ -8,7 +8,6 @@ ARCH=$(uname -m)
 
 CMAKE_C_FLAG=""
 CMAKE_CXX_FLAG=""
-CMAKE_EXTRA_FLAGS=""
 
 if [ "$OS" = "Darwin" ]; then
     echo "🍏 macOS detected ($ARCH)."
@@ -19,18 +18,12 @@ if [ "$OS" = "Darwin" ]; then
     fi
 
     echo "📦 Installing system packages via Homebrew..."
-    brew install llvm cmake ninja python git
+    brew install cmake ninja python git
 
-    BREW_LLVM_PATH="$(brew --prefix llvm)/bin"
-
-    export CC="$BREW_LLVM_PATH/clang"
-    export CXX="$BREW_LLVM_PATH/clang++"
-    export AR="$BREW_LLVM_PATH/llvm-ar"
-    export RANLIB="$BREW_LLVM_PATH/llvm-ranlib"
-
-    CMAKE_C_FLAG="-DCMAKE_C_COMPILER=$BREW_LLVM_PATH/clang"
-    CMAKE_CXX_FLAG="-DCMAKE_CXX_COMPILER=$BREW_LLVM_PATH/clang++"
-    CMAKE_EXTRA_FLAGS="-DCMAKE_AR=$BREW_LLVM_PATH/llvm-ar -DCMAKE_RANLIB=$BREW_LLVM_PATH/llvm-ranlib"
+    unset CC
+    unset CXX
+    CMAKE_C_FLAG=""
+    CMAKE_CXX_FLAG=""
 
 elif [ "$OS" = "Linux" ]; then
     echo "🐧 Linux detected ($ARCH)."
@@ -83,7 +76,7 @@ echo "🧹 Cleaning old build files..."
 rm -rf build-release
 
 echo "🔨 Building the Finch project (Release mode)..."
-cmake -B build-release -G Ninja -DCMAKE_BUILD_TYPE=Release $CMAKE_C_FLAG $CMAKE_CXX_FLAG $CMAKE_EXTRA_FLAGS
+cmake -B build-release -G Ninja -DCMAKE_BUILD_TYPE=Release $CMAKE_C_FLAG $CMAKE_CXX_FLAG
 cmake --build build-release
 
 echo "🔗 Creating global 'finch' command..."
