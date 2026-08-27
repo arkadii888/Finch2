@@ -27,9 +27,14 @@ if [ "$OS" = "Darwin" ]; then
     LLVM_PREFIX="$(brew --prefix llvm)"
     export CC="$LLVM_PREFIX/bin/clang"
     export CXX="$LLVM_PREFIX/bin/clang++"
+    # Homebrew's llvm-ar writes a GNU-style archive index that Apple's ld may
+    # interpret as a regular member named '/'. MAVSDK builds several nested
+    # static libraries, so export these as well as passing them to top-level
+    # CMake.
+    export AR=/usr/bin/ar
+    export RANLIB=/usr/bin/ranlib
     CMAKE_COMPILER_FLAGS=(
-        "-DCMAKE_C_COMPILER=$CC"
-        "-DCMAKE_CXX_COMPILER=$CXX"
+        "-DCMAKE_TOOLCHAIN_FILE=$SCRIPT_DIR/cmake/macos-homebrew-llvm.cmake"
     )
 
 elif [ "$OS" = "Linux" ]; then
