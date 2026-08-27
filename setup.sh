@@ -5,7 +5,7 @@ echo "🚀 Starting clean system setup for the Finch..."
 
 echo "📦 Installing system packages and GCC-13..."
 sudo apt update
-sudo apt install -y gcc-13 g++-13 ninja-build python3 curl wget git
+sudo apt install -y gcc-13 g++-13 ninja-build python3 python3-pip python3-venv curl wget git
 
 export CC=gcc-13
 export CXX=g++-13
