@@ -1,50 +1,39 @@
-# Prerequisites
 *.d
 
-# Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
 
-# Precompiled Headers
 *.gch
 *.pch
 
-# Linker files
 *.ilk
 
-# Debugger Files
 *.pdb
+*.dwo
 
-# Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
 *.so.*
 
-
-# Fortran module files
 *.mod
 *.smod
 
-# Compiled Static libraries
 *.lai
 *.la
 *.a
 *.lib
 
-# Executables
 *.exe
 *.out
 *.app
 
-# Build directories
 build/
 Build/
 build-*/
 
-# CMake generated files
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
@@ -52,27 +41,24 @@ Makefile
 install_manifest.txt
 compile_commands.json
 
-# Temporary files
 *.tmp
 *.log
 *.bak
 *.swp
 
-# vcpkg
 vcpkg_installed/
 
-# debug information files
-*.dwo
-
-# test output & cache
 Testing/
 .cache/
-# Keep directory placeholders; ignore all contents
-models/*
-!models/.gitkeep
-data/*
-!data/.gitkeep
-inference_runs/
-tools/map_renderer/.venv/
+
 __pycache__/
 .ruff_cache/
+tools/map_renderer/.venv/
+
+inference_runs/
+
+data/maps/**/*
+!data/maps/**/.gitkeep
+
+data/models/**/*
+!data/models/**/.gitkeep
