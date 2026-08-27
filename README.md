@@ -2,14 +2,13 @@
 
 ## Platforms & Compatibility
 
-🛠️ **CMake:** 3.28+
-
 🍏 **Mac:** 
-Apple Clang 15.0+ 
+macOS 14+, brew
 
 🐧 **Linux:** 
-GCC 13.1+ 
-Clang 16.0+ 
+Ubuntu 24.10,
+Debian 13 Trixie,
+Raspberry Pi OS
 
 <!--- [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=macos-14%20-%20apple-clang)](https://github.com/arkadii888/Finch2/actions) --->
 <!--- [![Status](https://github.com/arkadii888/Finch2/actions/workflows/ci.yml/badge.svg?job=ubuntu-24.04%20-%20gcc)](https://github.com/arkadii888/Finch2/actions) --->
@@ -46,7 +45,42 @@ mavproxy.py --master=/dev/tty.usbmodem101 --baudrate=921600 --out=udp:127.0.0.1:
 
 ## Building and Running
 
+1. Install the project: 
 
+```bash
+git clone https://github.com/arkadii888/Finch2.git
+cd Finch2
+chmod +x setup.sh
+./setup.sh
+```
+
+2. Install the model: 
+
+```bash
+cd data/models
+curl -L -o Qwen3VL-8B-Instruct-Q4_K_M.gguf "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF/resolve/main/Qwen3VL-8B-Instruct-Q4_K_M.gguf?download=true"
+curl -L -o mmproj-Qwen3VL-8B-Instruct-F16.gguf "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF/resolve/main/mmproj-Qwen3VL-8B-Instruct-F16.gguf?download=true"
+```
+
+3. Install the maps:
+
+For elevation, use this [resource](https://portal.opentopography.org/raster?opentopoID=OTSDEM.032021.4326.3), select the area you are interested in, download and place the ```.tif``` file in ```data/maps```.
+
+For a regular map, use this [resource](https://download.geofabrik.de/), select the area you are interested in, download and place the ```.gpkg``` in ```data/maps```
+
+Or just download default maps for Switzerland:
+
+```bash
+cd data/maps
+curl -L -o switzerland.gpkg "https://pub-3b84eed7dc5f44f6af42d2f1dd79492e.r2.dev/switzerland.gpkg"
+curl -L -o switzerland.tif "https://pub-3b84eed7dc5f44f6af42d2f1dd79492e.r2.dev/switzerland.tif"
+```	
+
+4. Run:
+
+```bash
+finch
+```	
 
 ## API Communication
 
