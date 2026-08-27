@@ -3,7 +3,7 @@
 ## Platforms & Compatibility
 
 🍏 **Mac:** 
-macOS 14+
+macOS 14
 
 🐧 **Linux:** 
 Ubuntu 24.10,
