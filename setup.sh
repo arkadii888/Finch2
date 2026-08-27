@@ -7,7 +7,7 @@ OS=$(uname -s)
 ARCH=$(uname -m)
 
 if [ "$OS" != "Linux" ]; then
-    echo "❌ This script supports only Linux (Ubuntu / Raspberry Pi OS)."
+    echo "❌ This script supports only Linux (Ubuntu 24.10+ / Debian 13+ / Raspberry Pi OS Trixie)."
     exit 1
 fi
 
@@ -50,8 +50,11 @@ fi
 echo "📦 Synchronizing Python packages for tools/map_renderer..."
 uv sync --project tools/map_renderer
 
+echo "🧹 Cleaning old build files..."
+rm -rf build-release
+
 echo "🔨 Building the Finch project (Release mode)..."
-cmake -B build-release -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake -B build-release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc-14 -DCMAKE_CXX_COMPILER=g++-14
 cmake --build build-release
 
 echo "🔗 Creating global 'finch' command..."
