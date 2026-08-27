@@ -22,7 +22,7 @@ void RequireFile(const std::filesystem::path& path, const char* name) {
 RuntimeConfig RuntimeConfig::Make() {
     const std::filesystem::path root {PROJECT_ROOT_DIR};
     RuntimeConfig config;
-    config.dem_path = root / "data/maps/output_hh.tif";
+    config.dem_path = root / "data/maps/switzerland.tif";
     config.inference_log_dir = root / "inference_runs";
     config.map_path = root / "data/maps/switzerland.gpkg";
     config.mmproj_path = root / "models/mmproj-Qwen3VL-8B-Instruct-F16.gguf";
