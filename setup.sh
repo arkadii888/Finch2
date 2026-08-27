@@ -1,13 +1,15 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
 echo "🚀 Starting clean system setup for the Finch project..."
 
 OS=$(uname -s)
 ARCH=$(uname -m)
 
-CMAKE_C_FLAG=""
-CMAKE_CXX_FLAG=""
+CMAKE_COMPILER_FLAGS=()
 
 if [ "$OS" = "Darwin" ]; then
     echo "🍏 macOS detected ($ARCH)."
@@ -17,13 +19,18 @@ if [ "$OS" = "Darwin" ]; then
         exit 1
     fi
 
+    # CMake's C++20 module scanning needs a recent upstream Clang.  The
+    # Apple-provided compiler can be too old even on otherwise supported Macs.
     echo "📦 Installing system packages via Homebrew..."
-    brew install cmake ninja python git
+    brew install cmake ninja llvm python git
 
-    unset CC
-    unset CXX
-    CMAKE_C_FLAG=""
-    CMAKE_CXX_FLAG=""
+    LLVM_PREFIX="$(brew --prefix llvm)"
+    export CC="$LLVM_PREFIX/bin/clang"
+    export CXX="$LLVM_PREFIX/bin/clang++"
+    CMAKE_COMPILER_FLAGS=(
+        "-DCMAKE_C_COMPILER=$CC"
+        "-DCMAKE_CXX_COMPILER=$CXX"
+    )
 
 elif [ "$OS" = "Linux" ]; then
     echo "🐧 Linux detected ($ARCH)."
@@ -34,8 +41,10 @@ elif [ "$OS" = "Linux" ]; then
 
     export CC=gcc-14
     export CXX=g++-14
-    CMAKE_C_FLAG="-DCMAKE_C_COMPILER=gcc-14"
-    CMAKE_CXX_FLAG="-DCMAKE_CXX_COMPILER=g++-14"
+    CMAKE_COMPILER_FLAGS=(
+        "-DCMAKE_C_COMPILER=$CC"
+        "-DCMAKE_CXX_COMPILER=$CXX"
+    )
 
     CMAKE_VERSION="3.29.3"
     if ! command -v cmake &> /dev/null || [ "$(cmake --version | grep -oP '\d+\.\d+' | head -1)" \< "3.28" ]; then
@@ -76,11 +85,14 @@ echo "🧹 Cleaning old build files..."
 rm -rf build-release
 
 echo "🔨 Building the Finch project (Release mode)..."
-cmake -B build-release -G Ninja -DCMAKE_BUILD_TYPE=Release $CMAKE_C_FLAG $CMAKE_CXX_FLAG
+cmake -S . -B build-release -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    "${CMAKE_COMPILER_FLAGS[@]}"
 cmake --build build-release
 
 echo "🔗 Creating global 'finch' command..."
-sudo ln -sf "$(pwd)/build-release/run" /usr/local/bin/finch
+sudo mkdir -p /usr/local/bin
+sudo ln -sf "$SCRIPT_DIR/build-release/run" /usr/local/bin/finch
 
 echo "🎉 Done! The project was built successfully."
 echo "👉 You can now run the program just by typing in the terminal: finch"
