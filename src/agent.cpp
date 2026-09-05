@@ -72,10 +72,9 @@ std::string Agent::GetVehicleTelemetry() const {
 
 std::string Agent::GetOutput() {
     if (is_processing_) {
-        return R"({"status":"processing"})";
+        return "";
     }
-    const std::string output {llm_output_.Get()};
-    return output.empty() ? R"({"status":"idle"})" : output;
+    return llm_output_.Get();
 }
 
 void Agent::ArmVehicle() {
