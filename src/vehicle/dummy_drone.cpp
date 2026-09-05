@@ -3,11 +3,10 @@
 #include <spdlog/spdlog.h>
 
 DummyDrone::DummyDrone()
-    // Bern coverage used by the offline DEM / GeoPackage map.
     : telemetry_ {
-          .latitude_deg = 46.982'426,
-          .longitude_deg = 7.431'551,
-          .absolute_altitude_m = 579.81f,
+          .latitude_deg = 46.989'705,
+          .longitude_deg = 7.463'160,
+          .absolute_altitude_m = 554.f,
           .current_battery_a = 10.0f,
           .home_absolute_altitude_m = 579.81f,
           .remaining_percent = 100.0f,
