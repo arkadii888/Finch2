@@ -19,18 +19,13 @@ if [ "$OS" = "Darwin" ]; then
         exit 1
     fi
 
-    # CMake's C++20 module scanning needs a recent upstream Clang.  The
-    # Apple-provided compiler can be too old even on otherwise supported Macs.
     echo "📦 Installing system packages via Homebrew..."
     brew install cmake ninja llvm python git
 
     LLVM_PREFIX="$(brew --prefix llvm)"
     export CC="$LLVM_PREFIX/bin/clang"
     export CXX="$LLVM_PREFIX/bin/clang++"
-    # Homebrew's llvm-ar writes a GNU-style archive index that Apple's ld may
-    # interpret as a regular member named '/'. MAVSDK builds several nested
-    # static libraries, so export these as well as passing them to top-level
-    # CMake.
+
     export AR=/usr/bin/ar
     export RANLIB=/usr/bin/ranlib
     CMAKE_COMPILER_FLAGS=(
