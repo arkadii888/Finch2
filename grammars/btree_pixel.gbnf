@@ -1,0 +1,60 @@
+# Flight-only UAV behavior tree (pixel). At most 26 go_to waypoints.
+root ::= ws node ws
+
+ws ::= [ \t\n\r]*
+
+node ::= sequence | fallback | parallel | action
+
+sequence ::= "{" ws "\"type\"" ws ":" ws "\"sequence\"" ws "," ws "\"children\"" ws ":" ws children ws "}"
+fallback ::= "{" ws "\"type\"" ws ":" ws "\"fallback\"" ws "," ws "\"children\"" ws ":" ws children ws "}"
+parallel ::= "{" ws "\"type\"" ws ":" ws "\"parallel\"" ws "," ws "\"success_threshold\"" ws ":" ws integer-ge1 ws "," ws "\"children\"" ws ":" ws children ws "}"
+
+# At most 28 children (takeoff + 26 go_to + rtl/land).
+children ::= "[" ws node children-rest-1 ws "]"
+children-rest-1 ::= (ws "," ws node children-rest-2)?
+children-rest-2 ::= (ws "," ws node children-rest-3)?
+children-rest-3 ::= (ws "," ws node children-rest-4)?
+children-rest-4 ::= (ws "," ws node children-rest-5)?
+children-rest-5 ::= (ws "," ws node children-rest-6)?
+children-rest-6 ::= (ws "," ws node children-rest-7)?
+children-rest-7 ::= (ws "," ws node children-rest-8)?
+children-rest-8 ::= (ws "," ws node children-rest-9)?
+children-rest-9 ::= (ws "," ws node children-rest-10)?
+children-rest-10 ::= (ws "," ws node children-rest-11)?
+children-rest-11 ::= (ws "," ws node children-rest-12)?
+children-rest-12 ::= (ws "," ws node children-rest-13)?
+children-rest-13 ::= (ws "," ws node children-rest-14)?
+children-rest-14 ::= (ws "," ws node children-rest-15)?
+children-rest-15 ::= (ws "," ws node children-rest-16)?
+children-rest-16 ::= (ws "," ws node children-rest-17)?
+children-rest-17 ::= (ws "," ws node children-rest-18)?
+children-rest-18 ::= (ws "," ws node children-rest-19)?
+children-rest-19 ::= (ws "," ws node children-rest-20)?
+children-rest-20 ::= (ws "," ws node children-rest-21)?
+children-rest-21 ::= (ws "," ws node children-rest-22)?
+children-rest-22 ::= (ws "," ws node children-rest-23)?
+children-rest-23 ::= (ws "," ws node children-rest-24)?
+children-rest-24 ::= (ws "," ws node children-rest-25)?
+children-rest-25 ::= (ws "," ws node children-rest-26)?
+children-rest-26 ::= (ws "," ws node children-rest-27)?
+children-rest-27 ::= (ws "," ws node)?
+
+action ::= go-to-action | land-action | rtl-action | takeoff-action
+
+go-to-action ::= "{" ws "\"type\"" ws ":" ws "\"action\"" ws "," ws "\"go_to\"" ws ":" ws go-to-payload ws "}"
+land-action ::= "{" ws "\"type\"" ws ":" ws "\"action\"" ws "," ws "\"land\"" ws ":" ws empty-object ws "}"
+rtl-action ::= "{" ws "\"type\"" ws ":" ws "\"action\"" ws "," ws "\"rtl\"" ws ":" ws empty-object ws "}"
+takeoff-action ::= "{" ws "\"type\"" ws ":" ws "\"action\"" ws "," ws "\"takeoff\"" ws ":" ws takeoff-payload ws "}"
+
+empty-object ::= "{" ws "}"
+
+go-to-payload ::= "{" ws "\"x\"" ws ":" ws pixel-int ws "," ws "\"y\"" ws ":" ws pixel-int ws "," ws "\"relative_altitude_m\"" ws ":" ws number (ws "," ws "\"reference_altitude_m\"" ws ":" ws number)? (ws "," ws "\"yaw_deg\"" ws ":" ws number)? ws "}"
+
+takeoff-payload ::= empty-object | ("{" ws "\"relative_altitude_m\"" ws ":" ws number ws "}")
+
+# Strict JSON number: no trailing ".", no leading ".", no leading zeros.
+number ::= "-"? ("0" | [1-9] [0-9]*) ("." [0-9]+)? ([eE] [+-]? [0-9]+)?
+
+integer ::= "-"? ("0" | [1-9] [0-9]*)
+integer-ge1 ::= [1-9] [0-9]*
+pixel-int ::= "0" | "1000" | [1-9] | [1-9] [0-9] | [1-9] [0-9] [0-9]

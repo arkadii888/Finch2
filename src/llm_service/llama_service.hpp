@@ -2,9 +2,11 @@
 
 #include <sys/types.h>
 
+#include <filesystem>
 #include <string>
 
 #include <httplib.h>
+#include <nlohmann/json.hpp>
 
 #include "llm_service.hpp"
 #include "runtime_config.hpp"
@@ -44,8 +46,12 @@ class LlamaService : public LlmService {
         int ubatch_size {512};
     };
 
+    nlohmann::json PostCompletion(const nlohmann::json& body);
+    std::string ReadTextFile(const std::filesystem::path& path) const;
+
     BackendConfig backend_config_ {};
     httplib::Client client_ {"127.0.0.1", globals::llm_server_port};
     RuntimeConfig config_;
+    std::string grammar_;
     pid_t pid_ {-1};
 };

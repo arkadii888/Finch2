@@ -119,10 +119,22 @@ void Agent::ProcessRequest(std::string input, Telemetry telemetry) {
         const auto request_dir = CreateRequestDirectory(config_.inference_log_dir);
         WriteText(request_dir / "prompt.txt", input);
 
+        const MapBounds bounds {
+            MapBoundsFromCenter(
+                telemetry.latitude_deg,
+                telemetry.longitude_deg,
+                config_.map_half_window_m
+            )
+        };
+
         const CompletionRequest request {
-            BuildSystemPrompt(telemetry),
-            input,
-            RenderMapImage(config_, telemetry.latitude_deg, telemetry.longitude_deg, request_dir)
+            BuildUserPrompt(telemetry, input),
+            RenderMapImage(
+                config_,
+                telemetry.latitude_deg,
+                telemetry.longitude_deg,
+                request_dir
+            )
         };
         std::string output {llm_service_.Complete(request)};
         if (output.empty()) {
@@ -130,7 +142,7 @@ void Agent::ProcessRequest(std::string input, Telemetry telemetry) {
         }
 
         WriteText(request_dir / "raw_response.txt", output);
-        HandleOutput(std::move(output), request_dir);
+        HandleOutput(std::move(output), bounds, request_dir);
     } catch (const std::exception& error) {
         spdlog::error("Agent::ProcessRequest: {}", error.what());
         llm_output_.Set(nlohmann::json{{"error", error.what()}}.dump());
@@ -140,9 +152,13 @@ void Agent::ProcessRequest(std::string input, Telemetry telemetry) {
 
 void Agent::HandleOutput(
     std::string output,
+    const MapBounds& bounds,
     const std::filesystem::path& request_dir
 ) {
-    nlohmann::json json_tree = nlohmann::json::parse(output);
+    nlohmann::json pixel_tree = nlohmann::json::parse(output);
+    nlohmann::json json_tree = MaterializeWgs84Btree(
+        pixel_tree, bounds, config_.max_go_to
+    );
     BTree candidate;
     if (!candidate.Build(json_tree)) {
         throw std::runtime_error {"Model returned an invalid behavior tree"};
@@ -150,40 +166,70 @@ void Agent::HandleOutput(
     WriteText(request_dir / "btree.json", json_tree.dump(2));
     std::lock_guard lock {btree_mutex_};
     btree_ = std::move(candidate);
-    llm_output_.Set(std::move(output));
+    llm_output_.Set(json_tree.dump());
 }
 
-std::string Agent::BuildSystemPrompt(const Telemetry& telemetry) const {
-    std::string prompt {
-        "You are a drone mission planner. Output ONLY a single valid JSON behavior tree.\n"
+std::string Agent::BuildUserPrompt(
+    const Telemetry& telemetry,
+    const std::string& mission
+) const {
+    const nlohmann::json telemetry_json {
+        {"latitude_deg", telemetry.latitude_deg},
+        {"longitude_deg", telemetry.longitude_deg},
+        {"absolute_altitude_m", telemetry.absolute_altitude_m},
+        {"home_absolute_altitude_m", telemetry.home_absolute_altitude_m},
+        {"relative_altitude_m", telemetry.relative_altitude_m},
+        {"yaw_deg", telemetry.yaw_deg},
+        {"is_armed", telemetry.is_armed},
     };
 
-    const nlohmann::json telemetry_json = telemetry;
-    prompt += "\nYour initial telemetry is: " + telemetry_json.dump() + "\n";
+    std::string prompt {
+        "You are a drone mission planner. Output ONLY a single valid JSON behavior tree.\n"
+        "Map image is centered on the drone.\n"
+        "\nTelemetry: " + telemetry_json.dump() + "\n"
+    };
+
+    const std::string half_window {
+        std::to_string(static_cast<int>(config_.map_half_window_m)) + " m"
+    };
     prompt +=
-        "\nThe attached map is centered on the drone and uses WGS84 longitude/latitude "
-        "axes. Contour labels are approximate ground elevation in meters ASL. Use map "
-        "labels and terrain to resolve named destinations and reference altitudes.\n";
+        "\nMap: north-up geographic square filling the image; labels locate places; "
+        "contour labels are ground ASL (coarse OK). Read named places from the map. "
+        "go_to x,y are integers in [0,1000] on the map image: (0,0) is the top-left, "
+        "(1000,1000) is the bottom-right, x right, y down. The drone / map center is "
+        "about (500,500). Compass offsets in meters: 1 x-unit = 2*" + half_window
+        + "/1000 m east, 1 y-unit = 2*" + half_window + "/1000 m south. "
+        "Plain integers — never formulas, never latitude_deg/longitude_deg. "
+        "Every go_to must stay inside [0,1000].\n";
 
     prompt +=
-        "\nAltitudes are meters above ground, not sea level. The reference defaults to "
-        "home's elevation - omit \"reference_altitude_m\" unless the destination's ground "
-        "differs (e.g. from a map), in which case set it to that elevation and let "
-        "\"relative_altitude_m\" be the clearance above it; never add them yourself.\n"
-        "go_to always needs \"relative_altitude_m\" - reuse the previous movement's value "
-        "(or the 10m takeoff default) if the user didn't specify one.\n";
-
-    prompt += "Available node types:\n";
-    for (const auto& node : node_catalog_.GetNodes()) {
-        prompt += node->GetPrompt() + "\n";
-    }
+        "\nAltitudes: relative_altitude_m is AGL above the reference. Always include "
+        "reference_altitude_m set it from contours or from home ground altitude."
+        "(approx ASL OK). Always include relative_altitude_m on go_to — reuse the previous "
+        "value (or 10m takeoff default) if unspecified. Never add reference+relative.\n"
+        "\nWaypoints: Generate the minimum waypoint set required to execute the mission.\n"
+        "Always include:\n"
+        "- route start and destination;\n"
+        "- required named targets;\n"
+        "- relevant junctions, entrances, exits, and meaningful turns.\n"
+        "Add intermediate waypoints only when adjacent required points are more than 200 m "
+        "apart. Do not add nearly collinear or duplicate waypoints.\n"
+        "Create at most " + std::to_string(config_.max_go_to) + " waypoints.\n";
 
     prompt +=
-        "\nRules:\n"
-        "  - sequence, fallback, parallel must have a non-empty \"children\" array\n"
-        "  - parallel requires an integer \"success_threshold\" >= 1\n"
-        "  - action nodes have exactly one intent key besides \"type\"\n"
-        "  - Output raw JSON only. No markdown fences, no explanation.\n";
+        "\nNodes:\n"
+        "sequence: {\"type\":\"sequence\",\"children\":[...]}\n"
+        "fallback: {\"type\":\"fallback\",\"children\":[...]}\n"
+        "parallel: {\"type\":\"parallel\",\"success_threshold\":1,\"children\":[...]}\n"
+        "go_to: {\"type\":\"action\",\"go_to\":{\"x\":<int>,\"y\":<int>,"
+        "\"relative_altitude_m\":<f>,\"reference_altitude_m\":<f optional AMSL>,"
+        "\"yaw_deg\":<f optional>}}\n"
+        "land: {\"type\":\"action\",\"land\":{}}\n"
+        "rtl: {\"type\":\"action\",\"rtl\":{}}\n"
+        "takeoff: {\"type\":\"action\",\"takeoff\":{\"relative_altitude_m\":<f optional>}}\n"
+        "\nRules: non-empty children; parallel success_threshold>=1; one intent per action; "
+        "raw JSON only with numeric literals.\n"
+        "\nMission: " + mission;
 
     return prompt;
 }

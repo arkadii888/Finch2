@@ -22,17 +22,19 @@ void RequireFile(const std::filesystem::path& path, const char* name) {
 RuntimeConfig RuntimeConfig::Make() {
     const std::filesystem::path root {PROJECT_ROOT_DIR};
     RuntimeConfig config;
+    config.btree_grammar_path = root / "grammars/btree_pixel.gbnf";
     config.dem_path = root / "data/maps/switzerland.tif";
     config.inference_log_dir = root / "inference_runs";
     config.map_path = root / "data/maps/switzerland.gpkg";
-    config.mmproj_path = root / "data/models/mmproj-Qwen3VL-8B-Instruct-F16.gguf";
-    config.model_path = root / "data/models/Qwen3VL-8B-Instruct-Q4_K_M.gguf";
+    config.mmproj_path = root / "models/qwen3-vl-8b-instruct.BF16-mmproj.gguf";
+    config.model_path = root / "models/qwen3-vl-8b-instruct.Q4_K_M.gguf";
     config.python_path = root / "tools/map_renderer/.venv/bin/python";
     config.renderer_path = root / "tools/map_renderer/cli.py";
     return config;
 }
 
 void RuntimeConfig::Validate() const {
+    RequireFile(btree_grammar_path, "Behavior-tree grammar");
     RequireFile(dem_path, "DEM");
     RequireFile(map_path, "Map GeoPackage");
     RequireFile(mmproj_path, "Multimodal projector");
