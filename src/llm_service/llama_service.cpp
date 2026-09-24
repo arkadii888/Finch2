@@ -55,12 +55,17 @@ std::string EncodeImage(const std::filesystem::path& path) {
 
 LlamaService::LlamaService(RuntimeConfig config) : config_ {std::move(config)} {
     grammar_ = ReadGrammar(config_.btree_grammar_path);
+    if (grammar_.empty()) {
+        spdlog::critical("LlamaService::LlamaService: Grammar is empty.");
+        std::exit(EXIT_FAILURE);
+    }
 }
 
 std::string LlamaService::ReadGrammar(const std::filesystem::path& path) const {
     std::ifstream input {path};
     if (!input) {
-        throw std::runtime_error {"Could not read grammar: " + path.string()};
+        spdlog::error("LlamaService::ReadGrammar: Failed.");
+        return "";
     }
     return {
         std::istreambuf_iterator<char> {input},
@@ -73,7 +78,8 @@ void LlamaService::Run() {
     client_.set_read_timeout(600, 0);
 
     if ((pid_ = fork()) < 0) {
-        throw std::runtime_error {"Could not fork llama-server"};
+        spdlog::critical("LlamaService::Run: Could not fork.");
+        std::exit(EXIT_FAILURE);
     }
 
     if (pid_ == 0) {
@@ -139,7 +145,8 @@ void LlamaService::Run() {
     while (std::chrono::steady_clock::now() < deadline) {
         if (waitpid(pid_, nullptr, WNOHANG) > 0) {
             pid_ = -1;
-            throw std::runtime_error {"llama-server crashed during startup"};
+            spdlog::critical("LlamaService::Run: Crashed.");
+            std::exit(EXIT_FAILURE);
         }
 
         auto result {client_.Get("/health")};
@@ -153,8 +160,11 @@ void LlamaService::Run() {
 
         std::this_thread::sleep_for(std::chrono::milliseconds {500});
     }
+
     Stop();
-    throw std::runtime_error {"llama-server startup timed out"};
+
+    spdlog::critical("LlamaService::Run: Timed out.");
+    std::exit(EXIT_FAILURE);
 }
 
 void LlamaService::Stop() {
