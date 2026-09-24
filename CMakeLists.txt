@@ -107,7 +107,7 @@ add_executable(run
     src/logger.hpp
     src/map_image_service.cpp
     src/pixel_btree.cpp
-    src/config/llm.cpp
+    src/config/llm.hpp
 
     src/behavior_tree/btree.cpp
     src/behavior_tree/node_catalog.cpp

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <filesystem>
+#include <cstdlib>
+#include <spdlog/spdlog.h>
 
 #ifndef PROJECT_ROOT_DIR
 #error "PROJECT_ROOT_DIR is not defined!"
@@ -8,7 +10,9 @@
 
 class LlmConfig {
  public:
-    LlmConfig();
+    LlmConfig() {
+        Validate();
+    }
 
     bool llama_jinja {true};
     double llama_temperature {0.0};
@@ -30,8 +34,22 @@ class LlmConfig {
     std::filesystem::path renderer_path {root / "tools/map_renderer/cli.py"};
 
  private:
-    void Validate() const;
-    void RequireFile(const std::filesystem::path& path) const;
+    void Validate() const {
+        RequireFile(btree_grammar_path);
+        RequireFile(dem_path);
+        RequireFile(map_path);
+        RequireFile(mmproj_path);
+        RequireFile(model_path);
+        RequireFile(python_path);
+        RequireFile(renderer_path);
+    }
+
+    void RequireFile(const std::filesystem::path& path) const {
+        if (!std::filesystem::is_regular_file(path)) {
+            spdlog::critical("LlmConfig::RequireFile: File not found {}",  path.string());
+            std::exit(EXIT_FAILURE);
+        }
+    }
 
     inline static const std::filesystem::path root {PROJECT_ROOT_DIR};
 };
