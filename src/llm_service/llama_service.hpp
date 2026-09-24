@@ -9,7 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include "llm_service.hpp"
-#include "runtime_config.hpp"
+#include "config/runtime_config.hpp"
 
 import globals;
 

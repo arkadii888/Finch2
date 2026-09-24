@@ -6,7 +6,7 @@
 #include "api_server.hpp"
 #include "llm_service/llama_service.hpp"
 #include "logger.hpp"
-#include "runtime_config.hpp"
+#include "config/runtime_config.hpp"
 #include "vehicle/dummy_drone.hpp"
 
 import lifecycle;

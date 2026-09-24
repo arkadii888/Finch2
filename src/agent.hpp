@@ -10,7 +10,7 @@
 #include "llm_service/llm_service.hpp"
 #include "map_image_service.hpp"
 #include "pixel_btree.hpp"
-#include "runtime_config.hpp"
+#include "config/runtime_config.hpp"
 #include "vehicle/vehicle.hpp"
 
 class LlmOutput {

@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include "runtime_config.hpp"
+#include "config/runtime_config.hpp"
 
 // Renders an offline map centered on the drone into request_dir/map.png.
 std::filesystem::path RenderMapImage(
