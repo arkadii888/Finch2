@@ -16,8 +16,7 @@ int main() {
 
     Logger logger;
 
-    const LlmConfig config {LlmConfig::Make()};
-    config.Validate();
+    const LlmConfig config;
 
     DummyDrone vehicle;
     vehicle.Init();
