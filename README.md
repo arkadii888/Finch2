@@ -45,10 +45,6 @@ mavproxy.py --master=/dev/tty.usbmodem101 --baudrate=921600 --out=udp:127.0.0.1:
 
 ## Building and Running
 
-Map-grounded inference uses the `v3_mix_from_base` Qwen3-VL GGUF pair and pixel
-`go_to` waypoints (`x,y` in `[0, 1000]`, at most 26). Follow
-[multimodal map inference setup](map-inference-setup.md) before starting Finch2.
-
 1. Install the project: 
 
 ```bash
