@@ -6,7 +6,7 @@
 #include "api_server.hpp"
 #include "llm_service/llama_service.hpp"
 #include "logger.hpp"
-#include "config/runtime_config.hpp"
+#include "config/llm.hpp"
 #include "vehicle/dummy_drone.hpp"
 
 import lifecycle;
@@ -16,7 +16,7 @@ int main() {
 
     Logger logger;
 
-    const RuntimeConfig config {RuntimeConfig::Make()};
+    const LlmConfig config {LlmConfig::Make()};
     config.Validate();
 
     DummyDrone vehicle;

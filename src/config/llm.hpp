@@ -2,8 +2,7 @@
 
 #include <filesystem>
 
-// Paths and knobs shared by the LLM server and offline map renderer.
-struct RuntimeConfig {
+struct LlmConfig {
     std::filesystem::path btree_grammar_path;
     std::filesystem::path dem_path;
     std::filesystem::path inference_log_dir;
@@ -22,7 +21,7 @@ struct RuntimeConfig {
     std::filesystem::path renderer_path;
     int renderer_timeout_s {60};
 
-    static RuntimeConfig Make();
+    static LlmConfig Make();
 
     void Validate() const;
 };

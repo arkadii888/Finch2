@@ -15,6 +15,7 @@
 #include "behavior_tree/nodes/parallel_node.hpp"
 #include "behavior_tree/nodes/sequence_node.hpp"
 #include "behavior_tree/nodes/task_nodes/task_node.hpp"
+#include "config/llm.hpp"
 
 import lifecycle;
 
@@ -41,7 +42,7 @@ void WriteText(const std::filesystem::path& path, const std::string& value) {
 
 }  // namespace
 
-Agent::Agent(Vehicle& vehicle, LlmService& llm_service, RuntimeConfig config)
+Agent::Agent(Vehicle& vehicle, LlmService& llm_service, LlmConfig config)
     : llm_service_ {llm_service},
       vehicle_ {vehicle},
       config_ {std::move(config)} {}

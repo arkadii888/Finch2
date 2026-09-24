@@ -9,7 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include "llm_service.hpp"
-#include "config/runtime_config.hpp"
+#include "config/llm.hpp"
 
 import globals;
 
@@ -19,7 +19,7 @@ import globals;
 
 class LlamaService : public LlmService {
  public:
-    explicit LlamaService(RuntimeConfig config);
+    explicit LlamaService(LlmConfig config);
 
     void Run() override;
     void Stop() override;
@@ -51,7 +51,7 @@ class LlamaService : public LlmService {
 
     BackendConfig backend_config_ {};
     httplib::Client client_ {"127.0.0.1", globals::llm_server_port};
-    RuntimeConfig config_;
+    LlmConfig config_;
     std::string grammar_;
     pid_t pid_ {-1};
 };

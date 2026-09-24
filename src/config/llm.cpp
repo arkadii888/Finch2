@@ -1,4 +1,4 @@
-#include "runtime_config.hpp"
+#include "llm.hpp"
 
 #include <stdexcept>
 #include <string>
@@ -19,9 +19,9 @@ void RequireFile(const std::filesystem::path& path, const char* name) {
 
 }  // namespace
 
-RuntimeConfig RuntimeConfig::Make() {
+LlmConfig LlmConfig::Make() {
     const std::filesystem::path root {PROJECT_ROOT_DIR};
-    RuntimeConfig config;
+    LlmConfig config;
     config.btree_grammar_path = root / "grammars/btree_pixel.gbnf";
     config.dem_path = root / "data/maps/switzerland.tif";
     config.inference_log_dir = root / "inference_runs";
@@ -33,7 +33,7 @@ RuntimeConfig RuntimeConfig::Make() {
     return config;
 }
 
-void RuntimeConfig::Validate() const {
+void LlmConfig::Validate() const {
     RequireFile(btree_grammar_path, "Behavior-tree grammar");
     RequireFile(dem_path, "DEM");
     RequireFile(map_path, "Map GeoPackage");

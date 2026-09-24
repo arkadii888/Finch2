@@ -13,7 +13,7 @@
 #include <vector>
 
 std::filesystem::path RenderMapImage(
-    const RuntimeConfig& config,
+    const LlmConfig& config,
     const double latitude_deg,
     const double longitude_deg,
     const std::filesystem::path& request_dir

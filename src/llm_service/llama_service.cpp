@@ -1,4 +1,5 @@
 #include "llama_service.hpp"
+#include "config/llm.hpp"
 
 #include <sys/wait.h>
 #include <unistd.h>
@@ -53,7 +54,7 @@ std::string EncodeImage(const std::filesystem::path& path) {
 
 }  // namespace
 
-LlamaService::LlamaService(RuntimeConfig config) : config_ {std::move(config)} {
+LlamaService::LlamaService(LlmConfig config) : config_ {std::move(config)} {
     grammar_ = ReadGrammar(config_.btree_grammar_path);
     if (grammar_.empty()) {
         spdlog::critical("LlamaService::LlamaService: Grammar is empty.");

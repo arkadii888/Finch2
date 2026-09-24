@@ -10,7 +10,7 @@
 #include "llm_service/llm_service.hpp"
 #include "map_image_service.hpp"
 #include "pixel_btree.hpp"
-#include "config/runtime_config.hpp"
+#include "config/llm.hpp"
 #include "vehicle/vehicle.hpp"
 
 class LlmOutput {
@@ -32,7 +32,7 @@ class LlmOutput {
 
 class Agent {
  public:
-    Agent(Vehicle& vehicle, LlmService& llm_service, RuntimeConfig config);
+    Agent(Vehicle& vehicle, LlmService& llm_service, LlmConfig config);
 
     void Run();
 
@@ -61,7 +61,7 @@ class Agent {
     LlmOutput llm_output_;
     LlmService& llm_service_;
     Vehicle& vehicle_;
-    RuntimeConfig config_;
+    LlmConfig config_;
     std::atomic<bool> is_processing_ {false};
     std::mutex btree_mutex_;
     std::jthread request_thread_;
