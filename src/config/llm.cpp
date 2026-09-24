@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <spdlog/spdlog.h>
+
 #ifndef PROJECT_ROOT_DIR
 #error "PROJECT_ROOT_DIR is not defined!"
 #endif
@@ -11,9 +13,8 @@ namespace {
 
 void RequireFile(const std::filesystem::path& path, const char* name) {
     if (!std::filesystem::is_regular_file(path)) {
-        throw std::runtime_error {
-            std::string {name} + " file not found: " + path.string()
-        };
+        spdlog::critical("LlmConfig::RequireFile: File not found {}",  path.string());
+        std::exit(EXIT_FAILURE);
     }
 }
 
