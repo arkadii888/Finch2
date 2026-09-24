@@ -36,7 +36,7 @@ class LlamaService : public LlmService {
 
         int batch_size {2'048};
         bool cont_batching {true};
-        std::string flash_attn {"on"};  // on | off | auto
+        std::string flash_attn {"on"};
         bool log_disable {true};
         bool mlock {false};
         bool no_mmap {false};
@@ -47,7 +47,7 @@ class LlamaService : public LlmService {
     };
 
     nlohmann::json PostCompletion(const nlohmann::json& body);
-    std::string ReadTextFile(const std::filesystem::path& path) const;
+    std::string ReadGrammar(const std::filesystem::path& path) const;
 
     BackendConfig backend_config_ {};
     httplib::Client client_ {"127.0.0.1", globals::llm_server_port};

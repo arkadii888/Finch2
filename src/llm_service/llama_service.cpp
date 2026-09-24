@@ -54,10 +54,10 @@ std::string EncodeImage(const std::filesystem::path& path) {
 }  // namespace
 
 LlamaService::LlamaService(RuntimeConfig config) : config_ {std::move(config)} {
-    grammar_ = ReadTextFile(config_.btree_grammar_path);
+    grammar_ = ReadGrammar(config_.btree_grammar_path);
 }
 
-std::string LlamaService::ReadTextFile(const std::filesystem::path& path) const {
+std::string LlamaService::ReadGrammar(const std::filesystem::path& path) const {
     std::ifstream input {path};
     if (!input) {
         throw std::runtime_error {"Could not read grammar: " + path.string()};
