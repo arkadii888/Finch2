@@ -34,16 +34,16 @@ class LlamaService : public LlmService {
             int gpu_layers {0};
         #endif
 
-        int batch_size {2'048};
         bool cont_batching {true};
-        std::string flash_attn {"on"};
         bool log_disable {true};
         bool mlock {false};
         bool no_mmap {false};
+        int batch_size {2'048};
         int parallel {1};
         int threads {-1};
         int threads_batch {-1};
         int ubatch_size {512};
+        std::string flash_attn {"on"};
     };
 
     nlohmann::json PostCompletion(const nlohmann::json& body);
