@@ -12,5 +12,5 @@ bool SequenceNode::Validate() const {
 }
 
 std::string SequenceNode::GetPrompt() const {
-    return R"(sequence: {"type": "sequence", "children": [...]})";
+    return "sequence: {\"type\":\"sequence\",\"children\":[...]}";
 }

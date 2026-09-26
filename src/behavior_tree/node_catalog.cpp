@@ -21,7 +21,7 @@ NodeCatalog::NodeCatalog() {
     nodes_.push_back(std::make_unique<RtlNode>());
     nodes_.push_back(std::make_unique<TakeoffNode>());
 
-    nodes_.push_back(std::make_unique<FibNode>(1));
+    //nodes_.push_back(std::make_unique<FibNode>(1));
 }
 
 const std::vector<std::unique_ptr<Node>>& NodeCatalog::GetNodes() const {

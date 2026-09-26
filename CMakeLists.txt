@@ -105,8 +105,9 @@ add_executable(run
     src/agent.cpp
     src/api_server.cpp
     src/logger.hpp
-    src/map_image_service.cpp
-    src/runtime_config.cpp
+    src/map/map_service.cpp
+    src/map/utils.cpp
+    src/config/llm.hpp
 
     src/behavior_tree/btree.cpp
     src/behavior_tree/node_catalog.cpp
@@ -131,8 +132,8 @@ target_sources(run
     PUBLIC
         FILE_SET CXX_MODULES
         BASE_DIRS src
-        FILES src/globals.cppm
-        FILES src/lifecycle.cppm
+        FILES src/config/globals.cppm
+        FILES src/config/lifecycle.cppm
 )
 
 target_include_directories(run PRIVATE src)

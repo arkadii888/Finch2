@@ -33,5 +33,5 @@ bool LandNode::Validate() const {
 }
 
 std::string LandNode::GetPrompt() const {
-    return R"({"type": "action", "land": {}})";
+    return "land: {\"type\":\"action\",\"land\":{}}";
 }

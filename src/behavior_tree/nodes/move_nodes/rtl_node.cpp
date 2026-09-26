@@ -33,5 +33,5 @@ bool RtlNode::Validate() const {
 }
 
 std::string RtlNode::GetPrompt() const {
-    return R"({"type": "action", "rtl": {}})";
+    return "rtl: {\"type\":\"action\",\"rtl\":{}}";
 }

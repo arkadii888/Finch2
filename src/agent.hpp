@@ -9,8 +9,9 @@
 #include "behavior_tree/btree.hpp"
 #include "behavior_tree/node_catalog.hpp"
 #include "llm_service/llm_service.hpp"
-#include "map_image_service.hpp"
-#include "runtime_config.hpp"
+#include "map/map_service.hpp"
+#include "map/utils.hpp"
+#include "config/llm.hpp"
 #include "vehicle/vehicle.hpp"
 
 class LlmOutput {
@@ -32,7 +33,7 @@ class LlmOutput {
 
 class Agent {
  public:
-    Agent(Vehicle& vehicle, LlmService& llm_service, RuntimeConfig config);
+    Agent(Vehicle& vehicle, LlmService& llm_service, LlmConfig config);
 
     void Run();
 
@@ -48,8 +49,12 @@ class Agent {
     bool ProcessInput(const std::string& input);
 
  private:
-    std::string BuildSystemPrompt(const Telemetry& telemetry) const;
-    void HandleOutput(std::string output, const std::filesystem::path& request_dir);
+    std::string BuildUserPrompt(const Telemetry& telemetry, const std::string& mission) const;
+    void HandleOutput(
+        std::string output,
+        const MapBounds& bounds,
+        const std::filesystem::path& request_dir
+    );
     void ProcessRequest(std::string input, Telemetry telemetry);
     NodeStatus TickNode(Node* node);
 
@@ -58,7 +63,7 @@ class Agent {
     LlmService& llm_service_;
     NodeCatalog node_catalog_;
     Vehicle& vehicle_;
-    RuntimeConfig config_;
+    LlmConfig config_;
     std::atomic<bool> is_processing_ {false};
     std::mutex btree_mutex_;
     std::jthread request_thread_;

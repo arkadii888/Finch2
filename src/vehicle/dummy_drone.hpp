@@ -24,4 +24,7 @@ class DummyDrone : public Vehicle {
 
  private:
     Telemetry telemetry_;
+    const double home_latitude_deg_ {46.989'705};
+    const double home_longitude_deg_ {7.463'160};
+    const float home_absolute_altitude_m_ {554.f};
 };

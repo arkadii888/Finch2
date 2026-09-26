@@ -115,10 +115,7 @@ bool GoToNode::Validate() const {
 }
 
 std::string GoToNode::GetPrompt() const {
-    return R"({"type": "action", "go_to": {
-        "latitude_deg": <degrees_double>,
-        "longitude_deg": <degrees_double>,
-        "relative_altitude_m": <meters_float, height above the reference altitude - always include this, even if unchanged from the previous movement>,
-        "reference_altitude_m": <meters_float AMSL, optional - omit to use home's ground elevation; only set this to a different location's ground elevation (e.g. read from a map) when relative_altitude_m should be measured above that location instead of home>,
-        "yaw_deg": <degrees_float, optional - omit to face the direction of travel>}})";
+    return "go_to: {\"type\":\"action\",\"go_to\":{\"x\":<int>,\"y\":<int>,"
+    "\"relative_altitude_m\":<f>,\"reference_altitude_m\":<f optional AMSL>,"
+    "\"yaw_deg\":<f optional>}}";
 }

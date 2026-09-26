@@ -18,7 +18,7 @@ bool ParallelNode::Validate() const {
 }
 
 std::string ParallelNode::GetPrompt() const {
-    return R"(parallel: {"type": "parallel", "success_threshold": 1, "children": [...]})";
+    return "parallel: {\"type\":\"parallel\",\"success_threshold\":1,\"children\":[...]}";
 }
 
 int ParallelNode::GetSuccessThreshold() const {

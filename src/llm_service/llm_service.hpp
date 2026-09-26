@@ -5,7 +5,6 @@
 #include <string>
 
 struct CompletionRequest {
-    std::string system_prompt;
     std::string user_prompt;
     std::optional<std::filesystem::path> image_path;
 };

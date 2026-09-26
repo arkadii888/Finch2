@@ -1,9 +1,11 @@
 #include "llama_service.hpp"
+#include "config/llm.hpp"
 
 #include <sys/wait.h>
 #include <unistd.h>
 
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <stdexcept>
@@ -52,14 +54,33 @@ std::string EncodeImage(const std::filesystem::path& path) {
 
 }  // namespace
 
-LlamaService::LlamaService(RuntimeConfig config) : config_ {std::move(config)} {}
+LlamaService::LlamaService(LlmConfig config) : config_ {std::move(config)} {
+    grammar_ = ReadGrammar(config_.btree_grammar_path);
+    if (grammar_.empty()) {
+        spdlog::critical("LlamaService::LlamaService: Grammar is empty.");
+        std::exit(EXIT_FAILURE);
+    }
+}
+
+std::string LlamaService::ReadGrammar(const std::filesystem::path& path) const {
+    std::ifstream input {path};
+    if (!input) {
+        spdlog::error("LlamaService::ReadGrammar: Failed.");
+        return "";
+    }
+    return {
+        std::istreambuf_iterator<char> {input},
+        std::istreambuf_iterator<char> {}
+    };
+}
 
 void LlamaService::Run() {
     client_.set_connection_timeout(10, 0);
-    client_.set_read_timeout(300, 0);
+    client_.set_read_timeout(600, 0);
 
     if ((pid_ = fork()) < 0) {
-        throw std::runtime_error {"Could not fork llama-server"};
+        spdlog::critical("LlamaService::Run: Could not fork.");
+        std::exit(EXIT_FAILURE);
     }
 
     if (pid_ == 0) {
@@ -121,11 +142,12 @@ void LlamaService::Run() {
         _exit(1);
     }
 
-    auto deadline {std::chrono::steady_clock::now() + std::chrono::seconds {120}};
+    auto deadline {std::chrono::steady_clock::now() + std::chrono::seconds {300}};
     while (std::chrono::steady_clock::now() < deadline) {
         if (waitpid(pid_, nullptr, WNOHANG) > 0) {
             pid_ = -1;
-            throw std::runtime_error {"llama-server crashed during startup"};
+            spdlog::critical("LlamaService::Run: Crashed.");
+            std::exit(EXIT_FAILURE);
         }
 
         auto result {client_.Get("/health")};
@@ -139,8 +161,11 @@ void LlamaService::Run() {
 
         std::this_thread::sleep_for(std::chrono::milliseconds {500});
     }
+
     Stop();
-    throw std::runtime_error {"llama-server startup timed out"};
+
+    spdlog::critical("LlamaService::Run: Timed out.");
+    std::exit(EXIT_FAILURE);
 }
 
 void LlamaService::Stop() {
@@ -150,6 +175,21 @@ void LlamaService::Stop() {
         pid_ = -1;
         spdlog::info("LlamaService::Stop: Stopped.");
     }
+}
+
+nlohmann::json LlamaService::PostCompletion(const nlohmann::json& body) {
+    auto result {
+        client_.Post("/v1/chat/completions", body.dump(), "application/json")
+    };
+    if (!result) {
+        throw std::runtime_error {"connection error"};
+    }
+    if (result->status != 200) {
+        throw std::runtime_error {
+            "HTTP " + std::to_string(result->status) + ": " + result->body
+        };
+    }
+    return nlohmann::json::parse(result->body);
 }
 
 std::string LlamaService::Complete(const CompletionRequest& request) {
@@ -166,30 +206,19 @@ std::string LlamaService::Complete(const CompletionRequest& request) {
             }}
         });
     }
-    const nlohmann::json body {
+
+    nlohmann::json body {
         {"model", config_.model_path.string()},
         {"messages", {
-            {{"role", "system"}, {"content", request.system_prompt}},
-            {{"role", "user"},   {"content", user_content}},
+            {{"role", "user"}, {"content", user_content}},
         }},
-        {"response_format", {{"type", "json_object"}}},
+        {"grammar", grammar_},
         {"stream", false},
-        {"temperature", config_.llama_temperature}
+        {"temperature", config_.llama_temperature},
+        {"max_tokens", config_.llama_max_tokens}
     };
 
-    auto result {
-        client_.Post("/v1/chat/completions", body.dump(), "application/json")
-    };
-    if (!result) {
-        throw std::runtime_error {"connection error"};
-    }
-    if (result->status != 200) {
-        throw std::runtime_error {
-            "HTTP " + std::to_string(result->status) + ": " + result->body
-        };
-    }
-
-    const nlohmann::json root = nlohmann::json::parse(result->body);
+    const nlohmann::json root = PostCompletion(body);
     auto output {root.at("choices").at(0).at("message").at("content").get<std::string>()};
     spdlog::info("LlamaService::Complete: {}", output);
     return output;

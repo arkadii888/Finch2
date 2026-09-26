@@ -38,6 +38,5 @@ bool TakeoffNode::Validate() const {
 }
 
 std::string TakeoffNode::GetPrompt() const {
-    return R"({"type": "action", "takeoff": {
-        "relative_altitude_m": <meters_float, optional - omit to use the default takeoff altitude>}})";
+    return "takeoff: {\"type\":\"action\",\"takeoff\":{\"relative_altitude_m\":<f optional>}}";
 }

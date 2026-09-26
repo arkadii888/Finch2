@@ -12,5 +12,5 @@ bool FallbackNode::Validate() const {
 }
 
 std::string FallbackNode::GetPrompt() const {
-    return R"(fallback: {"type": "fallback", "children": [...]})";
+    return "fallback: {\"type\":\"fallback\",\"children\":[...]}";
 }
