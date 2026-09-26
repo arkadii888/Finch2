@@ -133,8 +133,8 @@ void MapBounds::MapBoundsFromCenter(
     SetNorth(latitude_deg + dlat);
 }
 
-nlohmann::json MaterializeWgs84Btree(
-    const nlohmann::json& pixel_tree,
+nlohmann::json ConvertPixelsToCoordinates(
+    const nlohmann::json& unprocessed_tree,
     const MapBounds& bounds,
     const int max_go_to
 ) {
@@ -145,7 +145,7 @@ nlohmann::json MaterializeWgs84Btree(
         throw std::runtime_error {"Map bounds have zero width or height"};
     }
 
-    nlohmann::json tree = pixel_tree;
+    nlohmann::json tree = unprocessed_tree;
     int go_to_count {0};
     ConvertNode(tree, bounds, go_to_count, max_go_to);
     return tree;

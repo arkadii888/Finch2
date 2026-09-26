@@ -30,8 +30,8 @@ class MapBounds {
 
 // Validates a flight-only pixel tree (at most max_go_to waypoints), strips n_go_to,
 // and replaces each go_to x/y with WGS84 latitude_deg/longitude_deg.
-nlohmann::json MaterializeWgs84Btree(
-    const nlohmann::json& pixel_tree,
+nlohmann::json ConvertPixelsToCoordinates(
+    const nlohmann::json& unprocessed_tree,
     const MapBounds& bounds,
     int max_go_to
 );

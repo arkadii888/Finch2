@@ -152,18 +152,16 @@ void Agent::HandleOutput(
     const MapBounds& bounds,
     const std::filesystem::path& request_dir
 ) {
-    nlohmann::json pixel_tree = nlohmann::json::parse(output);
-    nlohmann::json json_tree = MaterializeWgs84Btree(
-        pixel_tree, bounds, config_.max_go_to
-    );
+    nlohmann::json unprocessed_tree = nlohmann::json::parse(output);
+    nlohmann::json processed_tree = ConvertPixelsToCoordinates(unprocessed_tree, bounds, config_.max_go_to);
     BTree candidate;
-    if (!candidate.Build(json_tree)) {
+    if (!candidate.Build(processed_tree)) {
         throw std::runtime_error {"Model returned an invalid behavior tree"};
     }
-    WriteText(request_dir / "btree.json", json_tree.dump(2));
+    WriteText(request_dir / "btree.json", processed_tree.dump(2));
     std::lock_guard lock {btree_mutex_};
     btree_ = std::move(candidate);
-    llm_output_.Set(json_tree.dump());
+    llm_output_.Set(processed_tree.dump());
 }
 
 std::string Agent::BuildUserPrompt(
