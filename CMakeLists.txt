@@ -105,8 +105,8 @@ add_executable(run
     src/agent.cpp
     src/api_server.cpp
     src/logger.hpp
-    src/map_image_service.cpp
-    src/pixel_btree.cpp
+    src/map/map_image_service.cpp
+    src/map/pixel_btree.cpp
     src/config/llm.hpp
 
     src/behavior_tree/btree.cpp
