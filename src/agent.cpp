@@ -120,14 +120,6 @@ void Agent::ProcessRequest(std::string input, Telemetry telemetry) {
         const auto request_dir = CreateRequestDirectory(config_.inference_log_dir);
         WriteText(request_dir / "prompt.txt", input);
 
-        const MapBounds bounds {
-            MapBoundsFromCenter(
-                telemetry.latitude_deg,
-                telemetry.longitude_deg,
-                config_.map_half_window_m
-            )
-        };
-
         const CompletionRequest request {
             BuildUserPrompt(telemetry, input),
             RenderMapImage(
@@ -143,6 +135,14 @@ void Agent::ProcessRequest(std::string input, Telemetry telemetry) {
         }
 
         WriteText(request_dir / "raw_response.txt", output);
+
+        const MapBounds bounds {
+            MapBoundsFromCenter(
+                telemetry.latitude_deg,
+                telemetry.longitude_deg,
+                config_.map_half_window_m
+            )
+        };
         HandleOutput(std::move(output), bounds, request_dir);
     } catch (const std::exception& error) {
         spdlog::error("Agent::ProcessRequest: {}", error.what());

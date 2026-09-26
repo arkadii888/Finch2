@@ -8,8 +8,8 @@
 
 #include "behavior_tree/btree.hpp"
 #include "llm_service/llm_service.hpp"
-#include "map/map_image_service.hpp"
-#include "map/pixel_btree.hpp"
+#include "map/map_service.hpp"
+#include "map/utils.hpp"
 #include "config/llm.hpp"
 #include "vehicle/vehicle.hpp"
 
