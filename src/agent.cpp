@@ -135,15 +135,11 @@ void Agent::ProcessRequest(std::string input, Telemetry telemetry) {
         }
 
         WriteText(request_dir / "raw_response.txt", output);
-
-        const MapBounds bounds {
-            MapBoundsFromCenter(
-                telemetry.latitude_deg,
-                telemetry.longitude_deg,
-                config_.map_half_window_m
-            )
-        };
-        HandleOutput(std::move(output), bounds, request_dir);
+        HandleOutput(std::move(output),
+            {telemetry.latitude_deg,
+            telemetry.longitude_deg,
+            config_.map_half_window_m},
+            request_dir);
     } catch (const std::exception& error) {
         spdlog::error("Agent::ProcessRequest: {}", error.what());
         llm_output_.Set(nlohmann::json{{"error", error.what()}}.dump());

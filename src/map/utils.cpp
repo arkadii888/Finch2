@@ -44,16 +44,16 @@ void ConvertNode(nlohmann::json& node, const MapBounds& bounds, int& go_to_count
             };
         }
 
-        const double span_x {bounds.east - bounds.west};
-        const double span_y {bounds.north - bounds.south};
+        const double span_x {bounds.GetEast() - bounds.GetWest()};
+        const double span_y {bounds.GetNorth() - bounds.GetSouth()};
         nlohmann::json converted {
             {
                 "latitude_deg",
-                bounds.north - (static_cast<double>(y) / PIXEL_MAX) * span_y
+                bounds.GetNorth() - (static_cast<double>(y) / PIXEL_MAX) * span_y
             },
             {
                 "longitude_deg",
-                bounds.west + (static_cast<double>(x) / PIXEL_MAX) * span_x
+                bounds.GetWest() + (static_cast<double>(x) / PIXEL_MAX) * span_x
             },
             {"relative_altitude_m", go_to.at("relative_altitude_m")},
         };
@@ -75,7 +75,43 @@ void ConvertNode(nlohmann::json& node, const MapBounds& bounds, int& go_to_count
 
 }  // namespace
 
-MapBounds MapBoundsFromCenter(
+MapBounds::MapBounds(double latitude_deg, double longitude_deg, double half_window_m) {
+    MapBoundsFromCenter(latitude_deg, longitude_deg, half_window_m);
+}
+
+double MapBounds::GetWest() const {
+    return west_;
+}
+
+void MapBounds::SetWest(double west) {
+    west_ = west;
+}
+
+double MapBounds::GetSouth() const {
+    return south_;
+}
+
+void MapBounds::SetSouth(double south) {
+    south_ = south;
+}
+
+double MapBounds::GetEast() const {
+    return east_;
+}
+
+void MapBounds::SetEast(double east) {
+    east_ = east;
+}
+
+double MapBounds::GetNorth() const {
+    return north_;
+}
+
+void MapBounds::SetNorth(double north) {
+    north_ = north;
+}
+
+void MapBounds::MapBoundsFromCenter(
     const double latitude_deg,
     const double longitude_deg,
     const double half_window_m
@@ -90,12 +126,11 @@ MapBounds MapBoundsFromCenter(
         half_window_m
         / (METERS_PER_DEG_LAT * std::max(std::cos(latitude_rad), 1e-6))
     };
-    return {
-        longitude_deg - dlon,
-        latitude_deg - dlat,
-        longitude_deg + dlon,
-        latitude_deg + dlat,
-    };
+
+    SetWest(longitude_deg - dlon);
+    SetSouth(latitude_deg - dlat);
+    SetEast(longitude_deg + dlon);
+    SetNorth(latitude_deg + dlat);
 }
 
 nlohmann::json MaterializeWgs84Btree(
@@ -106,7 +141,7 @@ nlohmann::json MaterializeWgs84Btree(
     if (max_go_to < 1) {
         throw std::runtime_error {"max_go_to must be at least 1"};
     }
-    if (bounds.east == bounds.west || bounds.north == bounds.south) {
+    if (bounds.GetEast() == bounds.GetWest() || bounds.GetNorth() == bounds.GetSouth()) {
         throw std::runtime_error {"Map bounds have zero width or height"};
     }
 
