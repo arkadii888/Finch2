@@ -36,7 +36,7 @@ elif [ "$OS" = "Linux" ]; then
     echo "🐧 Linux detected ($ARCH)."
 
     echo "📦 Installing system packages..."
-    sudo apt update
+    sudo apt update || echo "⚠️ Some apt repos returned errors (common with third-party repos); continuing with cached indexes."
     sudo apt install -y gcc-14 g++-14 ninja-build python3 python3-pip python3-venv curl wget git
 
     export CC=gcc-14
