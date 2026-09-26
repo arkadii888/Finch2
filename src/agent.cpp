@@ -211,17 +211,12 @@ std::string Agent::BuildUserPrompt(
         "apart. Do not add nearly collinear or duplicate waypoints.\n"
         "Create at most " + std::to_string(config_.max_go_to) + " waypoints.\n";
 
+    prompt += "\nNodes:\n";
+    for (const auto& node : node_catalog_.GetNodes()) {
+        prompt += node->GetPrompt() + "\n";
+    }
+
     prompt +=
-        "\nNodes:\n"
-        "sequence: {\"type\":\"sequence\",\"children\":[...]}\n"
-        "fallback: {\"type\":\"fallback\",\"children\":[...]}\n"
-        "parallel: {\"type\":\"parallel\",\"success_threshold\":1,\"children\":[...]}\n"
-        "go_to: {\"type\":\"action\",\"go_to\":{\"x\":<int>,\"y\":<int>,"
-        "\"relative_altitude_m\":<f>,\"reference_altitude_m\":<f optional AMSL>,"
-        "\"yaw_deg\":<f optional>}}\n"
-        "land: {\"type\":\"action\",\"land\":{}}\n"
-        "rtl: {\"type\":\"action\",\"rtl\":{}}\n"
-        "takeoff: {\"type\":\"action\",\"takeoff\":{\"relative_altitude_m\":<f optional>}}\n"
         "\nRules: non-empty children; parallel success_threshold>=1; one intent per action; "
         "raw JSON only with numeric literals.\n"
         "\nMission: " + mission;

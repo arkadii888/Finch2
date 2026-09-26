@@ -7,6 +7,7 @@
 #include <thread>
 
 #include "behavior_tree/btree.hpp"
+#include "behavior_tree/node_catalog.hpp"
 #include "llm_service/llm_service.hpp"
 #include "map/map_service.hpp"
 #include "map/utils.hpp"
@@ -60,6 +61,7 @@ class Agent {
     BTree btree_;
     LlmOutput llm_output_;
     LlmService& llm_service_;
+    NodeCatalog node_catalog_;
     Vehicle& vehicle_;
     LlmConfig config_;
     std::atomic<bool> is_processing_ {false};
